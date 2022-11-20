@@ -4,7 +4,7 @@
 
 Python Cat Detector is a "2-days-solution" that detects the presence of my cat ["Cookie"](tests/cookie.jpeg) near her litterbox and alerts me to clean it.
 
-Basically, the application grabs video frames from an IP camera RTSP stream, uses a neural network to identify a cat object, and play a message in a speaker.
+Basically, the application grabs video frames from an IP camera RTSP stream, uses a [neural network](pycatdetector/NeuralNet.py) to identify a cat object, and play a message in a speaker.
 
 All hardware and software used by pycatdetector (i.e. Camera, Linux Server and Speaker) can reach each other via my local WiFi network.
 
