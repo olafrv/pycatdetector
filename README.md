@@ -1,10 +1,10 @@
-# Introduction
+# About PyCatDetector
 
 !["Cookie"](tests/cookie.jpeg) 
 
-Python Cat Detector (pydetector) is a "2-days-solution" that detects the presence of my cat ["Cookie"](tests/cookie.jpeg) near her litterbox to alert me to clean it.
+Python Cat Detector is a "2-days-solution" that detects the presence of my cat ["Cookie"](tests/cookie.jpeg) near her litterbox and alerts me to clean it.
 
-Basically, the application grabs frames from an IP camera RTSP stream, uses a neural network to identify a cat object, and play a message in a speaker.
+Basically, the application grabs video frames from an IP camera RTSP stream, uses a neural network to identify a cat object, and play a message in a speaker.
 
 All hardware and software used by pycatdetector (i.e. Camera, Linux Server and Speaker) can reach each other via my local WiFi network.
 
@@ -15,6 +15,7 @@ The software architecture is pretty simple (or not?) as follows:
 * Detector.py -> Queue (Test) -> Screener.py (Mathplotlib)
 * Detector.py -> Queue (Detections) -> Notifier.py
 * Notifier.py -> HAGoogleSay.py (HomeAssistant API)
+
 # Requirements
 
 This Python package has been tested and designed for:
@@ -31,7 +32,6 @@ This Python package has been tested and designed for:
   * (Optional) [HomeAssistant](https://www.home-assistant.io/) endpoint for Text-To-Speach (TTS) service.
 
 *NOTE:* If your Linux is a Virtual Machine running on a Windows host you need to disable Windows Security > Core Isolation > Memory Protection.
-
 
 # Usage
 
