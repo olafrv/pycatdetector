@@ -1,0 +1,14 @@
+{
+    "LOG_TTY" : "yes",
+    "LOG_DIR" : "/tmp",
+    "LOG_LEVEL" : "INFO",
+    "RTSP_URL" : "rtsp://username:password@192.168.0.100:554/stream1",
+    "HEADLESS" : "no",
+    "OBJECTS": [ "cat" ],
+    "HOMEASSISTANT_ON" : "no",
+    "HOMEASSISTANT_URL": "http://homeassistant.local:8123/api",
+    "HOMEASSISTANT_TOKEN": "tokenABC123",
+    "HOMEASSISTANT_ENTITY": "media_player.google_nest",
+    "HOMEASSISTANT_MESSAGE": "The cat is in the living room.",
+    "HOMEASSISTANT_LANGUAGE": "us"
+}
