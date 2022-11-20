@@ -1,11 +1,13 @@
 ---
-version: 3
+version: "3"
 services:
-  image: olafrv/pycatdetector:latest
-  container_name: pycatdetector
-  volumes:
-  - ./config.json:/opt/pycatdetector/config.json
-  - ./logs:/opt/pycatdetector/logs
+  pycatdetector:
+    build: .
+    image: olafrv/pycatdetector:latest
+    container_name: pycatdetector
+    volumes:
+    - ./config.json:/opt/pycatdetector/config.json
+    - ./logs:/opt/pycatdetector/logs
 
 # networks:
 #  default:
