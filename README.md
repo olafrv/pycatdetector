@@ -1,6 +1,6 @@
 # Introduction
 
-!["Cookie"](tests/cookie.jpeg | width=100) 
+!["Cookie"](tests/cookie.jpeg) 
 
 Python Cat Detector (pydetector) is a "2-days-solution" that detects the presence of my cat ["Cookie"](tests/cookie.jpeg) near her litterbox to alert me to clean it.
 
