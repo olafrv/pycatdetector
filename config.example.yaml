@@ -1,7 +1,7 @@
 ---
 # PyCatDetector Basics
 log_tty: true
-log_dir: "/tmp"
+log_dir: "./logs"
 log_level: "info"
 rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: true
