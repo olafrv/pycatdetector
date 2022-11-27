@@ -46,34 +46,37 @@ mv config.example.yaml config.yaml # edit manually afterwards
 ```
 ## Run (Python)
 ```shell
-make install
+make install      # install end user requirements
 make check-config # checks for YAML parsing errors
-make run
-```
-
-## Run (Binary Dynamic Linked)
-```shell
-make build
-make check-config # checks for YAML parsing errors
-make run.bin
+make run          # with python3 interpreter
 ```
 
 ## Docker
 
 ```shell
-make docker.build
+make docker.build # build docker image
 make check-config # checks for YAML parsing errors
-make docker.run
-```
-## Docker Compose
-```
-make docker.build
-docker compose up # add '-d' to run in foreground
+make docker.run   # A) Without compose
+docker-compose up # B) With compose, add '-d' to run in foreground
+make docker exec  # Open bash in the container
 ```
 
 ## Uninstall
 ```
-make uninstall
+make uninstall    # remore python reqs. and delete disposable folders
+```
+
+## Advanced/Developement
+```shell
+make install.dev  # install development requirements
+make profile      # run python3 profiling over main.py
+make profile.view # check profiling results with snake
+make build        # build binary with nuitka3
+make check-config # checks for YAML parsing errors
+make run.bin      # run dist/main.bin dynamically linked binary
+make docker.push  # push docker image, update Makefile globlal vars!
+make docker.clean # delete local docker images of this project
+make clean        # delete local disposable folders of this project
 ```
 
 # References

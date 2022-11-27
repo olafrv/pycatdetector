@@ -1,4 +1,5 @@
-NAME=olafrv/pycatdetector
+USERNAME=olafrv
+NAME=ghcr.io/${USERNAME}/pycatdetector
 VERSION=1.1.0
 CPUS=2
 
@@ -60,10 +61,12 @@ build: install.dev
 
 profile: install.dev
 	# https://docs.python.org/3/library/profile.html
-	@ . venv/bin/activate && python3 -m cProfile -o main.prof main.py
+	@ mkdir -p profile \
+		&& . venv/bin/activate
+		&& python3 -m cProfile -o profile/main.prof main.py
 
 profile.view: install.dev
-	@ . venv/bin/activate && snakeviz main.prof
+	@ . venv/bin/activate && snakeviz profile/main.prof
 
 docker.run:
 	@ docker run --rm --cpus ${CPUS} \
@@ -82,6 +85,9 @@ docker.build:
 	@ docker tag ${NAME}:latest ${NAME}:${VERSION}
 
 docker.push:
+	# Personal Access Token (PAT) from GitHub
+	# https://github.com/features/packages
+	echo ${PAT} | docker login ghcr.io --username ${USERNAME} --password-stdin
 	@ docker push ${NAME}:latest
 	@ docker push ${NAME}:${VERSION}
 
