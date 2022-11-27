@@ -7,17 +7,17 @@ RUN apt update -y \
     && apt clean
 
 FROM base 
-ENV PYTHONUNBUFFERED 1
 WORKDIR /opt/pycatdetector
+COPY requirements.txt /opt/pycatdetector
+COPY pycatdetector /opt/pycatdetector/pycatdetector
+COPY main.py /opt/pycatdetector/
+
+ENV PYTHONUNBUFFERED 1
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-COPY requirements.txt /opt/pycatdetector
-RUN pip install -Ur requirements.txt \
+RUN pip3 install -Ur requirements.txt \
     && pip install --upgrade pip
-RUN mkdir logs
-COPY pycatdetector /opt/pycatdetector/pycatdetector
-COPY *.py /opt/pycatdetector/
-COPY config.yaml .
-ENV PATH="/opt/venv/bin:$PATH"
+RUN python3 -c "from pycatdetector import NeuralNet; NeuralNet()";
+
 ENTRYPOINT [ "python3" , "main.py" ]
 CMD [ "-c" ]
