@@ -19,6 +19,10 @@ def main():
             exit(0)
     
     enable_logging(config)
+    logger = logging.getLogger(__name__)
+
+    logger.info("PATH: " + os.environ["PATH"])
+    logger.info("Python Sys Prefix: " + sys.prefix)
 
     signal.signal(signal.SIGINT, handler)
     recorder = Recorder(config.get("rtsp_url"))

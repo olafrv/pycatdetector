@@ -42,26 +42,38 @@ This Python package has been tested and designed for:
 ```shell
 git clone "https://github.com/olafrv/pycatdetector.git"
 cd pycatdetector
-mv config.example.yaml config.yaml   # ... and edit config options
+mv config.example.yaml config.yaml # edit manually afterwards
 ```
-## Basic
+## Run (Python)
 ```shell
 make install
-make check-config # only if config.yaml changes to check parsing errors
+make check-config # checks for YAML parsing errors
 make run
 ```
 
+## Run (Binary Dynamic Linked)
+```shell
+make build
+make check-config # checks for YAML parsing errors
+make run.bin
+```
+
 ## Docker
 
 ```shell
 make docker.build
-make check-config # only if config.yaml changes to check parsing errors
+make check-config # checks for YAML parsing errors
 make docker.run
 ```
-## Docker
+## Docker Compose
 ```
 make docker.build
-docker compose up   # add '-d' to run in foreground
+docker compose up # add '-d' to run in foreground
+```
+
+## Uninstall
+```
+make uninstall
 ```
 
 # References
