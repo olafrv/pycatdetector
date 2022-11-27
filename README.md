@@ -72,9 +72,8 @@ make install.dev  # install development requirements
 make profile      # run python3 profiling over main.py
 make profile.view # check profiling results with snake
 make build        # build binary with nuitka3
-make check-config # checks for YAML parsing errors
 make run.bin      # run dist/main.bin dynamically linked binary
-make docker.push  # push docker image, update Makefile globlal vars!
+make docker.push  # push docker image, update Makefile global vars!
 make docker.clean # delete local docker images of this project
 make clean        # delete local disposable folders of this project
 ```
