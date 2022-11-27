@@ -2,11 +2,12 @@ NAME=olafrv/pycatdetector
 VERSION=1.1.0
 
 install:
-	apt install -y python3 \
-    	&& apt install -y python3.10-venv\
-    	&& apt install -y --no-install-recommends build-essential gcc \
-    	&& apt install -y ffmpeg \
-    	&& apt clean
+	sudo apt install -y python3 \
+    	&& sudo apt install -y python3.10-venv\
+    	&& sudo apt install -y --no-install-recommends build-essential gcc \
+    	&& sudo apt install -y ffmpeg \
+    	&& sudo apt install patchelf
+		&& sudo apt clean
 	pip install -Ur requirements.txt
 
 install.dev: install
@@ -14,6 +15,13 @@ install.dev: install
 
 run:
 	python3 main.py
+
+bin:
+	# https://nuitka.net/doc/user-manual.html
+	# https://nuitka.net/info/debian-dist-packages.html (Work in ubuntu!)
+	python3 -m nuitka --standalone --onefile --enable-plugin=numpy -o pycatdetector.bin main.py
+	chmod+x pycatdetector.bin
+	./pycatdetector.bin
 
 profile:
 	# https://docs.python.org/3/library/profile.html

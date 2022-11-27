@@ -1,5 +1,4 @@
 from time import sleep
-from queue import Queue
 from matplotlib import pyplot as plt
 import logging
 

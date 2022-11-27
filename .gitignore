@@ -1,10 +1,17 @@
+# python cache
 __pycache__
 *.pyc
+# virtualenv
 venv
-.vscode
+# visualstudio code
+.vscod
 *.swp
-recording
+# logs
 *.log
-config.json
+# configuration
 config.yaml
+# make profile
 main.prof
+# make bin
+main.build
+mail.dist

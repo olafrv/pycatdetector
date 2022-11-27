@@ -2,7 +2,7 @@ import logging
 import threading
 import traceback
 from time import sleep
-from datetime import datetime, timedelta
+from datetime import datetime
 
 class Notifier(threading.Thread):
     detector = None
