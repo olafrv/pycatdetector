@@ -2,8 +2,8 @@
 # PyCatDetector Basics
 log_tty: true
 log_dir: "/tmp"
-log_level: info
-rtsp_url: rtsp://username:password@192.168.1.2:554/stream1
+log_level: "info"
+rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: true
 
 # PyCatDetector Notifiers
@@ -19,7 +19,7 @@ notifiers:
       - "cat"
   discord_webhook:
     enabled: true
-    url: https://discordapp.com/api/webhooks/X/Y
+    url: "https://discordapp.com/api/webhooks/X/Y"
     content: "Hay una planta cerca de la caja de arena."
     objects:
       - "pottedplant"

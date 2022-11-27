@@ -1,5 +1,5 @@
-NAME=pycatdetector
-VERSION=1.0.0
+NAME=olafrv/pycatdetector
+VERSION=1.1.0
 
 install:
 	apt install -y python3 \
@@ -29,7 +29,12 @@ docker.exec:
 	docker run --rm -it --entrypoint /bin/bash ${NAME}:${VERSION}
 
 docker.build:
-	docker build -t ${NAME}:${VERSION} .
+	docker build -t ${NAME}:latest .
+	docker tag ${NAME}:latest ${NAME}:${VERSION}
+
+docker.push:
+	docker push ${NAME}:latest
+	docker push ${NAME}:${VERSION}
 
 docker.clean:
 	docker images | grep ${NAME} | awk '{print $$1":"$$2}' | sort | xargs --no-run-if-empty -n1 docker image rm

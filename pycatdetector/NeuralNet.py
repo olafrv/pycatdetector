@@ -14,13 +14,15 @@ class NeuralNet:
     def analyze(self, image):
         if isinstance(image, str):
             if os.path.exists(image):
-                x, img = data.transforms.presets.ssd.load_test(image, short=256) # short <=> pixels (Bigger is slower)
+                short = image.shape[0] if image.shape[0]<=256 else 256
+                x, img = data.transforms.presets.ssd.load_test(image, short=short) # short <=> pixels (Bigger is slower)
             else:
                 raise FileNotFoundError
         else:
 
             imageNDArray = mx.nd.array(image) # From NumPy Array to Apache MX NDArray
-            x, img = data.transforms.presets.ssd.transform_test(imgs=imageNDArray, short=256) # short <=> pixels (Bigger is slower) 
+            short = image.shape[0] if image.shape[0]<=256 else 256
+            x, img = data.transforms.presets.ssd.transform_test(imgs=imageNDArray, short=short) # short <=> pixels (Bigger is slower) 
 
         class_IDs, scores, bounding_boxes = self.net(x)
 

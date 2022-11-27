@@ -56,7 +56,7 @@ class Detector(threading.Thread):
                 for detection in detections:
                     detection['timestamp'] = str(datetime.now())
                     self.detections.put(detection)
-                    self.logger.info('Queued: '+str(self.images.qsize())+', Detection: ' + repr(detection))
+                    self.logger.info('Queued: '+str(self.images.qsize())+', Shape:'+str(image.shape) + ', Detection: ' + repr(detection))
             else:
                 self.logger.debug("Sleeping "+str(self.sleep_time)+"s due to empty queue...")
                 sleep(self.sleep_time) # Better sleep than not answering signals

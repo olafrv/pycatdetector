@@ -17,7 +17,7 @@ def pt():
 
 def test1():
     start = time.time()
-    with open("tests/cookie.jpeg", 'rb') as fp:
+    with open("tests/tree.jpg", 'rb') as fp:
         str_image = fp.read()
     image = mx.img.imdecode(str_image)
     end = time.time()
@@ -27,7 +27,7 @@ def test1():
 
 def test2():
     start = time.time()
-    image = cv2.imread("tests/cookie.jpeg")
+    image = cv2.imread("tests/tree.jpg")
     image = mx.nd.array(image)
     end = time.time()
     r=round(end-start,6)
