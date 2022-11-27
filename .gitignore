@@ -4,7 +4,7 @@ __pycache__
 # virtualenv
 venv
 # visualstudio code
-.vscod
+.vscode
 *.swp
 # logs
 *.log
@@ -13,5 +13,5 @@ config.yaml
 # make profile
 main.prof
 # make bin
-main.build
-mail.dist
+build
+pycatdetector.bin*

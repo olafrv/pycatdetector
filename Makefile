@@ -19,8 +19,12 @@ run:
 bin:
 	# https://nuitka.net/doc/user-manual.html
 	# https://nuitka.net/info/debian-dist-packages.html (Work in ubuntu!)
-	python3 -m nuitka --standalone --onefile --enable-plugin=numpy -o pycatdetector.bin main.py
-	chmod+x pycatdetector.bin
+	# python3 -m nuitka --standalone --onefile --enable-plugin=numpy -o pycatdetector.bin main.py
+	python3 -m nuitka --include-package=pycatdetector --output-dir=./build \
+		--show-progress --report=pycatdetector.bin.txt -j6 -o ./pycatdetector.bin \
+		main.py
+
+	chmod +x pycatdetector.bin
 	./pycatdetector.bin
 
 profile:
