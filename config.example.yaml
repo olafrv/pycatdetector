@@ -1,0 +1,25 @@
+---
+# PyCatDetector Basics
+log_tty: true
+log_dir: "/tmp"
+log_level: info
+rtsp_url: rtsp://username:password@192.168.1.2:554/stream1
+headless: true
+
+# PyCatDetector Notifiers
+notifiers:
+  ha_google_say:
+    enabled: true
+    url: "http://homeassistant.local:8123/api"
+    token: "token"
+    entity: "media_player.nesti"
+    message: "El gato está en la caja de arena."
+    language: "es"
+    objects:
+      - "cat"
+  discord_webhook:
+    enabled: true
+    url: https://discordapp.com/api/webhooks/X/Y
+    content: "Hay una planta cerca de la caja de arena."
+    objects:
+      - "pottedplant"

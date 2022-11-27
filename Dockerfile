@@ -17,7 +17,7 @@ RUN pip install -Ur requirements.txt \
 RUN mkdir logs
 COPY pycatdetector /opt/pycatdetector/pycatdetector
 COPY *.py /opt/pycatdetector/
-COPY config.json .
+COPY config.yaml .
 ENV PATH="/opt/venv/bin:$PATH"
 ENTRYPOINT [ "python3" , "main.py" ]
 CMD [ "-c" ]

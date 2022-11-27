@@ -6,3 +6,5 @@ venv
 recording
 *.log
 config.json
+config.yaml
+main.prof

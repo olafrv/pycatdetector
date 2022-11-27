@@ -1,37 +1,49 @@
 import logging
 import threading
+import traceback
 from time import sleep
 from datetime import datetime, timedelta
 
 class Notifier(threading.Thread):
     detector = None
     must_stop = False
-    object_labels = None
+    sleep_time = 1 # seconds
+    channels = {}
     logger = None
-    iot = None
     notifications = {}
     delay_seconds = 2*60
 
-    def __init__(self, detector, object_labels, iot):
+
+    def __init__(self, detector):
         threading.Thread.__init__(self)
         self.detector = detector
-        self.object_labels = object_labels
-        self.iot = iot
         self.logger = logging.getLogger(__name__)
 
+    def add_channel(self, channel, labels):
+        for label in labels:
+            if label not in self.channels.keys():    
+                self.channels[label] = [channel]
+            else:
+                self.channels[label].append(channel)
+
     def run(self):
-        self.logger.info("Starting...")
+        self.logger.info("Starting with Thread ID: %s" % (threading.get_native_id()))
 
         detections = self.detector.get_detections()
         while(not self.must_stop):
             if not detections.empty():
                 detection = detections.get(block=False)
-                if detection['label'] in self.object_labels:                    
-                    if self.notify():
-                        self.logger.info('Notified via ' + self.iot.get_name() + ' about ' + repr(detection))
+                detected_label = detection['label']
+                if detected_label in self.channels.keys():                    
+                    for channel in self.channels[detected_label]:
+                        try:
+                            if self.notify(channel):
+                                self.logger.info(channel.get_name() + ': ' + repr(detection))
+                        except:
+                            self.logger.error(traceback.format_exc())
             else:
-                self.logger.debug("Queue is empty.")
-                sleep(0.1) # better to sleep than block=True and not react to termination signals
+                self.logger.debug("Sleeping "+str(self.sleep_time)+"s due to empty queue...")
+                sleep(self.sleep_time) # Better sleep than not answering signals
 
         self.logger.info("Stopped.")
        
@@ -42,15 +54,16 @@ class Notifier(threading.Thread):
         else:
             self.logger.info("Already stopped")
  
-    def notify(self):
+    def notify(self, channel):
         now = datetime.now()
+        channel_name = channel.get_name()
         send = True
-        if self.iot.get_name() in self.notifications:
-            last = self.notifications[self.iot.get_name()]
+        if channel_name in self.notifications:
+            last = self.notifications[channel_name]    # this should instance id not channel name
             delta_seconds = int((now - last).total_seconds())
             if delta_seconds <= self.delay_seconds:
                 send = False
         if send:
-            self.iot.notify()
-            self.notifications[self.iot.get_name()] = now
+            channel.notify()
+            self.notifications[channel_name] = now     # this should instance id not channel name
         return send

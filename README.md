@@ -10,11 +10,14 @@ All hardware and software used by pycatdetector (i.e. Camera, Linux Server and S
 
 The software architecture is pretty simple (or not?) as follows:
 
-* Camera -> RTSP -> Recorder.py (OpenCV)
-* Recorder.py -> Queue (Image) -> Detector.py -> NeuralNet.py (GluonCV / Apache MXNet)
-* Detector.py -> Queue (Test) -> Screener.py (Mathplotlib)
-* Detector.py -> Queue (Detections) -> Notifier.py
-* Notifier.py -> HAGoogleSay.py (HomeAssistant API)
+```
+./pycatdetector
+  Recorder.py (OpenCV) <- RTSP <- IP Camera 
+  Recorder.py -> Queue (Image) -> Detector.py -> NeuralNet.py (GluonCV / Apache MXNet)
+  Detector.py -> Queue (Test) -> Screener.py (Mathplotlib)
+  Detector.py -> Queue (Detections) -> Notifier.py
+  Notifier.py -> ./notifiers/HAGoogleSay.py (HomeAssistant API)
+```
 
 # Requirements
 
@@ -39,11 +42,12 @@ This Python package has been tested and designed for:
 ```shell
 git clone "https://github.com/olafrv/pycatdetector.git"
 cd pycatdetector
-mv config.json.example config.json   # then edit config options
+mv config.example.yaml config.yaml   # ... and edit config options
 ```
 ## Basic
 ```shell
 make install
+make check-config # only if config.yaml changes to check parsing errors
 make run
 ```
 
@@ -51,6 +55,7 @@ make run
 
 ```shell
 make docker.build
+make check-config # only if config.yaml changes to check parsing errors
 make docker.run
 ```
 ## Docker
@@ -60,7 +65,9 @@ docker compose up   # add '-d' to run in foreground
 ```
 
 # References
-## OpenCV
+## OpenCV (not cv2)
+* https://pypi.org/project/opencv-python/
+* https://docs.opencv.org/4.6.0/d6/d00/tutorial_py_root.html
 * https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html
 * https://answers.opencv.org/question/24714/skipping-frames-in-videocapture/
 
@@ -75,6 +82,8 @@ docker compose up   # add '-d' to run in foreground
 
 ## Apache MXNet
 * https://mxnet.apache.org/versions/0.11.0/
+* https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
+https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 

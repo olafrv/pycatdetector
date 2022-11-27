@@ -9,8 +9,18 @@ install:
     	&& apt clean
 	pip install -Ur requirements.txt
 
+install.dev: install
+	pip install -Ur requirements-dev.txt
+
 run:
 	python3 main.py
+
+profile:
+	# https://docs.python.org/3/library/profile.html
+	python3 -m cProfile -o main.prof main.py
+
+profile.view:
+	snakeviz main.prof
 
 docker.run:
 	docker run --rm -it ${NAME}:${VERSION}

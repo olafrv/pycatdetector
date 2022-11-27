@@ -1,34 +1,46 @@
+import os
+import sys
 import signal
-from pycatdetector.Config import Config
-from pycatdetector.Recorder import Recorder
-from pycatdetector.Detector import Detector
-from pycatdetector.Notifier import Notifier
-from pycatdetector.Screener import Screener
-from pycatdetector.NeuralNet import NeuralNet
-from HAGoogleSay import HAGoogleSay
+import logging
+import colorlog
+from pycatdetector import *
+from pycatdetector.channels import *
 
 images = recorder = detector = notifier = screener = None
 
 def main():
     global images, recorder, detector, notifier, screener
     
-    config = Config() # Do not log anything before loading config!
+    config = Config() 
+
+    if len(sys.argv) > 1:
+        if "--check-config" in sys.argv:
+            print(config.config_flat)
+            exit(0)
     
+    enable_logging(config)
+
     signal.signal(signal.SIGINT, handler)
-    recorder = Recorder(config.get("RTSP_URL"))
+    recorder = Recorder(config.get("rtsp_url"))
     detector = Detector(recorder, NeuralNet())
 
-    if config.get("HOMEASSISTANT_ON").lower() == "yes": 
-        service = HAGoogleSay(config.get_regex("^HOMEASSISTANT.*"))
-    else:
-        service = None
-    notifier = Notifier(detector, config.get("OBJECTS"), service)
+    notifier = Notifier(detector)
+    if config.get("notifiers_ha_google_say_enabled"): 
+        notifier.add_channel(
+            HAGoogleSay(config.get_prefix("notifiers_ha_google_say")),
+            config.get("notifiers_ha_google_say_objects")
+        )
+    if config.get("notifiers_discord_webhook_enabled"): 
+        notifier.add_channel(
+            DiscordWebhook(config.get_prefix("notifiers_discord_webhook")),
+            config.get("notifiers_discord_webhook_objects")
+        )
 
     recorder.start()
     detector.start()
     notifier.start()
 
-    if str(config.get("HEADLESS")).lower() != "yes":
+    if not config.get("headless"):
         screener = Screener(detector)
         screener.show()
 
@@ -43,6 +55,29 @@ def handler(signum, frame):
     notifier.stop()
     recorder.stop()
     detector.stop()
+
+def enable_logging(config):
+    # https://docs.python.org/3/howto/logging.html
+    if config.get("log_level").upper() == "DEBUG":
+        logFormat = "[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'"
+    else:
+        logFormat = '[%(asctime)s] %(levelname)s %(name)s - %(message)s'
+    
+    logging.basicConfig(format=logFormat, encoding='utf-8', 
+        filename = os.path.join(config.get("log_dir"), 'detector.log'), 
+            level=eval('logging.' + config.get("log_level").upper()))
+    
+    # https://pypi.org/project/colorlog/
+    if config.get("log_tty"):
+        colorHandler = colorlog.StreamHandler()
+        colorHandler.setFormatter(colorlog.ColoredFormatter('%(log_color)s' + logFormat))
+        logging.getLogger().addHandler(colorHandler)
+    
+    # logging.debug("Logging Test");
+    # logging.info("Logging Test");
+    # logging.warning("Logging Test");
+    # logging.error("Logging Test");
+    # logging.critical("Logging Test");
 
 if __name__ == '__main__':
     main()

@@ -1,5 +1,4 @@
 import os
-import numpy as np
 import mxnet as mx
 from gluoncv import model_zoo, data, utils
 import warnings
@@ -7,20 +6,21 @@ import warnings
 class NeuralNet:
     net = None
 
-    def __init__(self, modelName='ssd_512_resnet50_v1_voc', pretrained=True):
+    def __init__(self, model_name='ssd_512_resnet50_v1_voc', pretrained=True):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore") # https://github.com/apache/mxnet/issues/15281
-            self.net = model_zoo.get_model(name=modelName, pretrained=pretrained)
+            self.net = model_zoo.get_model(name=model_name, pretrained=pretrained)
 
     def analyze(self, image):
         if isinstance(image, str):
             if os.path.exists(image):
-                x, img = data.transforms.presets.ssd.load_test(image, short=512)
+                x, img = data.transforms.presets.ssd.load_test(image, short=256) # short <=> pixels (Bigger is slower)
             else:
                 raise FileNotFoundError
         else:
-            imageNDArray = mx.nd.array(image) # From NumPy Array
-            x, img = data.transforms.presets.ssd.transform_test(imgs=imageNDArray, short=512)     
+
+            imageNDArray = mx.nd.array(image) # From NumPy Array to Apache MX NDArray
+            x, img = data.transforms.presets.ssd.transform_test(imgs=imageNDArray, short=256) # short <=> pixels (Bigger is slower) 
 
         class_IDs, scores, bounding_boxes = self.net(x)
 
@@ -34,11 +34,12 @@ class NeuralNet:
     def getClasses(self):
         return self.net.classes
 
-    def get_scored_labels(self, minScore, result):
+    def get_scored_labels(self, min_score, result):
         classes = result["classes"][0]
         scores = result["scores"][0]
         boxes = result["boxes"][0]
         scored_labels = []
+
 
         # As in https://cv.gluon.ai/_modules/gluoncv/utils/viz/bbox.html
         if mx is not None:
@@ -50,7 +51,7 @@ class NeuralNet:
                 scores = scores.asnumpy()
 
         for i, box in enumerate(boxes):
-            if scores.flat[i]>=minScore and classes.flat[i]>=0:
+            if scores.flat[i]>=min_score and classes.flat[i]>=0:
                 label = self.net.classes[int(classes.flat[i])]
                 score = scores.flat[i]
                 scored_labels.append({
