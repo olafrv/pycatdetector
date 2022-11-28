@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import logging
 
 class Screener:
+
     detector = None
     must_stop = False
     logger = None

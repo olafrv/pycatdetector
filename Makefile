@@ -23,7 +23,7 @@ install.base:
 	@ sudo apt install -y python3 \
     	&& sudo apt install -y python3.10-venv\
     	&& sudo apt install -y --no-install-recommends build-essential gcc \
-    	&& sudo apt install -y ffmpeg \
+    	&& sudo apt install -y python3-tk ffmpeg \
 		&& sudo apt clean
 
 uninstall: uninstall.venv clean
@@ -37,7 +37,7 @@ uninstall.venv:
 	rm -rf venv
 
 clean:
-	@ rm -rf build __pycache__ logs
+	@ rm -rf build logs
 
 check-config:
 	@ . venv/bin/activate \
@@ -59,6 +59,21 @@ build: install.dev
 			--show-progress --report=./build/main.xml -j6 \
 			main.py
 	@ chmod +x build/main.bin
+
+test:
+	@ . venv/bin/activate \
+		&& pytest -s -s --disable-warnings pycatdetector/tests/
+
+coverage:
+	@ . venv/bin/activate \
+		&& coverage run -m pytest -s --disable-warnings pycatdetector/tests/ \
+		&& coverage report --show-missing pycatdetector/*.py pycatdetector/channels/*.py
+
+coverage.live:
+	@ . venv/bin/activate \
+		&& coverage run main.py \
+		&& coverage report --show-missing pycatdetector/*.py pycatdetector/channels/*.py
+
 
 profile: install.dev
 	# https://docs.python.org/3/library/profile.html

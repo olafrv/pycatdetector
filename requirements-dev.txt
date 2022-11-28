@@ -3,3 +3,6 @@ snakeviz
 # make bin
 nuitka
 ordered-set
+# test
+pytest
+coverage

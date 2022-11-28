@@ -16,3 +16,6 @@ main.prof
 build
 pycatdetector.bin
 pycatdetector.xml
+# test
+.pytest_cache
+.coverage

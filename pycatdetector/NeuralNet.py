@@ -12,14 +12,15 @@ class NeuralNet:
             self.net = model_zoo.get_model(name=model_name, pretrained=pretrained)
 
     def analyze(self, image):
+        img = None
         if isinstance(image, str):
             if os.path.exists(image):
-                short = image.shape[0] if image.shape[0]<=256 else 256
+                # short = image.shape[0] if image.shape[0]<=256 else 256
+                short = 256
                 x, img = data.transforms.presets.ssd.load_test(image, short=short) # short <=> pixels (Bigger is slower)
             else:
                 raise FileNotFoundError
         else:
-
             imageNDArray = mx.nd.array(image) # From NumPy Array to Apache MX NDArray
             short = image.shape[0] if image.shape[0]<=256 else 256
             x, img = data.transforms.presets.ssd.transform_test(imgs=imageNDArray, short=short) # short <=> pixels (Bigger is slower) 
@@ -33,7 +34,7 @@ class NeuralNet:
             "boxes": bounding_boxes 
         }
 
-    def getClasses(self):
+    def get_classes(self):
         return self.net.classes
 
     def get_scored_labels(self, min_score, result):

@@ -14,7 +14,7 @@ class Detector(threading.Thread):
     images = None
     tests = None
     detections = None
-    sleep_time = 1 # seconds
+    sleep_time = 0.1 # seconds
     must_stop = False
     logger = None
 
@@ -39,7 +39,7 @@ class Detector(threading.Thread):
         self.logger.info('Minimum Score: '+str(self.net_min_score))
 
         while(not self.must_stop):               
-            
+
             if not self.images.empty():
                 image = self.images.get(False)
 

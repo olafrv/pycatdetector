@@ -35,9 +35,9 @@ def main():
     detector.start()
     notifier.start()
 
-    if not config.get("headless"):
-        screener = Screener(detector)
-        screener.show()
+    #if not config.get("headless"):
+    screener = Screener(detector)
+    screener.show()
 
     notifier.join()
     recorder.join()
