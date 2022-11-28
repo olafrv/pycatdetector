@@ -1,7 +1,7 @@
 import logging
 from requests import post
 
-class HAGoogleSay:
+class HaGoogleSay:
     config = {}
 
     def __init__(self, config):
