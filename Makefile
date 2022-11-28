@@ -30,13 +30,14 @@ uninstall: uninstall.venv clean
 
 uninstall.venv: 
 	# pip3 list --user --format=freeze | sed 's/=.*$//' | xargs pip3 uninstall --yes
-	@ test ! -d env \
-		|| . venv/bin/activate \
-		&& pip3 uninstall --yes -r requirements.txt \
-		&& pip3 uninstall --yes -r requirements-dev.txt
+	#@ test ! -d env \
+	#	|| . venv/bin/activate \
+	#	&& pip3 uninstall --yes -r requirements.txt \
+	#	&& pip3 uninstall --yes -r requirements-dev.txt
+	rm -rf venv
 
 clean:
-	@ rm -rf build __pycache__ venv
+	@ rm -rf build __pycache__ logs
 
 check-config:
 	@ . venv/bin/activate \
