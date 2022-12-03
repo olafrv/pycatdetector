@@ -1,36 +1,43 @@
+import os
+import sys
 import signal
-from pycatdetector.Config import Config
-from pycatdetector.Recorder import Recorder
-from pycatdetector.Detector import Detector
-from pycatdetector.Notifier import Notifier
-from pycatdetector.Screener import Screener
-from pycatdetector.NeuralNet import NeuralNet
-from HAGoogleSay import HAGoogleSay
+import logging
+import colorlog
+import pycatdetector.channels
+from pycatdetector import *
 
-images = recorder = detector = notifier = screener = None
+images = recorder = detector = notifier = screener = config = None
 
 def main():
-    global images, recorder, detector, notifier, screener
+    global images, recorder, detector, notifier, screener, config
     
-    config = Config() # Do not log anything before loading config!
+    config = Config() 
+
+    if len(sys.argv) > 1:
+        if "--check-config" in sys.argv:
+            print(config.config_flat)
+            exit(0)
     
+    enable_logging(config)
+    logger = logging.getLogger(__name__)
+    logger.info("PATH: " + os.environ["PATH"])
+    logger.info("Python Sys Prefix: " + sys.prefix)
+
     signal.signal(signal.SIGINT, handler)
-    recorder = Recorder(config.get("RTSP_URL"))
+
+    recorder = Recorder(config.get("rtsp_url"))
     detector = Detector(recorder, NeuralNet())
 
-    if config.get("HOMEASSISTANT_ON").lower() == "yes": 
-        service = HAGoogleSay(config.get_regex("^HOMEASSISTANT.*"))
-    else:
-        service = None
-    notifier = Notifier(detector, config.get("OBJECTS"), service)
+    notifier = Notifier(detector)
+    attach_channels(notifier)
 
     recorder.start()
     detector.start()
     notifier.start()
 
-    if str(config.get("HEADLESS")).lower() != "yes":
-        screener = Screener(detector)
-        screener.show()
+    #if not config.get("headless"):
+    screener = Screener(detector)
+    screener.show()
 
     notifier.join()
     recorder.join()
@@ -38,11 +45,40 @@ def main():
 
 def handler(signum, frame):
     global recorder, detector, notifier, screener
-    if not screener is None:
-        screener.close()
-    notifier.stop()
-    recorder.stop()
-    detector.stop()
+    if signum == signal.SIGINT: # CTRL + C
+        if not screener is None:
+            screener.close()
+        notifier.stop()
+        recorder.stop()
+        detector.stop()
+
+def attach_channels(notifier):
+    global config
+    for channel_class_name in pycatdetector.channels.__all__:
+        channel_s = Config.camel_to_snake(channel_class_name)
+        if config.get("notifiers_" + channel_s + "_enabled"):
+            notifier.add_channel(
+                eval('pycatdetector.channels.' + channel_class_name)(config.get_prefix("notifiers_" + channel_s)),
+                config.get("notifiers_" + channel_s + "_objects"))
+
+def enable_logging(config):
+    # https://docs.python.org/3/howto/logging.html
+    if config.get("log_level").upper() == "DEBUG":
+        logFormat = "[%(asctime)s] p%(process)s {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'"
+    else:
+        logFormat = '[%(asctime)s] %(levelname)s %(name)s - %(message)s'
+    
+    logging.basicConfig(format=logFormat, encoding='utf-8', 
+        filename = os.path.join(config.get("log_dir"), 'detector.log'), 
+            level=eval('logging.' + config.get("log_level").upper()))
+    
+    # https://pypi.org/project/colorlog/
+    if config.get("log_tty"):
+        colorHandler = colorlog.StreamHandler()
+        colorHandler.setFormatter(colorlog.ColoredFormatter('%(log_color)s' + logFormat))
+        logging.getLogger().addHandler(colorHandler)
+    else:
+        logging.StreamHandler(stream=None)
 
 if __name__ == '__main__':
     main()

@@ -1,17 +1,20 @@
 import logging
 import threading
+import traceback
 import logging
 from . import NeuralNet
 from . import Recorder
-from queue import Queue
+from queue import SimpleQueue
 from time import sleep
 from datetime import datetime
 
 class Detector(threading.Thread):
     net = None
+    net_min_score = 0.9
     images = None
     tests = None
     detections = None
+    sleep_time = 0.1 # seconds
     must_stop = False
     logger = None
 
@@ -19,9 +22,8 @@ class Detector(threading.Thread):
         threading.Thread.__init__(self)
         self.images = recorder.getImages()
         self.net = net
-        self.net_min_score = 0.5
-        self.tests =  Queue(60*60)  # 1 hour of frames = 1 fps * 60 sec * 60 min
-        self.detections = Queue(60*60)  # 1 hour of frames = 1 fps * 60 sec * 60 min
+        self.tests =  SimpleQueue()  
+        self.detections = SimpleQueue()
         self.logger = logging.getLogger(__name__)
         
     def stop(self):
@@ -32,36 +34,40 @@ class Detector(threading.Thread):
             self.logger.info("Already stopped")
 
     def run(self):
-        self.logger.info("Starting...")
-        minScore = 0.5
-        while(not self.must_stop):
-            if not self.images.empty():                
-                image = self.images.get(block=False)
-                
+
+        self.logger.info("Starting with Thread ID: %s" % (threading.get_native_id()))
+        self.logger.info('Minimum Score: '+str(self.net_min_score))
+
+        while(not self.must_stop):               
+
+            if not self.images.empty():
+                image = self.images.get(False)
+
                 try:
                     result = self.net.analyze(image)
-                except ValueError:
-                    self.logger.error("Corruptied image")
+                except:
+                    self.logger.error(traceback.format_exc())
                     continue
 
                 self.tests.put(result)
                 self.logger.debug('Test: ' + repr(self.net.get_scored_labels(-1, result)))
-                detections = self.net.get_scored_labels(minScore, result)
+
+                detections = self.net.get_scored_labels(self.net_min_score, result)
                 for detection in detections:
-                    detection['timestamp'] = datetime.now()
-                    detection['minScore'] = minScore 
+                    detection['timestamp'] = str(datetime.now())
                     self.detections.put(detection)
-                    self.logger.info('Detected:' + repr(detection))
+                    self.logger.info('Queued: '+str(self.images.qsize())+', Shape:'+str(image.shape) + ', Detection: ' + repr(detection))
             else:
-                self.logger.debug("Queue is empty.")
-                sleep(0.1) # better to sleep than block=True and not react to termination signals
+                self.logger.debug("Sleeping "+str(self.sleep_time)+"s due to empty queue...")
+                sleep(self.sleep_time) # Better sleep than not answering signals
 
         self.logger.info("Stopped.")
 
-    def get_detections(self) -> Queue:
+
+    def get_detections(self):
         return self.detections
 
-    def get_tests(self) -> Queue:
+    def get_tests(self):
         return self.tests
 
     def get_net(self):

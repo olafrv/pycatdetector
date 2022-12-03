@@ -1,8 +1,22 @@
+# python cache
 __pycache__
 *.pyc
+# virtualenv
 venv
+# visualstudio code
 .vscode
 *.swp
-recording
+# logs
+logs
 *.log
-config.json
+# configuration
+config.yaml
+# make profile
+main.prof
+# make bin
+build
+pycatdetector.bin
+pycatdetector.xml
+# test
+.pytest_cache
+.coverage

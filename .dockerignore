@@ -1,8 +1,0 @@
-__pycache__
-venv
-.git
-.gitignore
-.dockerignore
-.github
-.vscode
-*.swp

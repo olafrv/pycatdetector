@@ -3,11 +3,11 @@ version: "3"
 services:
   pycatdetector:
     build: .
-    image: olafrv/pycatdetector:latest
+    image: ghcr.io/olafrv/pycatdetector:latest
     container_name: pycatdetector
     volumes:
-    - ./config.json:/opt/pycatdetector/config.json
-    - ./logs:/opt/pycatdetector/logs
+    - ./config.yaml:/opt/pycatdetector/config.yaml:ro
+    - ./logs:/opt/pycatdetector/logs:rw
 
 # networks:
 #  default:

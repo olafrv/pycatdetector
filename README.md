@@ -1,20 +1,37 @@
 # About PyCatDetector
 
-!["Cookie"](tests/cookie.jpeg) 
+<a href="cookie.jpg"><img src="cookie.jpg" width=250></a> 
 
-Python Cat Detector is a "2-days-solution" that detects the presence of my cat ["Cookie"](tests/cookie.jpeg) near her litterbox and alerts me to clean it.
+Python Cat Detector is a tool to detect the presence of my cat ["Cookie"](pycatdetector/tests/images/cat1.jpg) near her litterbox and alerts me to clean it.
 
 Basically, the application grabs video frames from an IP camera RTSP stream, uses a [neural network](pycatdetector/NeuralNet.py) to identify a cat object, and play a message in a speaker.
 
 All hardware and software used by pycatdetector (i.e. Camera, Linux Server and Speaker) can reach each other via my local WiFi network.
 
-The software architecture is pretty simple (or not?) as follows:
+## Architecture & Workflow
 
-* Camera -> RTSP -> Recorder.py (OpenCV)
-* Recorder.py -> Queue (Image) -> Detector.py -> NeuralNet.py (GluonCV / Apache MXNet)
-* Detector.py -> Queue (Test) -> Screener.py (Mathplotlib)
-* Detector.py -> Queue (Detections) -> Notifier.py
-* Notifier.py -> HAGoogleSay.py (HomeAssistant API)
+The software architecture is pretty simple as follows:
+
+```mermaid
+sequenceDiagram
+    participant Camera
+    participant Recorder
+    participant Detector
+    participant Screener
+    participant Notifier
+    participant Channel
+    loop Read (RSTP)
+      Camera->>Recorder: Image
+    end
+    loop Read (Queue)
+      Recorder->>Detector: Image
+    end
+    loop Read (Queue)
+      Detector->>Screener: Image
+    end
+    Detector->>Notifier: notify()
+    Notifier->>Channel: notify()
+```
 
 # Requirements
 
@@ -39,28 +56,46 @@ This Python package has been tested and designed for:
 ```shell
 git clone "https://github.com/olafrv/pycatdetector.git"
 cd pycatdetector
-mv config.json.example config.json   # then edit config options
+mv config.example.yaml config.yaml # edit manually afterwards
 ```
-## Basic
+## Run (Python)
 ```shell
-make install
-make run
+make install      # install end user requirements
+make check-config # checks for YAML parsing errors
+make run          # with python3 interpreter
 ```
 
 ## Docker
 
 ```shell
-make docker.build
-make docker.run
+make docker.build # build docker image
+make check-config # checks for YAML parsing errors
+make docker.run   # A) Without compose
+docker-compose up # B) With compose, add '-d' to run in foreground
+make docker exec  # Open bash in the container
 ```
-## Docker
+
+## Uninstall
 ```
-make docker.build
-docker compose up   # add '-d' to run in foreground
+make uninstall    # remore python reqs. and delete disposable folders
+```
+
+## Advanced/Developement
+```shell
+make install.dev  # install development requirements
+make profile      # run python3 profiling over main.py
+make profile.view # check profiling results with snake
+make build        # build binary with nuitka3
+make run.bin      # run dist/main.bin dynamically linked binary
+make docker.push  # push docker image, update Makefile global vars!
+make docker.clean # delete local docker images of this project
+make clean        # delete local disposable folders of this project
 ```
 
 # References
-## OpenCV
+## OpenCV (not cv2)
+* https://pypi.org/project/opencv-python/
+* https://docs.opencv.org/4.6.0/d6/d00/tutorial_py_root.html
 * https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html
 * https://answers.opencv.org/question/24714/skipping-frames-in-videocapture/
 
@@ -75,6 +110,8 @@ docker compose up   # add '-d' to run in foreground
 
 ## Apache MXNet
 * https://mxnet.apache.org/versions/0.11.0/
+* https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
+https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 
