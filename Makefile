@@ -1,7 +1,11 @@
 USERNAME=olafrv
 NAME=ghcr.io/${USERNAME}/pycatdetector
-VERSION=1.1.0
+VERSION:=$(shell cat VERSION)
+API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "master","name": "%s","body": "Release of version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
+
+version:
+	@ echo ${VERSION}
 
 install: install.venv
 	@ . venv/bin/activate \
@@ -97,16 +101,23 @@ docker.exec:
 		--entrypoint /bin/bash ${NAME}:${VERSION}
 
 docker.build:
-	@ docker build -t ${NAME}:latest .
-	@ docker tag ${NAME}:latest ${NAME}:${VERSION}
+	@ docker build -t ${NAME}:${VERSION} .
+	@ docker tag ${NAME}:${VERSION} ${NAME}:latest 
 
 docker.push:
 	# Personal Access Token (PAT) from GitHub
 	# https://github.com/settings/tokens
 	# https://github.com/features/packages
 	echo ${GITHUB_PAT} | docker login ghcr.io --username ${USERNAME} --password-stdin
-	@ docker push ${NAME}:latest
 	@ docker push ${NAME}:${VERSION}
+	@ docker push ${NAME}:latest
 
 docker.clean:
 	@ docker images | grep ${NAME} | awk '{print $$1":"$$2}' | sort | xargs --no-run-if-empty -n1 docker image rm
+
+github.release:
+	git diff --exit-code
+	git diff --cached --exit-code
+	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
+	git tag ${VERSION} && git push origin ${VERSION}
+	@echo '${API_JSON}' | curl -H 'Authorization: token ${GITHUB_PAT}' -d @- https://api.github.com/repos/olafrv/pycatdetector/releases
