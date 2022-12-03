@@ -102,8 +102,9 @@ docker.build:
 
 docker.push:
 	# Personal Access Token (PAT) from GitHub
+	# https://github.com/settings/tokens
 	# https://github.com/features/packages
-	echo ${PAT} | docker login ghcr.io --username ${USERNAME} --password-stdin
+	echo ${GITHUB_PAT} | docker login ghcr.io --username ${USERNAME} --password-stdin
 	@ docker push ${NAME}:latest
 	@ docker push ${NAME}:${VERSION}
 
