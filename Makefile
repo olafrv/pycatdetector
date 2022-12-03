@@ -1,6 +1,7 @@
 USERNAME=olafrv
 NAME=ghcr.io/${USERNAME}/pycatdetector
 VERSION:=$(shell cat VERSION)
+API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Release of version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
 
 version:
@@ -122,5 +123,4 @@ github.release:
 	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
 	git tag ${VERSION} && git push origin ${VERSION}
 	# https://docs.github.com/rest/reference/repos#create-a-release
-	API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Release of version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 	@echo '${API_JSON}' | curl -H "Accept: application/vnd.github+json" -H 'Authorization: token ${GITHUB_PAT}' -d @- https://api.github.com/repos/olafrv/pycatdetector/releases
