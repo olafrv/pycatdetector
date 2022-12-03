@@ -119,8 +119,8 @@ github.release: github.push
 	git diff --exit-code
 	git diff --cached --exit-code
 	# Create and push tag
-	git tag -d ${VERSION} && git push --tags --delete origin ${VERSION} || /bin/true
-	git tag ${VERSION} && git push --tags origin ${VERSION}
+	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
+	git tag ${VERSION} && git push origin ${VERSION}
 	# https://docs.github.com/rest/reference/repos#create-a-release
 	@echo '${API_JSON}' | curl \
 		-H 'Accept: application/vnd.github+json' \
