@@ -1,11 +1,10 @@
-USERNAME=olafrv
-NAME=ghcr.io/${USERNAME}/pycatdetector
+USERNAME="olafrv"
+REPOSITORY="pycatdetector"
+NAME="ghcr.io/${USERNAME}/${REPOSITORY}"
 VERSION:=$(shell cat VERSION)
-API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Release of version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
+GIT_URL="https://api.github.com/repos/${USERNAME}/${REPOSITORY}"
+API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
-
-version:
-	@ echo ${VERSION}
 
 install: install.venv
 	@ . venv/bin/activate \
@@ -88,6 +87,13 @@ profile: install.dev
 profile.view: install.dev
 	@ . venv/bin/activate && snakeviz profile/main.prof
 
+docker.build:
+	@ docker build -t ${NAME}:${VERSION} .
+	@ docker tag ${NAME}:${VERSION} ${NAME}:latest 
+
+docker.clean:
+	@ docker images | grep ${NAME} | awk '{print $$1":"$$2}' | sort | xargs --no-run-if-empty -n1 docker image rm
+
 docker.run:
 	@ docker run --rm --cpus ${CPUS} \
 		-v "${PWD}/config.yaml:/opt/pycatdetector/config.yaml:ro" \
@@ -100,27 +106,23 @@ docker.exec:
     	-v "${PWD}/logs:/opt/pycatdetector/logs" \
 		--entrypoint /bin/bash ${NAME}:${VERSION}
 
-docker.build:
-	@ docker build -t ${NAME}:${VERSION} .
-	@ docker tag ${NAME}:${VERSION} ${NAME}:latest 
-
-docker.push:
-	# Personal Access Token (PAT) from GitHub
-	# https://github.com/settings/tokens
-	# https://github.com/features/packages
-	echo ${GITHUB_PAT} | docker login ghcr.io --username ${USERNAME} --password-stdin
+github.push: docker.build
+	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
+	# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
+	# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
+	echo ${GITHUB_TOKEN} | docker login ghcr.io --username ${USERNAME} --password-stdin
 	@ docker push ${NAME}:${VERSION}
 	@ docker push ${NAME}:latest
 
-docker.clean:
-	@ docker images | grep ${NAME} | awk '{print $$1":"$$2}' | sort | xargs --no-run-if-empty -n1 docker image rm
-
-github.release:
-	# Uncommited changes?
+github.release: github.push
+	# Fail if uncommited changes
 	git diff --exit-code
 	git diff --cached --exit-code
 	# Create and push tag
-	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
-	git tag ${VERSION} && git push origin ${VERSION}
+	git tag -d ${VERSION} && git push --tags --delete origin ${VERSION} || /bin/true
+	git tag ${VERSION} && git push --tags origin ${VERSION}
 	# https://docs.github.com/rest/reference/repos#create-a-release
-	@echo '${API_JSON}' | curl -H "Accept: application/vnd.github+json" -H 'Authorization: token ${GITHUB_PAT}' -d @- https://api.github.com/repos/olafrv/pycatdetector/releases
+	@echo '${API_JSON}' | curl \
+		-H 'Accept: application/vnd.github+json' \
+		-H 'Authorization: token ${GITHUB_TOKEN}' \
+		-d @- ${GIT_URL}/releases

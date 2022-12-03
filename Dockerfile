@@ -7,6 +7,11 @@ RUN apt update -y \
     && apt clean
 
 FROM base 
+
+LABEL org.opencontainers.image.source=https://github.com/olafrv/pycatdetector
+LABEL org.opencontainers.image.description="Python Cat Detector"
+LABEL org.opencontainers.image.licenses=MIT
+
 WORKDIR /opt/pycatdetector
 COPY requirements.txt /opt/pycatdetector
 COPY pycatdetector /opt/pycatdetector/pycatdetector
