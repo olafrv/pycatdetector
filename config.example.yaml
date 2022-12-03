@@ -11,7 +11,7 @@ notifiers:
   ha_google_say:
     enabled: true
     url: "http://homeassistant.local:8123/api"
-    token: "token"
+    token: "token123ABC"
     entity: "media_player.nesti"
     message: "El gato está en la caja de arena."
     language: "es"

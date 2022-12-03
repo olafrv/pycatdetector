@@ -2,6 +2,7 @@ from time import sleep
 from matplotlib import pyplot as plt
 import logging
 
+
 class Screener:
 
     detector = None
@@ -13,7 +14,7 @@ class Screener:
         self.detector = detector
         self.logger = logging.getLogger(__name__)
 
-    def close(self, event = None):
+    def close(self, event = None):  # noqa
         if not self.must_stop:
             self.logger.info("Closing...")
             self.must_stop = True
@@ -28,7 +29,7 @@ class Screener:
         ax = fig.add_subplot()
         tests = self.detector.get_tests()
         net = self.detector.get_net()
-        while(not self.must_stop):
+        while (not self.must_stop):
             ax.clear()
             if not tests.empty():
                 detection = tests.get(block=False)
@@ -37,6 +38,7 @@ class Screener:
                 fig.canvas.flush_events()
             else:
                 self.logger.debug("Queue is empty.")
-                sleep(0.1) # better to sleep than block=True and not react to termination signals
+                # better sleep than not react to termination signals
+                sleep(0.1)
         plt.close('all')
         self.logger.info("Closed.")

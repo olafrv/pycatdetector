@@ -2,6 +2,7 @@ import logging
 from datetime import datetime
 from requests import post
 
+
 class DiscordWebhook:
     config = {}
 

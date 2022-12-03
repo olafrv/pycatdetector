@@ -6,4 +6,7 @@ from .NeuralNet import NeuralNet
 from .Notifier import Notifier
 from .Recorder import Recorder
 from .Screener import Screener
-__all__ = ["Config", "Detector", "NeuralNet", "Notifier", "Recorder", "Screener"]
+__all__ = [
+    "Config", "Detector", "NeuralNet",
+    "Notifier", "Recorder", "Screener"
+]

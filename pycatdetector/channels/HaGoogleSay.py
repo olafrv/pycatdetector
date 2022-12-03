@@ -1,6 +1,7 @@
 import logging
 from requests import post
 
+
 class HaGoogleSay:
     config = {}
 
