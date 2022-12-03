@@ -19,7 +19,7 @@ sequenceDiagram
     participant Detector
     participant Screener
     participant Notifier
-    participant IoT Device
+    participant Channel
     loop Read (RSTP)
       Camera->>Recorder: Image
     end
@@ -29,8 +29,8 @@ sequenceDiagram
     loop Read (Queue)
       Detector->>Screener: Image
     end
-    Detector->>Notifier: Notify()
-    Notifier->>IoT Device: Action()
+    Detector->>Notifier: notify()
+    Notifier->>Channel: notify()
 ```
 
 # Requirements
