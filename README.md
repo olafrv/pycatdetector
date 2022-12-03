@@ -1,22 +1,36 @@
 # About PyCatDetector
 
-!["Cookie"](cookie.jpg) 
+<a href="cookie.jpg"><img src="cookie.jpg" width=250></a> 
 
-Python Cat Detector is a "2-days-solution" that detects the presence of my cat ["Cookie"](cookie.jpg) near her litterbox and alerts me to clean it.
+Python Cat Detector is a tool to detect the presence of my cat ["Cookie"](pycatdetector/tests/images/cat1.jpg) near her litterbox and alerts me to clean it.
 
 Basically, the application grabs video frames from an IP camera RTSP stream, uses a [neural network](pycatdetector/NeuralNet.py) to identify a cat object, and play a message in a speaker.
 
 All hardware and software used by pycatdetector (i.e. Camera, Linux Server and Speaker) can reach each other via my local WiFi network.
 
-The software architecture is pretty simple (or not?) as follows:
+## Architecture & Workflow
 
-```
-./pycatdetector
-  Recorder.py (OpenCV) <- RTSP <- IP Camera 
-  Recorder.py -> Queue (Image) -> Detector.py -> NeuralNet.py (GluonCV / Apache MXNet)
-  Detector.py -> Queue (Test) -> Screener.py (Mathplotlib)
-  Detector.py -> Queue (Detections) -> Notifier.py
-  Notifier.py -> ./notifiers/HAGoogleSay.py (HomeAssistant API)
+The software architecture is pretty simple as follows:
+
+```mermaid
+sequenceDiagram
+    participant Camera
+    participant Recorder
+    participant Detector
+    participant Screener
+    participant Notifier
+    participant IoT Device
+    loop Read (RSTP)
+      Camera->>Recorder: Image
+    end
+    loop Read (Queue)
+      Recorder->>Detector: Image
+    end
+    loop Read (Queue)
+      Detector->>Screener: Image
+    end
+    Detector->>Notifier: Notify()
+    Notifier->>IoT Device: Action()
 ```
 
 # Requirements
