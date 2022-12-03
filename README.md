@@ -82,14 +82,19 @@ make uninstall    # remore python reqs. and delete disposable folders
 
 ## Advanced/Developement
 ```shell
-make install.dev  # install development requirements
-make profile      # run python3 profiling over main.py
-make profile.view # check profiling results with snake
-make build        # build binary with nuitka3
-make run.bin      # run dist/main.bin dynamically linked binary
-make docker.push  # push docker image, update Makefile global vars!
-make docker.clean # delete local docker images of this project
-make clean        # delete local disposable folders of this project
+make uninstall       # revert install steps
+make install.dev     # install development requirements
+make build           # build binary with nuitka3
+make clean           # delete local disposable files
+make run.bin         # run ./dist/main.bin dynamically linked binary
+make run.coverage    # check call coverage during runtime
+make profile         # run python3 profiling over main.py
+make profile.view    # check profiling results with snake
+make test            # run ./pycatdetector/tests/*
+make test.coverage   # check test coverage
+make docker.clean    # delete local docker images of this project
+make github.push     # push docker image to github registry
+make github.release  # create a new github relase
 ```
 
 # References

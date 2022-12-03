@@ -45,13 +45,6 @@ clean:
 check-config:
 	@ . venv/bin/activate \
 		&& python3 main.py --check-config
-run:
-	@ mkdir -p logs \
-		&& . venv/bin/activate \
-		&& python3 main.py
-
-run.bin:
-	@ ./build/main.bin
 
 build: install.dev
 	# https://nuitka.net/doc/user-manual.html
@@ -63,20 +56,27 @@ build: install.dev
 			main.py
 	@ chmod +x build/main.bin
 
-test:
-	@ . venv/bin/activate \
-		&& pytest -s -s --disable-warnings pycatdetector/tests/
+run:
+	@ mkdir -p logs \
+		&& . venv/bin/activate \
+		&& python3 main.py
 
-coverage:
-	@ . venv/bin/activate \
-		&& coverage run -m pytest -s --disable-warnings pycatdetector/tests/ \
-		&& coverage report --show-missing pycatdetector/*.py pycatdetector/channels/*.py
+run.bin:
+	@ ./build/main.bin
 
-coverage.live:
+run.coverage:
 	@ . venv/bin/activate \
 		&& coverage run main.py \
 		&& coverage report --show-missing pycatdetector/*.py pycatdetector/channels/*.py
 
+test:
+	@ . venv/bin/activate \
+		&& pytest -s -s --disable-warnings pycatdetector/tests/
+
+test.coverage:
+	@ . venv/bin/activate \
+		&& coverage run -m pytest -s --disable-warnings pycatdetector/tests/ \
+		&& coverage report --show-missing pycatdetector/*.py pycatdetector/channels/*.py
 
 profile: install.dev
 	# https://docs.python.org/3/library/profile.html

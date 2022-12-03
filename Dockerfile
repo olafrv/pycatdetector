@@ -8,6 +8,7 @@ RUN apt update -y \
 
 FROM base 
 
+# This is required to autolink the package to the repository in github
 LABEL org.opencontainers.image.source=https://github.com/olafrv/pycatdetector
 LABEL org.opencontainers.image.description="Python Cat Detector"
 LABEL org.opencontainers.image.licenses=MIT
