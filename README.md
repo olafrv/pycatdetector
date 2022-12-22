@@ -116,7 +116,7 @@ make github.release  # create a new github relase
 ## Apache MXNet
 * https://mxnet.apache.org/versions/0.11.0/
 * https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
-https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
+* https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 
