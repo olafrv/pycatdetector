@@ -1,5 +1,10 @@
-# master
-* Ensure container is always restarted
+# 1.1.3
+* Add better logging inside channels/*.py classes.
+* Add hints on documentation about Notifiers/Channels configurations.
+* Fix missing HomeAssistant service endpoint URL for Google TTS service.
+* Fix GUI crash when X11 display forward (python3-pil.imagetk + mathplotlib/TkAgg)
+* Ensure container is always restarted even if stopped manually
+
 # 1.1.2
 * Added CHANGELOG.md
 * Added flake as defaut linter.

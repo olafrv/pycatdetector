@@ -1,7 +1,7 @@
 from time import sleep
 from matplotlib import pyplot as plt
+import matplotlib
 import logging
-
 
 class Screener:
 
@@ -23,6 +23,7 @@ class Screener:
 
     def show(self):
         self.logger.info("Showing...")
+        matplotlib.use('TkAgg')
         plt.ion()
         fig = plt.figure()
         fig.canvas.mpl_connect('close_event', self.close)

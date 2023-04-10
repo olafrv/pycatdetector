@@ -26,7 +26,7 @@ install.base:
 	@ sudo apt install -y python3 \
     	&& sudo apt install -y python3.10-venv\
     	&& sudo apt install -y --no-install-recommends build-essential gcc \
-    	&& sudo apt install -y python3-tk ffmpeg \
+    	&& sudo apt install -y python3-tk python3-pil.imagetk ffmpeg \
 		&& sudo apt clean
 
 uninstall: uninstall.venv clean

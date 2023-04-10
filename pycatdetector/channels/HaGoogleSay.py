@@ -7,21 +7,41 @@ class HaGoogleSay:
 
     def __init__(self, config):
         self.config = config
+        self.logger = logging.getLogger(__name__)
 
     def get_name(self):
         return self.__class__.__name__
-
-    # https://developers.home-assistant.io/docs/api/rest/
-    def notify(self, url, token, entity, message, language):
+    
+    # HomeAssitant
+    # * Text To Speech (TTS):
+    #   https://www.home-assistant.io/integrations/tts
+    # * API:
+    #   https://developers.home-assistant.io/docs/api/rest/
+    # * TTS Integration Configuration (configuration.yaml)
+    # <<<
+    # tts:
+    #   - platform: google_translate
+    #     cache: true
+    #     cache_dir: /tmp/tts
+    #     time_memory: 300
+    #     service_name: google_translate_say
+    # >>>
+    def notify(self):    
+        url = self.config["url"]
+        url = url + "/services/tts/google_translate_say"  # /services/<domain>/<service>
+        token = self.config["token"]
+        entity = self.config["entity"]
+        message = self.config["message"]
+        language = self.config["language"]
         headers = {
             "Authorization": "Bearer " + token,
-            "content-type": "application/json",
+            "Content-Type": "application/json",
         }
         data = {
             "entity_id": entity,
             "message": message,
             "language": language
         }
-        logging.debug(data)
+        self.logger.info("Request: " + str(data))
         response = post(url, headers=headers, json=data)
-        logging.debug(response.text)
+        self.logger.info("Response: " + response.text)
