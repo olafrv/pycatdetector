@@ -1,3 +1,5 @@
+# master
+* Ensure container is always restarted
 # 1.1.2
 * Added CHANGELOG.md
 * Added flake as defaut linter.
