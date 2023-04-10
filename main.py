@@ -34,12 +34,10 @@ def main():
     recorder = Recorder(config.get("rtsp_url"))
     
     screener_enabled = not config.get("headless")    
-    # https://cv.gluon.ai/model_zoo/detection.html
-    # model_name = 'ssd_512_resnet50_v1_voc'   # PC (Slower), min_score = 0.9
-    model_name = 'ssd_512_mobilenet1.0_voc'  # IoT (Faster), min_score = 0.8
-    net_min_score = 0.8
-    net = NeuralNet(model_name=model_name)
+    net_model_name = config.get("net_model_name")
+    net = NeuralNet(model_name=net_model_name)
 
+    net_min_score = config.get("net_min_score")
     detector = Detector(recorder, screener_enabled, net, net_min_score)
 
     notifier = Notifier(detector)

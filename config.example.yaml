@@ -5,6 +5,10 @@ log_dir: "./logs"
 log_level: "info"
 rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: true
+# https://cv.gluon.ai/model_zoo/detection.html
+# net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Slower), min_score = 0.9
+net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Faster), min_score = 0.7
+net_min_score: 0.7
 
 # PyCatDetector Notifiers
 notifiers:
