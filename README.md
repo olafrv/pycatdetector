@@ -55,6 +55,7 @@ This Python package has been tested and designed for:
 
 ## Configuration
 ```shell
+sudo apt install make
 git clone "https://github.com/olafrv/pycatdetector.git"
 cd pycatdetector
 mv config.example.yaml config.yaml # edit manually afterwards
