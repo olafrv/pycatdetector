@@ -1,4 +1,5 @@
 # 1.1.3
++ Fix mxnet 1.9.1 with numpy>=1.24 error [#21165](https://github.com/apache/mxnet/issues/21165)
 * Add better logging inside channels/*.py classes.
 * Add hints on documentation about Notifiers/Channels configurations.
 * Fix missing HomeAssistant service endpoint URL for Google TTS service.
