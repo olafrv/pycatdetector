@@ -6,8 +6,9 @@ import warnings
 
 class NeuralNet:
     net = None
-
-    def __init__(self, model_name='ssd_512_resnet50_v1_voc', pretrained=True):
+    
+    def __init__(self, model_name, pretrained=True):
+        # https://cv.gluon.ai/model_zoo/detection.html (model_name=?)
         # https://github.com/apache/mxnet/issues/15281
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")

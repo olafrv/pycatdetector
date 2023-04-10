@@ -10,7 +10,7 @@ from datetime import datetime
 
 class Detector(threading.Thread):
     net = None
-    net_min_score = 0.9
+    net_min_score = None
     images = None
     tests = None
     detections = None
@@ -19,10 +19,15 @@ class Detector(threading.Thread):
     must_stop = False
     logger = None
 
-    def __init__(self, recorder: Recorder, screener_enabled: False, net: NeuralNet):
+    def __init__(self, 
+                 recorder: Recorder, 
+                 screener_enabled: bool, 
+                 net: NeuralNet, 
+                 net_min_score: int):
         threading.Thread.__init__(self)
         self.images = recorder.getImages()
         self.net = net
+        self.net_min_score = net_min_score
         self.screener_enabled = screener_enabled
         self.tests = SimpleQueue() if self.screener_enabled else None
         self.detections = SimpleQueue()
