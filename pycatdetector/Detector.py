@@ -14,15 +14,17 @@ class Detector(threading.Thread):
     images = None
     tests = None
     detections = None
+    screenerOn = False
     sleep_time = 0.1  # seconds
     must_stop = False
     logger = None
 
-    def __init__(self, recorder: Recorder, net: NeuralNet):
+    def __init__(self, recorder: Recorder, screener_enabled: False, net: NeuralNet):
         threading.Thread.__init__(self)
         self.images = recorder.getImages()
         self.net = net
-        self.tests = SimpleQueue()
+        self.screener_enabled = screener_enabled
+        self.tests = SimpleQueue() if self.screener_enabled else None
         self.detections = SimpleQueue()
         self.logger = logging.getLogger(__name__)
 
@@ -52,10 +54,11 @@ class Detector(threading.Thread):
                     self.logger.error(traceback.format_exc())
                     continue
 
-                self.tests.put(result)
-                self.logger.debug(
-                    'Test: ' + repr(self.net.get_scored_labels(-1, result))
-                )
+                if self.screener_enabled:
+                    self.tests.put(result)
+                    self.logger.debug(
+                        'Test: ' + repr(self.net.get_scored_labels(-1, result))
+                    )
 
                 detections = self.net.get_scored_labels(
                                 self.net_min_score, result

@@ -32,7 +32,10 @@ def main():
     signal.signal(signal.SIGINT, handler)
 
     recorder = Recorder(config.get("rtsp_url"))
-    detector = Detector(recorder, NeuralNet())
+    
+    screener_enabled = not config.get("headless")
+    detector = Detector(recorder, screener_enabled, NeuralNet())
+    detector.disableTests()
 
     notifier = Notifier(detector)
     attach_channels(notifier)
@@ -41,7 +44,7 @@ def main():
     detector.start()
     notifier.start()
 
-    if not config.get("headless"):
+    if screener_enabled:
         screener = Screener(detector)
         screener.show()
 

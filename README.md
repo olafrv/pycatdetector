@@ -38,7 +38,7 @@ sequenceDiagram
 This Python package has been tested and designed for:
 
 * Hardware:
-  * 1 GB of RAM and a CPU (depending of what you are doing) with [AVX2 support](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions).
+  * 2 GB of RAM and a CPU (depending of what you are doing) with [AVX2 support](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions).
   * An RTSP streaming device like the [TP-Link Tapo C210 Camera](https://www.tp-link.com/en/home-networking/cloud-camera/tapo-c210/) 
   * (Optional) A [discord webhook](https://support.discord.com/hc/en-us/articles/228383668) to be used as notification channel.
   * (Optional) A compatible IoT device like [Google Nest](https://store.google.com/product/google_nest_mini?hl=de) with HomeAssistant (see below).
