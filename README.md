@@ -35,6 +35,8 @@ sequenceDiagram
 
 # Requirements
 
+## General
+
 This Python package has been tested and designed for:
 
 * Hardware:
@@ -49,7 +51,24 @@ This Python package has been tested and designed for:
   * (Optional) [Docker and/or Docker Compose](https://docs.docker.com/) for headless run (no graphical features).
   * (Optional) [HomeAssistant](https://www.home-assistant.io/) endpoint for Text-To-Speach (TTS) service.
 
-*NOTE:* If your Linux is a Virtual Machine running on a Windows host you need to disable Windows Security > Core Isolation > Memory Protection.
+
+## AVX Instruction Set
+
+> **NOTICE:** If your Linux is a Virtual Machine running on a Windows host you need to disable Windows Security > Core Isolation > Memory Protection.
+
+Check if your CPU (or vCPU) is supporting the AVX instruction set:
+
+```bash
+cat /proc/cpuinfo | grep -i avx
+```
+
+To check when running if AVX is used define the following environment variable:
+```bash
+export MKLDNN_VERBOSE=1
+# unset MKLDNN_VERBOSE
+```
+
+See more information on: https://mxnet.apache.org/versions/1.9.1/api/python/docs/tutorials/performance/backend/mkldnn/index.html
 
 # Usage
 
@@ -108,6 +127,7 @@ make github.release  # create a new github relase
 
 ## GluonCV
 * https://cv.gluon.ai/
+* https://cv.gluon.ai/install.html
 * https://cv.gluon.ai/tutorials/index.html
 * https://cv.gluon.ai/build/examples_detection/demo_ssd.html
 * https://github.com/dmlc/gluon-cv
