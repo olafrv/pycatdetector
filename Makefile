@@ -20,7 +20,8 @@ install.venv: install.base
 		|| python3 -m venv venv \
 		&& pip3 install -Ur requirements.txt \
     	&& pip3 install --upgrade pip \
-		&& python3 -c "from pycatdetector import NeuralNet; NeuralNet()";
+		&& python3 -c "from pycatdetector import NeuralNet; NeuralNet('ssd_512_resnet50_v1_voc', True)";
+		&& python3 -c "from pycatdetector import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)";
 
 install.base:
 	@ sudo apt install -y python3 \
