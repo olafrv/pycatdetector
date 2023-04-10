@@ -35,7 +35,6 @@ def main():
     
     screener_enabled = not config.get("headless")
     detector = Detector(recorder, screener_enabled, NeuralNet())
-    detector.disableTests()
 
     notifier = Notifier(detector)
     attach_channels(notifier)
