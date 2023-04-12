@@ -5,6 +5,8 @@ services:
     build: .
     image: ghcr.io/olafrv/pycatdetector:latest
     container_name: pycatdetector
+    environment:
+      - TZ=Europe/Berlin
     volumes:
     - ./config.yaml:/opt/pycatdetector/config.yaml:ro
     - ./logs:/opt/pycatdetector/logs:rw

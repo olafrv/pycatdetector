@@ -2,6 +2,7 @@ import os
 import sys
 import signal
 import logging
+import time
 import colorlog
 import pycatdetector.channels
 from pycatdetector.Config import Config
@@ -80,25 +81,31 @@ def attach_channels(notifier):
                 ),
                 config.get("notifiers_" + channel_s + "_objects"))
 
-
 def enable_logging(config):
+    tz = time.strftime('%z')
     # https://docs.python.org/3/howto/logging.html
     if config.get("log_level").upper() == "DEBUG":
-        logFormat = "[%(asctime)s] p%(process)s \
-            {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'"
+        logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
+        logFormat += ' {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
     else:
-        logFormat = '[%(asctime)s] %(levelname)s %(name)s - %(message)s'
+        logFormat = '[%(asctime)s ' + tz + '] %(levelname)s %(name)s - %(message)s'
 
-    logging.basicConfig(format=logFormat, encoding='utf-8',
-                        filename=os.path.join(
-                            config.get("log_dir"), 'detector.log'
-                        ),
-                        level=eval(
-                                'logging.' +
-                                config.get("log_level").upper()
-                            )
-                        )
+    # https://docs.python.org/3/library/logging.html#logging.basicConfig
+    logging.basicConfig(
+        format=logFormat, 
+        encoding='utf-8',
+        filename=os.path.join(
+            config.get("log_dir"), 'detector.log'
+        ),
+        level=eval(
+            'logging.' +
+            config.get("log_level").upper()
+        ),
+        force=True
+    )
+    logging.Formatter.default_msec_format='%s.%03d'
 
+    
     # https://pypi.org/project/colorlog/
     if config.get("log_tty"):
         colorHandler = colorlog.StreamHandler()
@@ -108,7 +115,7 @@ def enable_logging(config):
         logging.getLogger().addHandler(colorHandler)
     else:
         logging.StreamHandler(stream=None)
-
+    
 
 if __name__ == '__main__':
     main()
