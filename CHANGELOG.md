@@ -1,4 +1,5 @@
 # 1.1.3
+* Added support for different timezones
 * Added IoT optimization (mobile mxnet models)
 * Added missing fresh install hints/packages (make, pip3)
 * Fix memory leak when screener is not used (headless)

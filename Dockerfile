@@ -1,5 +1,6 @@
 FROM ubuntu:22.04 as base
 RUN apt update -y \
+    && apt install -y tzdata \
     && apt install -y python3 \
     && apt install -y python3.10-venv\
     && apt install -y --no-install-recommends build-essential gcc \
