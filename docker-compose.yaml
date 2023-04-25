@@ -11,6 +11,12 @@ services:
     - ./config.yaml:/opt/pycatdetector/config.yaml:ro
     - ./logs:/opt/pycatdetector/logs:rw
     restart: always
+    deploy:
+        resources:
+            limits:
+              memory: 640M
+            reservations:
+              memory: 512M
 
 # networks:
 #  default:
