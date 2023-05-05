@@ -108,17 +108,18 @@ make install.dev     # install development requirements
 make build           # build binary with nuitka3
 make clean           # delete local disposable files
 make run.bin         # run ./dist/main.bin dynamically linked binary
-make run.coverage    # check call coverage during runtime
 make profile         # run python3 profiling over main.py
 make profile.view    # check profiling results with snake
 make test            # run ./pycatdetector/tests/*
-make test.coverage   # check test coverage
+make test.cov        # check call coverage during runtime
+make test.cov.report # check test coverage
 make docker.clean    # delete local docker images of this project
 make github.push     # push docker image to github registry
 make github.release  # create a new github relase
 ```
 
 # References
+
 ## OpenCV (not cv2)
 * https://pypi.org/project/opencv-python/
 * https://docs.opencv.org/4.6.0/d6/d00/tutorial_py_root.html
@@ -141,6 +142,10 @@ make github.release  # create a new github relase
 * https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
+
+## Deep Learning (MXNet)
+
+* https://d2l.ai/chapter_computer-vision/bounding-box.html
 
 ## PEP 8 – Style Guide for Python Code
 * https://peps.python.org/pep-0008/

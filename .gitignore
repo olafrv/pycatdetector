@@ -11,6 +11,7 @@ logs
 # configuration
 config.yaml
 # make profile
+profile
 main.prof
 # make bin
 build
