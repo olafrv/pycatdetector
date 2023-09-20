@@ -1,6 +1,11 @@
-NAME="pycatdetector"
-VERSION:=$(shell cat VERSION)
-GITHUB_USER="olafrv"
+#!/usr/bin/make
+
+# Environment Variables:
+# - GITHUB_USER
+# - GITHUB_TOKEN
+
+NAME=$(shell cat METADATA | grep NAME | cut -d"=" -f2)
+VERSION:=$(shell cat METADATA | grep VERSION | cut -d"=" -f2)
 REPOSITORY="${NAME}"
 IMAGE_NAME="ghcr.io/${GITHUB_USER}/${REPOSITORY}"
 IMAGE_APP_DIR="/opt/${REPOSITORY}"
@@ -8,28 +13,35 @@ GITHUB_API="https://api.github.com/repos/${GITHUB_USER}/${REPOSITORY}"
 GITHUB_API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
 
+metadata: 
+	@ echo "METADATA: NAME=${NAME}, VERSION=${VERSION}"
+
 install: install.venv
 	@ . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt
 
+# customize!
 install.dev: install.venv
 	@ . venv/bin/activate \
 		&& pip3 install -Ur requirements-dev.txt \
 		&& sudo apt install -y patchelf ccache
 
+# customize!
 install.venv: install.base
-	@ test -d venv \
-		|| python3 -m venv venv \
+	@ true \
+		&& test -d venv || python3 -m venv venv \
+		&& . venv/bin/activate
 		&& pip3 install -Ur requirements.txt \
     	&& pip3 install --upgrade pip \
 		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_resnet50_v1_voc', True)" \
 		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)"
 
 install.base:
-	@ sudo apt install -y python3 \
-    	&& sudo apt install -y python3.10-venv\
+	@ sudo apt update \
+		&& sudo apt install -y python3 \
+    	&& sudo apt install -y python3.10-venv python3-dev python3-setuptools \
     	&& sudo apt install -y --no-install-recommends build-essential gcc \
-    	&& sudo apt install -y python3-pip python3-tk python3-pil.imagetk ffmpeg \
+    	&& sudo apt install -y python3-pip \
 		&& sudo apt clean
 
 uninstall: uninstall.venv clean
@@ -42,9 +54,11 @@ uninstall.venv:
 	#	&& pip3 uninstall --yes -r requirements-dev.txt
 	rm -rf venv
 
+# customize!
 clean:
 	@ rm -rf build logs
 
+# customize!
 check-config:
 	@ . venv/bin/activate \
 		&& python3 main.py --check-config
@@ -59,6 +73,7 @@ build: install.dev
 			main.py
 	@ chmod +x build/main.bin
 
+# customize!
 run:
 	@ mkdir -p logs \
 		&& . venv/bin/activate \
@@ -72,12 +87,14 @@ test:
 	@ . venv/bin/activate \
 		&& pytest -s -s --disable-warnings ${NAME}/tests/
 
+# customize!
 test.coverage:
 	# https://coverage.readthedocs.io
 	@ . venv/bin/activate \
 		&& coverage run main.py \
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
 
+# customize!
 test.coverage.report:
 	@ . venv/bin/activate \
 		&& coverage run -m pytest -s --disable-warnings ${NAME}/tests/ \
@@ -99,12 +116,14 @@ docker.build:
 docker.clean:
 	@ docker images | grep ${IMAGE_NAME} | awk '{print $$1":"$$2}' | sort | xargs --no-run-if-empty -n1 docker image rm
 
+# customize!
 docker.run:
 	@ docker run --rm --cpus ${CPUS} \
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		${IMAGE_NAME}:${VERSION}
 
+# customize!
 docker.exec:
 	@ docker run --rm -it --cpus ${CPUS} \
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \

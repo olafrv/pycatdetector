@@ -103,6 +103,7 @@ make uninstall    # remore python reqs. and delete disposable folders
 
 ## Advanced/Developement
 ```shell
+make metadata        # show METADATA file content
 make uninstall       # revert install steps
 make install.dev     # install development requirements
 make build           # build binary with nuitka3
@@ -114,6 +115,7 @@ make test            # run ./pycatdetector/tests/*
 make test.cov        # check call coverage during runtime
 make test.cov.report # check test coverage
 make docker.clean    # delete local docker images of this project
+# See Makefile for required GITHUB_* required variables
 make github.push     # push docker image to github registry
 make github.release  # create a new github relase
 ```
