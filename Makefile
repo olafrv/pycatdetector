@@ -30,18 +30,19 @@ install.dev: install.venv
 install.venv: install.base
 	@ true \
 		&& test -d venv || python3 -m venv venv \
-		&& . venv/bin/activate
+		&& . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt \
-    	&& pip3 install --upgrade pip \
+		&& pip3 install --upgrade pip \
 		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_resnet50_v1_voc', True)" \
-		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)"
+		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)" \
+		&& apt install python3-tk  # matplotlib uses tkinter
 
 install.base:
 	@ sudo apt update \
 		&& sudo apt install -y python3 \
-    	&& sudo apt install -y python3.10-venv python3-dev python3-setuptools \
-    	&& sudo apt install -y --no-install-recommends build-essential gcc \
-    	&& sudo apt install -y python3-pip \
+		&& sudo apt install -y python3.10-venv python3-dev python3-setuptools \
+		&& sudo apt install -y --no-install-recommends build-essential gcc \
+		&& sudo apt install -y python3-pip \
 		&& sudo apt clean
 
 uninstall: uninstall.venv clean
