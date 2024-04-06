@@ -93,7 +93,7 @@ make run          # with python3 interpreter
 make docker.build   # build docker image
 make check-config   # checks for YAML parsing errors
 make docker.run     # A) Without compose
-docker-compose up   # B) With compose, add '-d' to run in foreground
+docker compose up   # B) With compose, add '-d' to run in foreground
 make docker exec    # Open bash in the container
 ```
 
