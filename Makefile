@@ -13,6 +13,9 @@ GITHUB_API="https://api.github.com/repos/${GITHUB_USER}/${REPOSITORY}"
 GITHUB_API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
 
+env:
+	@ env | grep -E "GITHUB_" || (echo "GITHUB_ variables not set." && exit 1)
+
 metadata: 
 	@ echo "METADATA: NAME=${NAME}, VERSION=${VERSION}"
 
@@ -111,6 +114,15 @@ profile.view: install.dev
 	@ . venv/bin/activate && snakeviz profile/main.prof
 
 docker.build:
+# ARM64 MXNet Issue Impides Multi-Arch Build: 
+# https://github.com/apache/mxnet/issues/19234
+#	@ if ! docker buildx ls | grep multi-arch-builder; \
+#	then \
+#		docker buildx create --name multi-arch-builder; \
+#	fi
+#	@ docker buildx build \
+#		--push --platform linux/amd64,linux/arm64 \
+#		-t ${IMAGE_NAME}:${VERSION} .
 	@ docker build -t ${IMAGE_NAME}:${VERSION} .
 	@ docker tag ${IMAGE_NAME}:${VERSION} ${IMAGE_NAME}:latest 
 

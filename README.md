@@ -89,11 +89,12 @@ make run          # with python3 interpreter
 ## Docker
 
 ```shell
-make docker.build # build docker image
-make check-config # checks for YAML parsing errors
-make docker.run   # A) Without compose
-docker-compose up # B) With compose, add '-d' to run in foreground
-make docker exec  # Open bash in the container
+./install-docker.sh # install docker and docker-compose
+make docker.build   # build docker image
+make check-config   # checks for YAML parsing errors
+make docker.run     # A) Without compose
+docker-compose up   # B) With compose, add '-d' to run in foreground
+make docker exec    # Open bash in the container
 ```
 
 ## Uninstall
