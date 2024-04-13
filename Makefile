@@ -136,6 +136,12 @@ docker.run:
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		${IMAGE_NAME}:${VERSION}
 
+docker.start:
+	@ docker compose up -d
+
+docker.stop:
+	@ docker compose down
+
 # customize!
 docker.exec:
 	@ docker run --rm -it --cpus ${CPUS} \

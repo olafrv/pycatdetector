@@ -91,8 +91,9 @@ make run          # with python3 interpreter
 ```shell
 ./install-docker.sh # install docker and docker-compose
 make docker.build   # build docker image (adjust METADATA first !!!)
-make docker.run     # A) Without compose
-docker compose up   # B) With compose, add '-d' to run in foreground
+make docker.run     # A) without compose, deleted after stopped
+make docker.start   # B) with compose, add '-d' to run in foreground
+make docker.stop    # B) stop the composed docker service
 make docker exec    # Open bash in the container
 ```
 
