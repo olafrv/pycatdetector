@@ -137,7 +137,7 @@ docker.run:
 		${IMAGE_NAME}:${VERSION}
 
 docker.start:
-	@ docker compose up -d
+	@ docker compose pull && docker compose up -d
 
 docker.stop:
 	@ docker compose down
