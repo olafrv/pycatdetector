@@ -38,7 +38,7 @@ install.venv: install.base
 		&& pip3 install --upgrade pip \
 		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_resnet50_v1_voc', True)" \
 		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)" \
-		&& apt install python3-tk  # matplotlib uses tkinter
+		&& sudo apt install python3-tk  # matplotlib uses tkinter
 
 install.base:
 	@ sudo apt update \
