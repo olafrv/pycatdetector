@@ -33,8 +33,8 @@ def main():
     signal.signal(signal.SIGINT, handler)
 
     recorder = Recorder(config.get("rtsp_url"))
-    
-    screener_enabled = not config.get("headless")    
+
+    screener_enabled = not config.get("headless")
     net_model_name = config.get("net_model_name")
     net = NeuralNet(model_name=net_model_name)
 
@@ -81,6 +81,7 @@ def attach_channels(notifier):
                 ),
                 config.get("notifiers_" + channel_s + "_objects"))
 
+
 def enable_logging(config):
     tz = time.strftime('%z')
     # https://docs.python.org/3/howto/logging.html
@@ -88,11 +89,12 @@ def enable_logging(config):
         logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
         logFormat += ' {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
     else:
-        logFormat = '[%(asctime)s ' + tz + '] %(levelname)s %(name)s - %(message)s'
+        logFormat = '[%(asctime)s ' \
+            + tz + '] %(levelname)s %(name)s - %(message)s'
 
     # https://docs.python.org/3/library/logging.html#logging.basicConfig
     logging.basicConfig(
-        format=logFormat, 
+        format=logFormat,
         encoding='utf-8',
         filename=os.path.join(
             config.get("log_dir"), 'detector.log'
@@ -103,9 +105,8 @@ def enable_logging(config):
         ),
         force=True
     )
-    logging.Formatter.default_msec_format='%s.%03d'
+    logging.Formatter.default_msec_format = '%s.%03d'
 
-    
     # https://pypi.org/project/colorlog/
     if config.get("log_tty"):
         colorHandler = colorlog.StreamHandler()
@@ -115,7 +116,7 @@ def enable_logging(config):
         logging.getLogger().addHandler(colorHandler)
     else:
         logging.StreamHandler(stream=None)
-    
+
 
 if __name__ == '__main__':
     main()

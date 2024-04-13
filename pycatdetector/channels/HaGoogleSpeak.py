@@ -12,7 +12,7 @@ from requests import post
 # - https://www.home-assistant.io/integrations/tts/#service-speak
 #
 # FAQ:
-# - https://community.home-assistant.io/t/rest-api-service-calls-specify-target/537269
+# - https://community.home-assistant.io/t/rest-api-service-calls-specify-target/537269  # noqa
 ##
 
 
