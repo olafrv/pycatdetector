@@ -1,5 +1,6 @@
----
+###
 # PyCatDetector Basics
+###
 log_tty: false
 log_dir: "./logs"
 log_level: "info"
@@ -7,20 +8,35 @@ rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: true
 # https://cv.gluon.ai/model_zoo/detection.html
 # net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Slower), min_score = 0.9
-net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Faster), min_score = 0.9
+net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Faster), min_score = 0.7
 net_min_score: 0.9
 
+###
 # PyCatDetector Notifiers
+# NOTE: don't remove just disable by setting enabled: false
+###
 notifiers:
-  ha_google_say:
+  ha_google_speak: # NEW: ./channels/HaGoogleSpeak.py
     enabled: true
     url: "http://homeassistant.local:8123/api"
     token: "token123ABC"
-    entity: "media_player.nesti"
+    entity_id: "tts.google_en_com"
+    media_player_entity_id: "media_player.nesti_speaker"
+    volume_level: 1  # 0.0 to 1.0
+    message: "El gato está en la caja de arena."
+    objects:
+      - "cat"
+
+  ha_google_say:  # LEGACY: ./channels/HaGoogleSay.py
+    enabled: true
+    url: "http://homeassistant.local:8123/api"
+    token: "token123ABC"
+    entity: "media_player.nesti_speaker"
     message: "El gato está en la caja de arena."
     language: "es"
     objects:
       - "cat"
+
   discord_webhook:
     enabled: true
     url: "https://discordapp.com/api/webhooks/X/Y"
