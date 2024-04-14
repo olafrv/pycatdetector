@@ -6,7 +6,7 @@ import warnings
 
 class NeuralNet:
     net = None
-    
+
     def __init__(self, model_name='ssd_512_mobilenet1.0_voc', pretrained=True):
         # https://cv.gluon.ai/model_zoo/detection.html (model_name=?)
         # https://github.com/apache/mxnet/issues/15281
@@ -43,9 +43,6 @@ class NeuralNet:
             "scores": scores,
             "boxes": bounding_boxes
         }
-
-    def get_classes(self):
-        return self.net.classes
 
     def get_scored_labels(self, min_score, result):
         classes = result["classes"][0]
