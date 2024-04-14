@@ -42,6 +42,8 @@ def main():
     detector = Detector(recorder, screener_enabled, net, net_min_score)
 
     notifier = Notifier(detector)
+    notifier.set_notify_window(config.get("notify_window_start"),
+                               config.get("notify_window_end"))
     attach_channels(notifier)
 
     recorder.start()
