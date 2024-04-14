@@ -20,7 +20,9 @@ metadata:
 	@ echo "METADATA: NAME=${NAME}, VERSION=${VERSION}"
 
 install: install.venv
+# https://github.com/pytorch/pytorch/issues/17023  - PyTorch Download Speed Issue
 	@ . venv/bin/activate \
+		&& pip3 install torch torchvision -f https://download.pytorch.org/whl/torch_stable.html --no-cache-dir \
 		&& pip3 install -Ur requirements.txt
 
 # customize!

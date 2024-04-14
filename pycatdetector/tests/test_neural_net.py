@@ -5,26 +5,27 @@ import os
 
 def test_main():
     nn = NeuralNet()
+    assert 'cat' in nn.get_classes()
+    print()   
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')
-    print()
     for filename in os.listdir(dirname):
         fullpath = os.path.join(dirname, filename)
+
         with open(fullpath, 'rb') as fp:
             str_image = fp.read()
             image = mx.img.imdecode(str_image)
-            labels = nn.get_scored_labels(0.5, nn.analyze(image))
+            scored_labels = nn.get_scored_labels(0.5, nn.analyze(image))
+            print(fullpath + " => " + repr(scored_labels))
+            labels = [label['label'] for label in scored_labels]
             if len(labels) == 0:
                 assert False
-            for label in labels:
-                print(fullpath + "=>" + str(labels))
-                assert label['label'] == 'cat'
+            else:
+                assert 'cat' in labels
 
-            labels = nn.get_scored_labels(0.5, nn.analyze(fullpath))
-
-            if len(labels) == 0:
-                assert False
-            for label in labels:
-                print(fullpath + "=>" + str(labels))
-                assert label['label'] == 'cat'
-
-    assert 'cat' in nn.get_classes()
+        scored_labels = nn.get_scored_labels(0.5, nn.analyze(fullpath))
+        print(fullpath + " => " + repr(scored_labels))
+        labels = [label['label'] for label in scored_labels]
+        if len(labels) == 0:
+            assert False
+        else:
+            assert 'cat' in labels

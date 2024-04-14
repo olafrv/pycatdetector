@@ -8,6 +8,7 @@ import pycatdetector.channels
 from pycatdetector.Config import Config
 from pycatdetector.Recorder import Recorder
 from pycatdetector.NeuralNet import NeuralNet
+from pycatdetector.NeuralNet2 import NeuralNet2
 from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
@@ -35,8 +36,13 @@ def main():
     recorder = Recorder(config.get("rtsp_url"))
 
     screener_enabled = not config.get("headless")
-    net_model_name = config.get("net_model_name")
-    net = NeuralNet(model_name=net_model_name)
+    if config.get("net_version") == 'v1':
+        net_model_name = config.get("net_model_name")
+        net = NeuralNet(model_name=net_model_name)
+    elif config.get("net_version") == 'v2':
+        net = NeuralNet2(model_name=net_model_name)
+    else:
+        raise ValueError("Invalid net_version: " + config.get("net_version"))
 
     net_min_score = config.get("net_min_score")
     detector = Detector(recorder, screener_enabled, net, net_min_score)
