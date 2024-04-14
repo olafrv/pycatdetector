@@ -19,10 +19,10 @@ class Detector(threading.Thread):
     must_stop = False
     logger = None
 
-    def __init__(self, 
-                 recorder: Recorder, 
-                 screener_enabled: bool, 
-                 net: NeuralNet, 
+    def __init__(self,
+                 recorder: Recorder,
+                 screener_enabled: bool,
+                 net: NeuralNet,
                  net_min_score: int):
         threading.Thread.__init__(self)
         self.images = recorder.getImages()
