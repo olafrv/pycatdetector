@@ -40,12 +40,12 @@ def main():
         net_model_name = config.get("net_model_name")
         net = NeuralNet(model_name=net_model_name)
     elif config.get("net_version") == 'v2':
-        net = NeuralNet2(model_name=net_model_name)
+        net = NeuralNet2()
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
 
-    net_min_score = config.get("net_min_score")
-    detector = Detector(recorder, screener_enabled, net, net_min_score)
+    notify_min_score = config.get("notify_min_score")
+    detector = Detector(recorder, screener_enabled, net, notify_min_score)
 
     notifier = Notifier(detector)
     notifier.set_notify_window(config.get("notify_window_start"),

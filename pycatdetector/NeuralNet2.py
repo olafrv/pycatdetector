@@ -3,6 +3,7 @@
 import os
 import PIL
 from torchvision.io import read_image
+from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
 from torchvision.models.detection import \
     fasterrcnn_mobilenet_v3_large_fpn, \
@@ -31,7 +32,8 @@ class NeuralNet2:
         #   models/detection/faster_rcnn.py
         ###
         self.weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
-        self.model = fasterrcnn_mobilenet_v3_large_fpn(weights=self.weights)
+        self.model = fasterrcnn_mobilenet_v3_large_fpn(weights=self.weights,
+                                                       box_score_thresh=0.7)
         self.model.eval()
         self.preprocess = self.weights.transforms()
 
@@ -39,17 +41,19 @@ class NeuralNet2:
         img = None
         if isinstance(image, str):
             if os.path.exists(image):
-                img = read_image(image)
+                img = read_image(image)  # PIL Image
             else:
                 raise FileNotFoundError
         else:
             if not isinstance(image, PIL.Image.Image):
-                img = PIL.Image.fromarray(image)
+                img = PIL.Image.fromarray(image)  # PIL Image
+
         batch = [self.preprocess(img)]
         prediction = self.model(batch)[0]
         labels = [
             self.weights.meta["categories"][i] for i in prediction["labels"]
         ]
+
         return {
             "image": img,
             "labels": labels,
@@ -76,7 +80,11 @@ class NeuralNet2:
 
     def plot(self, result, ax):
         img = result["image"]
-        classes = result["classes"]
+        labels = result["labels"]
         boxes = result["boxes"]
-        result = draw_bounding_boxes(img, boxes, labels=classes, width=2)
-        ax.imshow(result)
+        img_tensor = ToTensor()(img)  # Convert PIL Image to tensor
+        img_tensor = img_tensor.mul(255).byte()  # Convert to tensor (uint8)
+        img_tensor = draw_bounding_boxes(img_tensor, boxes,
+                                         labels=labels, width=20)
+        img = ToPILImage()(img_tensor)
+        ax.imshow(img)

@@ -10,7 +10,7 @@ from datetime import datetime
 
 class Detector(threading.Thread):
     net = None
-    net_min_score = None
+    notify_min_score = None
     images = None
     tests = None
     detections = None
@@ -23,11 +23,11 @@ class Detector(threading.Thread):
                  recorder: Recorder,
                  screener_enabled: bool,
                  net: NeuralNet,
-                 net_min_score: int):
+                 notify_min_score: int):
         threading.Thread.__init__(self)
         self.images = recorder.getImages()
         self.net = net
-        self.net_min_score = net_min_score
+        self.notify_min_score = notify_min_score
         self.screener_enabled = screener_enabled
         self.tests = SimpleQueue() if self.screener_enabled else None
         self.detections = SimpleQueue()
@@ -46,7 +46,7 @@ class Detector(threading.Thread):
                         "Starting with Thread ID: %s"
                         % (threading.get_native_id())
                         )
-        self.logger.info('Minimum Score: '+str(self.net_min_score))
+        self.logger.info('Minimum Score: '+str(self.notify_min_score))
 
         while (not self.must_stop):
 
@@ -66,7 +66,7 @@ class Detector(threading.Thread):
                     )
 
                 detections = self.net.get_scored_labels(
-                                self.net_min_score, result
+                                self.notify_min_score, result
                              )
                 for detection in detections:
                     detection['timestamp'] = str(datetime.now())

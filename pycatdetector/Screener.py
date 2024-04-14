@@ -3,6 +3,7 @@ from matplotlib import pyplot as plt
 import matplotlib
 import logging
 
+
 class Screener:
 
     detector = None
@@ -25,7 +26,7 @@ class Screener:
         self.logger.info("Showing...")
         matplotlib.use('TkAgg')
         plt.ion()
-        fig = plt.figure()
+        fig = plt.figure("PyCatDetector")
         fig.canvas.mpl_connect('close_event', self.close)
         ax = fig.add_subplot()
         tests = self.detector.get_tests()
