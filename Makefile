@@ -131,7 +131,7 @@ docker.clean:
 
 # customize!
 docker.run:
-	@ docker run --rm --cpus ${CPUS} \
+	@ docker run --rm -it --cpus ${CPUS} \
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		${IMAGE_NAME}:${VERSION}
