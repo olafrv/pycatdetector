@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 import os
 import PIL
 from torchvision.io import read_image

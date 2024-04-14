@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 import os
 import mxnet as mx
 from gluoncv import model_zoo, data, utils
@@ -22,7 +24,7 @@ class NeuralNet:
             Returns the classes of the detected objects.
 
         get_scored_labels(self, min_score, result):
-            Returns the labels of the detected objects with scores above a 
+            Returns the labels of the detected objects with scores above a
             minimum threshold.
 
         plot(self, result, ax):
@@ -35,9 +37,9 @@ class NeuralNet:
         Initializes the NeuralNet object.
 
         Args:
-            model_name (str): The name of the model to use for object detection.
+            model_name (str): Name of the model to use for object detection.
             Default is 'ssd_512_mobilenet1.0_voc'.
-            pretrained (bool): Whether to use a pretrained model. Default is True.
+            pretrained (bool): Use pretrained model. Default: True.
         """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -89,20 +91,20 @@ class NeuralNet:
         Returns the classes of the detected objects.
 
         Returns:
-            list: A list of strings representing the classes of the detected objects.
+            list: A list of strings of the classes of the detected objects.
         """
         return self.net.classes
 
     def get_scored_labels(self, min_score, result):
         """
-        Returns the labels of the detected objects with scores above a minimum threshold.
+        Returns the labels of the detected objects with a minimun score.
 
         Args:
             min_score (float): The minimum score threshold.
-            result (dict): The result dictionary returned by the analyze method.
+            result (dict): The result dict returned by the analyze method.
 
         Returns:
-            list: A list of dictionaries containing the labels and scores of the detected objects.
+            list: List of dicts with labels and scores of the detected objects.
         """
         classes = result["classes"][0]
         scores = result["scores"][0]
@@ -132,7 +134,7 @@ class NeuralNet:
         Plots the detected objects on the image.
 
         Args:
-            result (dict): The result dictionary returned by the analyze method.
+            result (dict): The result dict returned by the analyze method.
             ax: The matplotlib axes object to plot on.
         """
         img = result["image"]
