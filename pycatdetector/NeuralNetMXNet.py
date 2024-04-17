@@ -1,12 +1,13 @@
 # pyright: reportMissingImports=false
 
+from .AbstractNeuralNet import AbstractNeuralNet
 import os
 import mxnet as mx
 from gluoncv import model_zoo, data, utils
 import warnings
 
 
-class NeuralNet:
+class NeuralNetMXNet(AbstractNeuralNet):
     """
     A class representing a neural network for object detection.
 
@@ -129,19 +130,22 @@ class NeuralNet:
                 })
         return scored_labels
 
-    def plot(self, result, ax):
+    def plot(self, result):
         """
         Plots the detected objects on the image.
+        https://cv.gluon.ai/_modules/gluoncv/utils/viz/bbox.html
 
         Args:
             result (dict): The result dict returned by the analyze method.
-            ax: The matplotlib axes object to plot on.
+
+        Returns:
+            numpy.ndarray: The image with the detected objects plotted.
         """
         img = result["image"]
         classes = result["classes"][0]
         scores = result["scores"][0]
         boxes = result["boxes"][0]
 
-        utils.viz.plot_bbox(img=img, bboxes=boxes, scores=scores,
-                            labels=classes, class_names=self.net.classes,
-                            ax=ax)
+        return utils.viz.cv_plot_bbox(
+            img=img, bboxes=boxes, scores=scores,
+            labels=classes, class_names=self.net.classes)

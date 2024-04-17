@@ -1,9 +1,9 @@
-from pycatdetector.NeuralNet2 import NeuralNet2
+from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 import os
 
 
 def test_main():
-    nn = NeuralNet2()
+    nn = NeuralNetPyTorch()
     assert 'cat' in nn.get_classes()
     print()
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')

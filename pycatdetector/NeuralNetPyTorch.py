@@ -1,5 +1,6 @@
 # pyright: reportMissingImports=false
 
+from .AbstractNeuralNet import AbstractNeuralNet
 import os
 import PIL
 from torchvision.io import read_image
@@ -17,7 +18,7 @@ from torchvision.models.detection import \
 # https://pytorch.org/vision/stable/auto_examples/others/
 #   plot_visualization_utils.html
 
-class NeuralNet2:
+class NeuralNetPyTorch(AbstractNeuralNet):
     weights = None
     model = None
     preprocess = None
@@ -55,7 +56,7 @@ class NeuralNet2:
         ]
 
         return {
-            "image": img,
+            "image": img,  # PIL Image
             "labels": labels,
             "scores": prediction["scores"],
             "boxes": prediction["boxes"]
@@ -78,13 +79,13 @@ class NeuralNet2:
                 })
         return scored_labels
 
-    def plot(self, result, ax):
+    def plot(self, result) -> PIL.Image.Image:
         img = result["image"]
         labels = result["labels"]
         boxes = result["boxes"]
         img_tensor = ToTensor()(img)  # Convert PIL Image to tensor
         img_tensor = img_tensor.mul(255).byte()  # Convert to tensor (uint8)
         img_tensor = draw_bounding_boxes(img_tensor, boxes,
-                                         labels=labels, width=20)
+                                         labels=labels, width=1)
         img = ToPILImage()(img_tensor)
-        ax.imshow(img)
+        return img

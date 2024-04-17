@@ -22,7 +22,7 @@ class Recorder (threading.Thread):
         self.logger = logging.getLogger(__name__)
         self.images = SimpleQueue()
 
-    def getImages(self):
+    def get_images(self):
         return self.images
 
     def run(self):
@@ -39,7 +39,7 @@ class Recorder (threading.Thread):
         else:
             self.logger.info("Already stopped.")
 
-    def maskUrl(self, url) -> str:
+    def mask_url(self, url) -> str:
         parsed = urlparse(url)
         # 'https://user:???@example.com/path?key=value#hash'
         replaced = parsed._replace(
@@ -54,7 +54,7 @@ class Recorder (threading.Thread):
             cap = cv2.VideoCapture(self.rtspUrl)
             if not cap.isOpened():
                 self.logger.error(
-                    "Connection error to: " + self.maskUrl(self.rtspUrl)
+                    "Connection error to: " + self.mask_url(self.rtspUrl)
                 )
                 conn_error = True
             else:

@@ -7,8 +7,8 @@ import colorlog
 import pycatdetector.channels
 from pycatdetector.Config import Config
 from pycatdetector.Recorder import Recorder
-from pycatdetector.NeuralNet import NeuralNet
-from pycatdetector.NeuralNet2 import NeuralNet2
+from pycatdetector.NeuralNetMXNet import NeuralNetMXNet
+from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
@@ -38,14 +38,17 @@ def main():
     screener_enabled = not config.get("headless")
     if config.get("net_version") == 'v1':
         net_model_name = config.get("net_model_name")
-        net = NeuralNet(model_name=net_model_name)
+        net = NeuralNetMXNet(model_name=net_model_name)
     elif config.get("net_version") == 'v2':
-        net = NeuralNet2()
+        net = NeuralNetPyTorch()
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
 
     notify_min_score = config.get("notify_min_score")
-    detector = Detector(recorder, screener_enabled, net, notify_min_score)
+    videos_folder = config.get("videos_folder")
+
+    detector = Detector(recorder, screener_enabled, net,
+                        notify_min_score, videos_folder)
 
     notifier = Notifier(detector)
     notifier.set_notify_window(config.get("notify_window_start"),

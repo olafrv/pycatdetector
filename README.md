@@ -17,6 +17,7 @@ sequenceDiagram
     participant Camera
     participant Recorder
     participant Detector
+    participant Encoder
     participant Screener
     participant Notifier
     participant Channel
@@ -29,8 +30,11 @@ sequenceDiagram
     loop Read (Queue)
       Detector->>Screener: Image
     end
-    Detector->>Notifier: notify()
-    Notifier->>Channel: notify()
+    Detector->>Encoder: write(Video, Image)
+    loop Read (Queue)
+      Detector->>Notifier: Label/Score
+    end
+    Notifier->>Channel: notify(Label)
 ```
 
 # Requirements
@@ -124,11 +128,12 @@ make github.release  # create a new github relase
 
 # References
 
-## OpenCV (not cv2)
+## OpenCV (cv2)
 * https://pypi.org/project/opencv-python/
 * https://docs.opencv.org/4.6.0/d6/d00/tutorial_py_root.html
 * https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html
 * https://answers.opencv.org/question/24714/skipping-frames-in-videocapture/
+* https://docs.opencv.org/4.x/dd/d9e/classcv_1_1VideoWriter.html
 
 ## GluonCV
 * https://cv.gluon.ai/

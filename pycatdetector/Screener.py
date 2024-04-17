@@ -9,7 +9,6 @@ class Screener:
     detector = None
     must_stop = False
     logger = None
-    neuralnet = None
 
     def __init__(self, detector):
         self.detector = detector
@@ -29,13 +28,12 @@ class Screener:
         fig = plt.figure("PyCatDetector")
         fig.canvas.mpl_connect('close_event', self.close)
         ax = fig.add_subplot()
-        tests = self.detector.get_tests()
-        net = self.detector.get_net()
+        imgs = self.detector.get_images()
         while (not self.must_stop):
             ax.clear()
-            if not tests.empty():
-                detection = tests.get(block=False)
-                net.plot(detection, ax)
+            if not imgs.empty():
+                img = imgs.get(block=False)
+                ax.imshow(img)
                 fig.canvas.draw()
                 fig.canvas.flush_events()
             else:

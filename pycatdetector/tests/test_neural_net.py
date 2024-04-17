@@ -1,10 +1,10 @@
-from pycatdetector.NeuralNet import NeuralNet
+from pycatdetector.NeuralNetMXNet import NeuralNetMXNet
 import mxnet as mx
 import os
 
 
 def test_main():
-    nn = NeuralNet()
+    nn = NeuralNetMXNet()
     assert 'cat' in nn.get_classes()
     print()   
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')

@@ -12,9 +12,11 @@ net_version: 'v2'  # 'v1' MXNet or 'v2' PyTorch
 # https://cv.gluon.ai/model_zoo/detection.html
 # net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Slower), min_score = 0.9
 # net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Faster), min_score = 0.7
+# For 'v2' PyTorch use min_score = 0.9
 notify_min_score: 0.9
 notify_window_start: "06:00"
 notify_window_end: "22:00"
+videos_folder: "./videos"
 
 ###
 # PyCatDetector Notifiers

@@ -5,6 +5,8 @@ __pycache__
 venv
 # temporal file
 *.swp
+# videos
+videos
 # logs
 logs
 *.log
