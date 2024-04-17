@@ -58,7 +58,10 @@ This Python package has been tested and designed for:
 
 ## AVX Instruction Set
 
-> **NOTICE:** If your Linux is a Virtual Machine running on a Windows host you need to disable Windows Security > Core Isolation > Memory Protection.
+> **NOTICE:** If your Linux is a Virtual Machine running on a Windows host you \
+> need to disable Windows Security > Core Isolation > Memory Protection.
+
+### Linux (or WSL2)
 
 Check if your CPU (or vCPU) is supporting the AVX instruction set:
 
@@ -66,13 +69,25 @@ Check if your CPU (or vCPU) is supporting the AVX instruction set:
 cat /proc/cpuinfo | grep -i avx
 ```
 
-To check when using MXNet if AVX, define the following environment variable:
+### Apache MXNet
+
+During runtime check if AVX, define the following environment variable:
+
 ```bash
+# Apache MXNet
 export MKLDNN_VERBOSE=1
 # unset MKLDNN_VERBOSE
 ```
+See more information on: \
+https://mxnet.apache.org/versions/1.9.1/api/python/docs/tutorials/performance/backend/mkldnn/index.html
 
-See more information on: https://mxnet.apache.org/versions/1.9.1/api/python/docs/tutorials/performance/backend/mkldnn/index.html
+### PyTorch
+
+Run the following to check if AVX is enabled: [test_aaa_torch.py](./pycatdetector/tests/test_aaa_torch.py).
+
+See more information on: \
+https://pytorch.org/get-started/locally/#windows-verification
+
 
 # Usage
 
