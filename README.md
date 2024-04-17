@@ -113,23 +113,24 @@ make uninstall       # remove python requirements and disposable folders
 
 ```shell
 # Metadata and Requirements
-make metadata        # show release METADATA file content
-make install.dev     # install development requirements
+make metadata             # show release METADATA file content
+make install.dev          # install development requirements
+make package.outdated     # check outdated python packages
 # Binary build with Nuitka3
-make build           # build binary with nuitka3
-make clean           # delete local disposable files
-make run.bin         # run ./dist/main.bin dynamically linked binary
+make build                # build binary with nuitka3
+make clean                # delete local disposable files
+make run.bin              # run ./dist/main.bin dynamically linked binary
 # Profiling and Testing
-make profile         # run python3 profiling over main.py
-make profile.view    # check profiling results with snake
-make test            # run ./pycatdetector/tests/*
-make test.cov        # check call coverage during runtime
-make test.cov.report # check test coverage after runtime
+make profile              # run python3 profiling over main.py
+make profile.view         # check profiling results with snake
+make test                 # run ./pycatdetector/tests/*
+make test.coverage        # check call coverage during runtime
+make test.coverage.report # check test coverage after runtime
 # GitHub Release
 # See Makefile for required GITHUB_* required variables
 # Adjust METADATA file before running the following commands
-make github.push     # push docker image to github registry
-make github.release  # create a new github relase
+make github.push          # push docker image to github registry
+make github.release       # create a new github relase
 ```
 
 # References

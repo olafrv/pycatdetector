@@ -38,8 +38,8 @@ install.venv: install.base
 		&& . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip \
-		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_resnet50_v1_voc', True)" \
-		&& python3 -c "from ${NAME} import NeuralNet; NeuralNet('ssd_512_mobilenet1.0_voc', True)" \
+		&& python3 -c "from ${NAME} import NeuralNetMXNet; NeuralNetMXNet('ssd_512_resnet50_v1_voc', True)" \
+		&& python3 -c "from ${NAME} import NeuralNetMXNet; NeuralNetMXNet('ssd_512_mobilenet1.0_voc', True)" \
 		&& sudo apt install python3-tk  # matplotlib uses tkinter
 
 install.base:
@@ -78,6 +78,12 @@ build: install.dev
 			--show-progress --report=./build/main.xml -j6 \
 			main.py
 	@ chmod +x build/main.bin
+
+package.outdated:
+	@ . venv/bin/activate \
+		&& pip3 list --outdated > requirements.new && deactivate
+	@ grep -f requirements.txt requirements.new > requirements.outdated || true
+	@ grep -f requirements-dev.txt requirements.new > requirements-dev.outdated || true
 
 # customize!
 run:

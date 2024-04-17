@@ -2,7 +2,7 @@
 
 # General
 numpy==1.23  # https://github.com/apache/mxnet/issues/21165
-colorlog==6.7.0
+colorlog==6.8.2
 
 # Neural Net v1 - MXNet
 # ./venv/lib/python3.10/site-packages/gluoncv/__init__.py

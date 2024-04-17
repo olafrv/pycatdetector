@@ -20,5 +20,7 @@ build
 pycatdetector.bin
 pycatdetector.xml
 # test
+requirements.new
+requirements*.outdated
 .pytest_cache
 .coverage
