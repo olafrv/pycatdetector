@@ -13,6 +13,7 @@ def test_main():
     for filename in os.listdir(dirname):
         fullpath = os.path.join(dirname, filename)
 
+        # Use analyze() + in memory image
         with open(fullpath, 'rb') as fp:
             str_image = fp.read()
             image = mx.img.imdecode(str_image)
@@ -24,6 +25,7 @@ def test_main():
             else:
                 assert 'cat' in labels
 
+        # Use analyze() + image file path
         scored_labels = nn.get_scored_labels(0.5, nn.analyze(fullpath))
         print(fullpath + " => " + repr(scored_labels))
         labels = [label['label'] for label in scored_labels]
