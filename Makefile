@@ -136,23 +136,18 @@ docker.run:
 	@ docker run --rm -it --cpus ${CPUS} \
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
+		-v "${PWD}/videos:${IMAGE_APP_DIR}/videos" \
 		${IMAGE_NAME}:${VERSION}
-
-docker.sh:
-	@ docker exec -it ${NAME} /bin/bash
 
 docker.start:
 	@ docker compose pull && docker compose up -d
 
+docker.sh:
+	@ docker exec -it ${NAME} /bin/bash
+
 docker.stop:
 	@ docker compose down
 
-# customize!
-docker.exec:
-	@ docker run --rm -it --cpus ${CPUS} \
-		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
-    	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
-		--entrypoint /bin/bash ${IMAGE_NAME}:${VERSION}
 
 github.push: docker.build
 	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry

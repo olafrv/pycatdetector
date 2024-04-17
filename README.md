@@ -83,43 +83,49 @@ git clone "https://github.com/olafrv/pycatdetector.git"
 cd pycatdetector
 mv config.example.yaml config.yaml # edit manually afterwards
 ```
+
 ## Run (Python)
 ```shell
-make install      # install end user requirements
-make check-config # checks for YAML parsing errors
-make run          # with python3 interpreter
+make install         # install end user requirements
+make check-config    # checks for YAML parsing errors
+make run             # with python3 interpreter
 ```
 
-## Docker
+## Run (Docker)
 
 ```shell
-./install-docker.sh # install docker and docker-compose
-make docker.build   # build docker image (adjust METADATA first !!!)
-make docker.run     # A) without compose, deleted after stopped
-make docker.start   # B) with compose, add '-d' to run in foreground
-make docker.stop    # B) stop the composed docker service
-make docker exec    # Open bash in the container
+./install-docker.sh  # install docker with compose capabilities
+make docker.build    # build docker image with python requirements
+make docker.run      # A) without compose, and removed after stopped
+make docker.start    # B.1) with compose running in background as service
+make docker.stop     # B.2) stop the composed container service
+make docker.sh       # B.3) open bash in the container service
+make docker.clean    # delete local docker images to save space
 ```
 
 ## Uninstall
-```
-make uninstall    # remove python requirements and disposable folders
+
+```shell
+make uninstall       # remove python requirements and disposable folders
 ```
 
 ## Advanced/Developement
+
 ```shell
-make metadata        # show METADATA file content
-make uninstall       # revert install steps
+# Metadata and Requirements
+make metadata        # show release METADATA file content
 make install.dev     # install development requirements
+# Binary build with Nuitka3
 make build           # build binary with nuitka3
 make clean           # delete local disposable files
 make run.bin         # run ./dist/main.bin dynamically linked binary
+# Profiling and Testing
 make profile         # run python3 profiling over main.py
 make profile.view    # check profiling results with snake
 make test            # run ./pycatdetector/tests/*
 make test.cov        # check call coverage during runtime
-make test.cov.report # check test coverage
-make docker.clean    # delete local docker images of this project
+make test.cov.report # check test coverage after runtime
+# GitHub Release
 # See Makefile for required GITHUB_* required variables
 # Adjust METADATA file before running the following commands
 make github.push     # push docker image to github registry
