@@ -138,6 +138,9 @@ docker.run:
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		${IMAGE_NAME}:${VERSION}
 
+docker.sh:
+	@ docker exec -it ${NAME} /bin/bash
+
 docker.start:
 	@ docker compose pull && docker compose up -d
 
