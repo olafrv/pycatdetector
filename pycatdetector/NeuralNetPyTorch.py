@@ -11,13 +11,6 @@ from torchvision.models.detection import \
     FasterRCNN_MobileNet_V3_Large_FPN_Weights
 
 
-# References
-# https://pytorch.org/vision/stable/index.html
-# https://pytorch.org/vision/stable/models.html#classification
-# https://pytorch.org/vision/main/models/faster_rcnn.html
-# https://pytorch.org/vision/stable/auto_examples/others/
-#   plot_visualization_utils.html
-
 class NeuralNetPyTorch(AbstractNeuralNet):
     weights = None
     model = None

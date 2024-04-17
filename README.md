@@ -135,7 +135,13 @@ make github.release  # create a new github relase
 * https://answers.opencv.org/question/24714/skipping-frames-in-videocapture/
 * https://docs.opencv.org/4.x/dd/d9e/classcv_1_1VideoWriter.html
 
-## GluonCV
+## PyTorch - Torchvision
+* https://pytorch.org/vision/stable/index.html
+* https://pytorch.org/vision/stable/models.html#classification
+* https://pytorch.org/vision/main/models/faster_rcnn.html
+* https://pytorch.org/vision/stable/auto_examples/others/plot_visualization_utils.html
+
+## GluonCV (Legacy)
 * https://cv.gluon.ai/
 * https://cv.gluon.ai/install.html
 * https://cv.gluon.ai/tutorials/index.html
@@ -145,18 +151,19 @@ make github.release  # create a new github relase
 * https://cv.gluon.ai/_modules/gluoncv/data/transforms/presets/ssd.html
 * https://cv.gluon.ai/api/model_zoo.html
 
-## Apache MXNet
+## Apache MXNet (Legacy)
 * https://mxnet.apache.org/versions/0.11.0/
 * https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
 * https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
+
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 
 ## Deep Learning (MXNet)
-
 * https://d2l.ai/chapter_computer-vision/bounding-box.html
 
 ## PEP 8 – Style Guide for Python Code
 * https://peps.python.org/pep-0008/
+
 ## PEP 0 – Index of Python Enhancement Proposals (PEPs)
 * https://peps.python.org/pep-0000/

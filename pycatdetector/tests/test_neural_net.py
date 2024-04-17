@@ -1,3 +1,5 @@
+# pyright: reportMissingImports=false
+
 from pycatdetector.NeuralNetMXNet import NeuralNetMXNet
 import mxnet as mx
 import os
@@ -6,7 +8,7 @@ import os
 def test_main():
     nn = NeuralNetMXNet()
     assert 'cat' in nn.get_classes()
-    print()   
+    print()
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')
     for filename in os.listdir(dirname):
         fullpath = os.path.join(dirname, filename)
