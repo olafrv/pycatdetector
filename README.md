@@ -66,7 +66,7 @@ Check if your CPU (or vCPU) is supporting the AVX instruction set:
 cat /proc/cpuinfo | grep -i avx
 ```
 
-To check when running if AVX is used define the following environment variable:
+To check when using MXNet if AVX, define the following environment variable:
 ```bash
 export MKLDNN_VERBOSE=1
 # unset MKLDNN_VERBOSE
