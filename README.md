@@ -52,8 +52,11 @@ This Python package has been tested and designed for:
 * Software:
   * [Ubuntu Linux 22.04 LTS](https://releases.ubuntu.com/)
   * [Python 3.10.6](https://docs.python.org/3/) and several [python libraries](https://github.com/olafrv/pycatdetector/blob/master/requirements.txt).
-  * (Optional) [Docker and/or Docker Compose](https://docs.docker.com/) for headless run (no graphical features).
+  * PyCatDetector uses [Apache MXNet](https://attic.apache.org/projects/mxnet.html) but it is being [refactored](https://github.com/olafrv/pycatdetector/issues/4) to only rely on [PyTorch](https://pytorch.org/).
+  * (Recommended) [Docker and/or Docker Compose](https://docs.docker.com/) for headless run (no graphical features).
   * (Optional) [HomeAssistant](https://www.home-assistant.io/) endpoint for Text-To-Speach (TTS) service.
+
+
 
 
 ## AVX Instruction Set
@@ -69,7 +72,14 @@ Check if your CPU (or vCPU) is supporting the AVX instruction set:
 cat /proc/cpuinfo | grep -i avx
 ```
 
-### Apache MXNet
+### PyTorch
+
+Run the following to check if AVX is enabled: [test_aaa_torch.py](./pycatdetector/tests/test_aaa_torch.py).
+
+See more information on: \
+https://pytorch.org/get-started/locally/#windows-verification
+
+### Apache MXNet (Legacy)
 
 During runtime check if AVX, define the following environment variable:
 
@@ -80,14 +90,6 @@ export MKLDNN_VERBOSE=1
 ```
 See more information on: \
 https://mxnet.apache.org/versions/1.9.1/api/python/docs/tutorials/performance/backend/mkldnn/index.html
-
-### PyTorch
-
-Run the following to check if AVX is enabled: [test_aaa_torch.py](./pycatdetector/tests/test_aaa_torch.py).
-
-See more information on: \
-https://pytorch.org/get-started/locally/#windows-verification
-
 
 # Usage
 

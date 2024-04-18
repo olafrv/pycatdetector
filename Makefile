@@ -22,7 +22,6 @@ metadata:
 install: install.venv
 # https://github.com/pytorch/pytorch/issues/17023  - PyTorch Download Speed Issue
 	@ . venv/bin/activate \
-		&& pip3 install torch torchvision -f https://download.pytorch.org/whl/torch_stable.html --no-cache-dir \
 		&& pip3 install -Ur requirements.txt
 
 # customize!
@@ -38,8 +37,10 @@ install.venv: install.base
 		&& . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip \
-		&& python3 -c "from ${NAME} import NeuralNetMXNet; NeuralNetMXNet('ssd_512_resnet50_v1_voc', True)" \
-		&& python3 -c "from ${NAME} import NeuralNetMXNet; NeuralNetMXNet('ssd_512_mobilenet1.0_voc', True)" \
+		&& sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' venv/lib/python3.10/site-packages/gluoncv/__init__.py \
+		&& python3 -c "from ${NAME}.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_resnet50_v1_voc', True)" \
+		&& python3 -c "from ${NAME}.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_mobilenet1.0_voc', True)" \
+		&& python3 -c "from  ${NAME}.NeuralNetPyTorch import NeuralNetPyTorch; NeuralNetPyTorch();" \
 		&& sudo apt install python3-tk  # matplotlib uses tkinter
 
 install.base:
@@ -131,7 +132,7 @@ docker.build:
 #	@ docker buildx build \
 #		--push --platform linux/amd64,linux/arm64 \
 #		-t ${IMAGE_NAME}:${VERSION} .
-	@ docker build -t ${IMAGE_NAME}:${VERSION} .
+	@ DOCKER_BUILDKIT=1 docker build -t ${IMAGE_NAME}:${VERSION} .
 	@ docker tag ${IMAGE_NAME}:${VERSION} ${IMAGE_NAME}:latest 
 
 docker.clean:

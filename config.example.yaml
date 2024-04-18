@@ -1,13 +1,14 @@
 ###
 # PyCatDetector Basics
 ###
-log_tty: false
+log_tty: false  # true => stdout, false => log file
 log_dir: "./logs"
-log_level: "info"
+log_level: "info" # debug, info, warning, error
 rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 #headless: true  # Only terminal (no GUI)
 headless: false  # Screener Window (GUI)
-net_version: 'v2'  # 'v1' MXNet or 'v2' PyTorch
+# 'v1' MXNet or 'v2' PyTorch
+net_version: 'v2'  
 # Only tunable for 'v1' MXNet
 # https://cv.gluon.ai/model_zoo/detection.html
 # net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Slower), min_score = 0.9
@@ -33,6 +34,8 @@ notifiers:
     message: "El gato está en la caja de arena."
     objects:
       - "cat"
+#      - "pottedplant"
+#      - "potted plant"
 
   ha_google_say:  # LEGACY: ./channels/HaGoogleSay.py
     enabled: true
@@ -43,10 +46,14 @@ notifiers:
     language: "es"
     objects:
       - "cat"
+#      - "pottedplant"
+#      - "potted plant"
 
   discord_webhook:
     enabled: true
     url: "https://discordapp.com/api/webhooks/X/Y"
-    content: "Hay una planta cerca de la caja de arena."
+    content: "El gato está en la caja de arena."
     objects:
       - "cat"
+#      - "pottedplant"
+#      - "potted plant"

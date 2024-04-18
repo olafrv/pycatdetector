@@ -1,17 +1,20 @@
 # make run
 
 # General
-numpy==1.23  # https://github.com/apache/mxnet/issues/21165
 colorlog==6.8.2
 
-# Neural Net v1 - MXNet
-# ./venv/lib/python3.10/site-packages/gluoncv/__init__.py
-# Comment the line: # _require_mxnet_version('1.4.0', '2.0.0')
-# To fix conflict with PyTorch and MXNet requirements
+# Neural Net MXNet (Legacy)
+#
+# To fix conflict with PyTorch and MXNet requirements:
+# sed -i 's/\(_require_.*_version\)/# FIX: \1/g' \
+#   ./venv/lib/python3.10/site-packages/gluoncv/__init__.py
+#
+numpy==1.23  # https://github.com/apache/mxnet/issues/21165
 mxnet==1.9.1
 gluoncv==0.10.5
 
-# Neural Net v2 - PyTorch
-torch==2.2.2+rocm5.7
-torchvision==0.17.2+rocm5.7
-pytorch-triton-rocm==2.2.0
+# Neural Net PyTorch (Remove +cpu for full NVIDIA CUDA support)
+# https://github.com/pytorch/pytorch/issues/29745#issuecomment-553588171
+--find-links https://download.pytorch.org/whl/torch_stable.html
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
