@@ -15,7 +15,7 @@ class NeuralNetMXNet(AbstractNeuralNet):
         net: The neural network model.
 
     Methods:
-        __init__(self, model_name='ssd_512_mobilenet1.0_voc', pretrained=True):
+        __init__(self, model_name):
             Initializes the NeuralNet object.
 
         analyze(self, image):
@@ -33,20 +33,19 @@ class NeuralNetMXNet(AbstractNeuralNet):
     """
     net = None
 
-    def __init__(self, model_name='ssd_512_mobilenet1.0_voc', pretrained=True):
+    def __init__(self, model_name):
         """
         Initializes the NeuralNet object.
 
         Args:
             model_name (str): Name of the model to use for object detection.
-            Default is 'ssd_512_mobilenet1.0_voc'.
             pretrained (bool): Use pretrained model. Default: True.
         """
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             self.net = model_zoo.get_model(
                                            name=model_name,
-                                           pretrained=pretrained
+                                           pretrained=True
                                           )
 
     def analyze(self, image):

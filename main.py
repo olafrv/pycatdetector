@@ -36,11 +36,12 @@ def main():
     recorder = Recorder(config.get("rtsp_url"))
 
     screener_enabled = not config.get("headless")
+    net_model_name = config.get("net_model_name")
+
     if config.get("net_version") == 'v1':
-        net_model_name = config.get("net_model_name")
         net = NeuralNetMXNet(model_name=net_model_name)
     elif config.get("net_version") == 'v2':
-        net = NeuralNetPyTorch()
+        net = NeuralNetPyTorch(model_name=net_model_name)
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
 

@@ -23,21 +23,17 @@ RUN --mount=type=cache,target=/root/.cache/pip pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -Ur requirements.txt
 # RUN pip3 cache purge
 
-# Workaround to avoid downloading the models every time
-# image is built or container is created from the image
-COPY pycatdetector/AbstractNeuralNet.py /opt/pycatdetector/pycatdetector/
-
-# Neural Net MXNet (Legacy)
-COPY pycatdetector/NeuralNetMXNet.py /opt/pycatdetector/pycatdetector/
 # To fix conflict with PyTorch and MXNet requirements:
 RUN sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' \
     /opt/venv/lib/python3.10/site-packages/gluoncv/__init__.py
-RUN python3 -c "from pycatdetector.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_resnet50_v1_voc', True)"
-RUN python3 -c "from pycatdetector.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_mobilenet1.0_voc', True)"
 
-# Neural Net PyTorch
+# Workaround to avoid downloading the models every time
+# image is built or container is created from the image
+COPY pycatdetector/AbstractNeuralNet.py /opt/pycatdetector/pycatdetector/
+COPY pycatdetector/NeuralNetMXNet.py /opt/pycatdetector/pycatdetector/
 COPY pycatdetector/NeuralNetPyTorch.py /opt/pycatdetector/pycatdetector/
-RUN python3 -c "from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch; NeuralNetPyTorch();"
+COPY preload.py /opt/pycatdetector/
+RUN python3 preload.py
 
 # This allows faster builds
 COPY pycatdetector /opt/pycatdetector/pycatdetector

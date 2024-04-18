@@ -6,7 +6,7 @@ import os
 
 
 def test_main():
-    nn = NeuralNetMXNet()
+    nn = NeuralNetMXNet('ssd_512_mobilenet1.0_voc')
     assert 'cat' in nn.get_classes()
     print()
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')

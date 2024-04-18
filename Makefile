@@ -38,9 +38,7 @@ install.venv: install.base
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip \
 		&& sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' venv/lib/python3.10/site-packages/gluoncv/__init__.py \
-		&& python3 -c "from ${NAME}.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_resnet50_v1_voc', True)" \
-		&& python3 -c "from ${NAME}.NeuralNetMXNet import NeuralNetMXNet; NeuralNetMXNet('ssd_512_mobilenet1.0_voc', True)" \
-		&& python3 -c "from  ${NAME}.NeuralNetPyTorch import NeuralNetPyTorch; NeuralNetPyTorch();" \
+		&& python3 preload.py \
 		&& sudo apt install python3-tk  # matplotlib uses tkinter
 
 install.base:

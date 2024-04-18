@@ -6,8 +6,14 @@ import PIL
 from torchvision.io import read_image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
+
+# https://pytorch.org/vision/main/models.html
+# https://pytorch.org/vision/stable/_modules/torchvision/models/detection/ssdlite.html
+# https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html
 from torchvision.models.detection import \
     fasterrcnn_mobilenet_v3_large_fpn, \
+    fasterrcnn_mobilenet_v3_large_320_fpn, \
+    FasterRCNN_MobileNet_V3_Large_320_FPN_Weights, \
     FasterRCNN_MobileNet_V3_Large_FPN_Weights
 
 
@@ -15,19 +21,21 @@ class NeuralNetPyTorch(AbstractNeuralNet):
     weights = None
     model = None
     preprocess = None
+    MIN_FORCED_SCORE = 0.7  # Avoid low confidence detections
 
-    def __init__(self, model_name=None, pretrained=True):
-        ###
-        # https://pytorch.org/vision/0.17/_modules/torchvision/models/detection/
-        #   faster_rcnn.html#FasterRCNN_MobileNet_V3_Large_FPN_Weights
-        # https://pytorch.org/vision/main/_modules/torchvision/models/detection/
-        #   faster_rcnn.html#fasterrcnn_resnet50_fpn
-        # https://github.com/pytorch/vision/blob/main/torchvision/
-        #   models/detection/faster_rcnn.py
-        ###
-        self.weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
-        self.model = fasterrcnn_mobilenet_v3_large_fpn(weights=self.weights,
-                                                       box_score_thresh=0.7)
+    def __init__(self, model_name):
+
+        if model_name == "FasterRCNN_MobileNet_V3_Large_FPN":
+            self.weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
+            self.model = fasterrcnn_mobilenet_v3_large_fpn(
+                weights=self.weights, box_score_thresh=self.MIN_FORCED_SCORE)
+        elif model_name == "FasterRCNN_MobileNet_V3_Large_320_FPN":
+            self.weights = FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
+            self.model = fasterrcnn_mobilenet_v3_large_320_fpn(
+                weights=self.weights, box_score_thresh=self.MIN_FORCED_SCORE)
+        else:
+            raise ValueError("Invalid model_name" + repr(model_name))
+
         self.model.eval()
         self.preprocess = self.weights.transforms()
 

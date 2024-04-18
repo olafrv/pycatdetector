@@ -1,11 +1,16 @@
 # pyright: reportMissingImports=false
 
 import torch
-from torchvision import models
+import torchvision
+from torchvision.models import list_models
 
 
 def test_main():
-    print(dir(models))
+    print()
+    print(list_models(module=torchvision.models.detection))
+    print()
+    print(list_models(module=torchvision.models.quantization))
+    print()
     print(torch.__config__.show())  # AVX flag
     if torch.cuda.is_available():
         print(repr(torch.cuda.get_device_name()))

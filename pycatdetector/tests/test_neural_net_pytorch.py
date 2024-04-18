@@ -3,7 +3,7 @@ import os
 
 
 def test_main():
-    nn = NeuralNetPyTorch()
+    nn = NeuralNetPyTorch("FasterRCNN_MobileNet_V3_Large_320_FPN")
     assert 'cat' in nn.get_classes()
     print()
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')
