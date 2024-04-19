@@ -37,24 +37,26 @@ def main():
 
     screener_enabled = not config.get("headless")
     net_model_name = config.get("net_model_name")
+    notify_min_score = config.get("notify_min_score")
 
     if config.get("net_version") == 'v1':
-        net = NeuralNetMXNet(model_name=net_model_name)
+        net = NeuralNetMXNet(net_model_name)
     elif config.get("net_version") == 'v2':
-        net = NeuralNetPyTorch(model_name=net_model_name)
+        net = NeuralNetPyTorch(net_model_name)
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
 
-    notify_min_score = config.get("notify_min_score")
     videos_folder = config.get("videos_folder")
 
     detector = Detector(recorder, screener_enabled, net,
                         notify_min_score, videos_folder)
 
-    notifier = Notifier(detector)
+    notifier = Notifier(detector.get_detections())
     notifier.set_notify_window(config.get("notify_window_start"),
                                config.get("notify_window_end"))
-    attach_channels(notifier)
+    load_channels(config, notifier)
+
+    detector.set_labels(notifier.get_labels())
 
     recorder.start()
     detector.start()
@@ -79,19 +81,15 @@ def handler(signum, frame):
         detector.stop()
 
 
-def attach_channels(notifier):
-    global config
-    for channel_class_name in pycatdetector.channels.__all__:
-        channel_s = Config.camel_to_snake(channel_class_name)
+def load_channels(config, notifier):
+    for class_name in pycatdetector.channels.__all__:
+        channel_s = Config.camel_to_snake(class_name)
         if config.get("notifiers_" + channel_s + "_enabled"):
-            notifier.add_channel(
-                eval(
-                    'pycatdetector.channels.' +
-                    channel_class_name)(config.get_prefix(
-                            "notifiers_" + channel_s
-                    )
-                ),
-                config.get("notifiers_" + channel_s + "_objects"))
+            filtered_config = config.get_prefix("notifiers_" + channel_s)
+            channel = \
+                eval('pycatdetector.channels.' + class_name)(filtered_config)
+            labels = config.get("notifiers_" + channel_s + "_objects")
+            notifier.add_channel(channel, labels)
 
 
 def enable_logging(config):
@@ -99,7 +97,7 @@ def enable_logging(config):
     # https://docs.python.org/3/howto/logging.html
     if config.get("log_level").upper() == "DEBUG":
         logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
-        logFormat += ' {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
+        logFormat += ' {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
     else:
         logFormat = '[%(asctime)s ' \
             + tz + '] %(levelname)s %(name)s - %(message)s'

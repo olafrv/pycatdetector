@@ -12,14 +12,15 @@ class Notifier(threading.Thread):
     channels = {}
     logger = None
     notifications = {}
+    detections = None
     notify_delay = 2*60  # seconds, less noise for same object detection
     notify_window_start = None  # string with HH:MM 24h format
     notify_window_end = None  # string with HH:MM 24h format
 
-    def __init__(self, detector):
+    def __init__(self, detections):
         threading.Thread.__init__(self)
-        self.detector = detector
         self.logger = logging.getLogger(__name__)
+        self.detections = detections
 
     def add_channel(self, channel, labels):
         for label in labels:
@@ -30,6 +31,9 @@ class Notifier(threading.Thread):
                 self.channels[label] = [channel]
             else:
                 self.channels[label].append(channel)
+
+    def get_labels(self):
+        return self.channels.keys()
 
     def set_notify_window(self, start_hhmm, end_hhmm):
         self.notify_window_start = start_hhmm
@@ -57,12 +61,11 @@ class Notifier(threading.Thread):
 
     def run(self):
         self.logger.info("Started Thread ID: %s" % (threading.get_native_id()))
-        detections = self.detector.get_detections()
         while (not self.must_stop):
 
-            if detections.empty():
-                self.logger.debug(
-                    "Queue empty, sleeping" + str(self.queue_sleep) + "s")
+            if self.detections.empty():
+                self.logger.debug("Sleeping %.2fs due to empty queue..."
+                                  % self.queue_sleep)
                 sleep(self.queue_sleep)
                 continue
 
@@ -73,7 +76,7 @@ class Notifier(threading.Thread):
                 continue
 
             self.logger.debug("Notify window is open")
-            detection = detections.get(block=False)
+            detection = self.detections.get(block=False)
             detected_label = detection['label']
             if detected_label in self.channels.keys():
                 for channel in self.channels[detected_label]:

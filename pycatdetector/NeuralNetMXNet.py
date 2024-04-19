@@ -1,11 +1,10 @@
 # pyright: reportMissingImports=false
 
-from .AbstractNeuralNet import AbstractNeuralNet
 import os
 import mxnet as mx
 from gluoncv import model_zoo, data, utils
 import warnings
-
+from .AbstractNeuralNet import AbstractNeuralNet
 
 class NeuralNetMXNet(AbstractNeuralNet):
     """
@@ -95,7 +94,7 @@ class NeuralNetMXNet(AbstractNeuralNet):
         """
         return self.net.classes
 
-    def get_scored_labels(self, min_score, result):
+    def get_scored_labels(self, result, min_score=-1):
         """
         Returns the labels of the detected objects with a minimun score.
 

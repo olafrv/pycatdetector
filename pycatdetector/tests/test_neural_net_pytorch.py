@@ -9,7 +9,7 @@ def test_main():
     dirname = os.path.join(os.curdir, 'pycatdetector', 'tests', 'images')
     for filename in os.listdir(dirname):
         fullpath = os.path.join(dirname, filename)
-        scored_labels = nn.get_scored_labels(0.5, nn.analyze(fullpath))
+        scored_labels = nn.get_scored_labels(nn.analyze(fullpath), 0.9)
         print(fullpath + " => " + repr(scored_labels))
         labels = [label['label'] for label in scored_labels]
         if len(labels) == 0:

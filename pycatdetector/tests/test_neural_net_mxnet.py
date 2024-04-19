@@ -17,7 +17,7 @@ def test_main():
         with open(fullpath, 'rb') as fp:
             str_image = fp.read()
             image = mx.img.imdecode(str_image)
-            scored_labels = nn.get_scored_labels(0.5, nn.analyze(image))
+            scored_labels = nn.get_scored_labels(nn.analyze(image), 0.9)
             print(fullpath + " => " + repr(scored_labels))
             labels = [label['label'] for label in scored_labels]
             if len(labels) == 0:
@@ -26,7 +26,7 @@ def test_main():
                 assert 'cat' in labels
 
         # Use analyze() + image file path
-        scored_labels = nn.get_scored_labels(0.5, nn.analyze(fullpath))
+        scored_labels = nn.get_scored_labels(nn.analyze(fullpath), 0.9)
         print(fullpath + " => " + repr(scored_labels))
         labels = [label['label'] for label in scored_labels]
         if len(labels) == 0:

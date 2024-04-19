@@ -1,11 +1,11 @@
 # pyright: reportMissingImports=false
 
-from .AbstractNeuralNet import AbstractNeuralNet
 import os
 import PIL
 from torchvision.io import read_image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
+from .AbstractNeuralNet import AbstractNeuralNet
 
 # https://pytorch.org/vision/main/models.html
 # https://pytorch.org/vision/stable/_modules/torchvision/models/detection/ssdlite.html
@@ -21,18 +21,17 @@ class NeuralNetPyTorch(AbstractNeuralNet):
     weights = None
     model = None
     preprocess = None
-    MIN_FORCED_SCORE = 0.7  # Avoid low confidence detections
 
-    def __init__(self, model_name):
+    def __init__(self, model_name, min_score=0.7):
 
         if model_name == "FasterRCNN_MobileNet_V3_Large_FPN":
             self.weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
             self.model = fasterrcnn_mobilenet_v3_large_fpn(
-                weights=self.weights, box_score_thresh=self.MIN_FORCED_SCORE)
+                weights=self.weights, box_score_thresh=min_score)
         elif model_name == "FasterRCNN_MobileNet_V3_Large_320_FPN":
             self.weights = FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
             self.model = fasterrcnn_mobilenet_v3_large_320_fpn(
-                weights=self.weights, box_score_thresh=self.MIN_FORCED_SCORE)
+                weights=self.weights, box_score_thresh=min_score)
         else:
             raise ValueError("Invalid model_name" + repr(model_name))
 
@@ -66,7 +65,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
     def get_classes(self):
         return self.weights.meta["categories"]
 
-    def get_scored_labels(self, min_score, result):
+    def get_scored_labels(self, result, min_score=-1):
         labels = result["labels"]
         scores = result["scores"].detach().numpy()
         boxes = result["boxes"].detach().numpy()

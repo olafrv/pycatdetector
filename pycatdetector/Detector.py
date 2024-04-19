@@ -15,9 +15,11 @@ class Detector(threading.Thread):
     notify_min_score = None
     images = None
     images_boxed = None
+    labels = []
     detections = None
     screenerOn = False
-    sleep_time = 0.1  # seconds
+    sleep_time_min = 0.05  # seconds, avoid CPU overload
+    sleep_time = 10  # seconds, start with worst case
     must_stop = False
     logger = None
 
@@ -38,6 +40,21 @@ class Detector(threading.Thread):
         self.encoder_folder = encoder_folder
         self.encoder_active = False
 
+    def disable_screener(self):
+        self.screener_enabled = False
+        self.images_boxed.empty()
+        self.logger.info("Screener disabled. Queue: %i "
+                         % self.images_boxed.qsize())
+
+    def get_detections(self):
+        return self.detections
+
+    def get_images(self):
+        return self.images_boxed
+
+    def set_labels(self, labels):
+        self.labels = labels
+
     def stop(self):
         if not self.must_stop:
             self.logger.info("Stopping...")
@@ -47,10 +64,8 @@ class Detector(threading.Thread):
 
     def run(self):
 
-        self.logger.info(
-                        "Starting with Thread ID: %s"
-                        % (threading.get_native_id())
-                        )
+        self.logger.info("Starting with Thread ID: %s"
+                         % threading.get_native_id())
         self.logger.info('Minimum Score: '+str(self.notify_min_score))
 
         if len(self.encoder_folder) > 0:
@@ -69,16 +84,38 @@ class Detector(threading.Thread):
             if not self.images.empty():
 
                 image_raw = self.images.get(False)
+                images_queued = self.images.qsize()
 
                 try:
+                    analyze_begin = datetime.now()
                     result = self.net.analyze(image_raw)
+                    analyze_end = datetime.now()
                 except:  # noqa -- flake8 skip
                     self.logger.error(traceback.format_exc())
                     continue
 
-                all_scored_labels = self.net.get_scored_labels(-1, result)
+                analyze_duration = analyze_end - analyze_begin
+                analyze_duration = analyze_duration.total_seconds()
+                if analyze_duration < self.sleep_time_min:
+                    # Avoid CPU overload on next cycle
+                    self.sleep_time = self.sleep_time_min
+                else:
+                    if analyze_duration > self.sleep_time:
+                        # Keep worst case for one more cycle
+                        self.sleep_time = analyze_duration
+                    else:
+                        # Reduce based on average on next sleep
+                        self.sleep_time = \
+                            (analyze_duration + self.sleep_time)/2
+
+                self.logger.debug(
+                    "Analisis: %.3fs, Queue: %i, Shape: %s"
+                    % (analyze_duration, images_queued, str(image_raw.shape))
+                )
+
+                all_scored_labels = self.net.get_scored_labels(result)
                 min_scored_labels = \
-                    self.net.get_scored_labels(self.notify_min_score, result)
+                    self.net.get_scored_labels(result, self.notify_min_score)
 
                 self.logger.debug("ALL: " + repr(all_scored_labels))
                 self.logger.debug("MIN: " + repr(min_scored_labels))
@@ -90,21 +127,18 @@ class Detector(threading.Thread):
                     self.images_boxed.put(image_boxed)
 
                 for detection in min_scored_labels:
+                    if detection['label'] not in self.labels:
+                        self.logger.info('Ignored: ' + repr(detection))
+                        continue
                     detection['timestamp'] = str(datetime.now())
                     self.detections.put(detection)
-                    self.logger.info(
-                        'Queued: ' + str(self.images.qsize()) +
-                        ', Shape:' + str(image_raw.shape) +
-                        ', Detection: ' + repr(detection)
-                    )
+                    self.logger.info('Match: ' + repr(detection))
                     if self.encoder_active:
                         self.logger.debug('Adding to video...')
                         encoder.add_image(image_boxed)
 
-                self.logger.debug(
-                    "Sleeping " +
-                    str(self.sleep_time) +
-                    "s due to empty queue...")
+                self.logger.debug("Sleeping %.3fs due to empty queue..."
+                                  % self.sleep_time)
 
                 # Better sleep than not answering termination signals
                 sleep(self.sleep_time)
@@ -114,9 +148,3 @@ class Detector(threading.Thread):
             encoder.close()
 
         self.logger.info("Stopped.")
-
-    def get_detections(self):
-        return self.detections
-
-    def get_images(self):
-        return self.images_boxed

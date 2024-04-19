@@ -13,8 +13,9 @@ class Screener:
     def __init__(self, detector):
         self.detector = detector
         self.logger = logging.getLogger(__name__)
+        self.sleep_time = 0.5  # seconds
 
-    def close(self, event = None):  # noqa
+    def close(self, event=None):  # noqa -- mpl_connect event required
         if not self.must_stop:
             self.logger.info("Closing...")
             self.must_stop = True
@@ -37,8 +38,10 @@ class Screener:
                 fig.canvas.draw()
                 fig.canvas.flush_events()
             else:
-                self.logger.debug("Queue is empty.")
                 # better sleep than not react to termination signals
-                sleep(0.1)
+                self.logger.debug("Sleeping %.2f, due to empty queue..."
+                                  % self.sleep_time)
+                sleep(self.sleep_time)
         plt.close('all')
+        self.detector.disable_screener()
         self.logger.info("Closed.")
