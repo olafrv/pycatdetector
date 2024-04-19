@@ -8,12 +8,12 @@ rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: false  # Only terminal (no GUI) or with Screener Window (GUI)
 
 net_version: 'v2'  # 'v1' MXNet or 'v2' PyTorch
-# For 'v1' MXNet
+# For 'v1' MXNet  - RTSP at 1080p <-> 720p
 # https://cv.gluon.ai/model_zoo/detection.html
 # net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Big), min_score = 0.9
 # net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Small), min_score = 0.7
 
-# For 'v2' PyTorch
+# For 'v2' PyTorch - RTSP at 1080p <-> 720p
 # https://pytorch.org/vision/stable/models.html (Object Detection Models) 
 # net_model_name: 'FasterRCNN_MobileNet_V3_Large_FPN' # PC (Big), min_score = 0.9
 net_model_name: 'FasterRCNN_MobileNet_V3_Large_320_FPN' # IoT (Small), min_score = 0.9
