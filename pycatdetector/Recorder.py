@@ -64,10 +64,8 @@ class Recorder (threading.Thread):
                 corrupted_count = 0
                 fps = cap.get(cv2.CAP_PROP_FPS)
                 frames_to_skip = fps-1
-                self.logger.info(
-                    "Connected. FPS: " +
-                    str(fps) + ", SKIP: " + str(frames_to_skip)
-                )
+                self.logger.info("Connected. FPS: %i, SKIP: %i"
+                                 % (fps, frames_to_skip))
 
                 while (not self.must_stop):
                     ret, frame = cap.read()  # return numpy.array
@@ -85,25 +83,23 @@ class Recorder (threading.Thread):
                             )
                             break    # retry conn
                         else:
-                            self.logger.debug(
-                                "[Corrupted]" +
-                                " In:" + str(total_reads) +
-                                ", Out: " + str(total_writes) +
-                                ", Queue: " + str(self.images.qsize())
+                            self.logger.warn(
+                                "Reads: %i, Writes: %i, Queued: %i" %
+                                (total_reads, total_writes, self.images.qsize())
                             )
                             continue  # skip frame
                     else:
                         corrupted_count = 0  # reset counter
 
                         if reads % frames_to_skip == 0:
-                            if greyscale:
-                                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-                            if saveImage:
-                                cv2.imwrite(
-                                    'recording/opencv/imgx-' +
-                                    str(total_reads) + '.jpg',
-                                    frame
-                                )
+                            # if greyscale:
+                            #    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                            # if saveImage:
+                            #    cv2.imwrite(
+                            #        'recording/opencv/imgx-' +
+                            #        str(total_reads) + '.jpg',
+                            #        frame
+                            #    )
                             if showVisor:
                                 cv2.imshow('frame', frame)
                                 if cv2.waitKey(1) & 0xFF == ord('q'):
@@ -113,9 +109,8 @@ class Recorder (threading.Thread):
                             total_writes += 1
                             self.images.put(frame)
                             self.logger.debug(
-                                "In:" + str(total_reads) +
-                                ", Out: " + str(total_writes) +
-                                ", Queue: " + str(self.images.qsize())
+                                "Reads: %i, Writes: %i, Queued: %i" %
+                                (total_reads, total_writes, self.images.qsize())
                             )
 
             cap.release()
