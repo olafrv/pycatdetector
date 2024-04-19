@@ -4,7 +4,7 @@ snakeviz==2.1.1
 Nuitka==2.1.5
 ordered-set==4.1.0
 # make test
-pytest==8.1.1
+pytest==7.4.4
 coverage==7.4.4
 # linter
 flake8==7.0.0
