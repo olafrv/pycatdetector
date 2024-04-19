@@ -96,7 +96,7 @@ run.bin:
 test:
 	# https://docs.pytest.org/
 	@ . venv/bin/activate \
-		&& pytest -s -s --disable-warnings ${NAME}/tests/
+		&& pytest -s --disable-warnings ${NAME}/tests/
 
 # customize!
 test.coverage:
