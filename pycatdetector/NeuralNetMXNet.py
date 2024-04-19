@@ -6,6 +6,7 @@ from gluoncv import model_zoo, data, utils
 import warnings
 from .AbstractNeuralNet import AbstractNeuralNet
 
+
 class NeuralNetMXNet(AbstractNeuralNet):
     """
     A class representing a neural network for object detection.

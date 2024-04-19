@@ -7,6 +7,7 @@ from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
 from .AbstractNeuralNet import AbstractNeuralNet
 
+
 # https://pytorch.org/vision/main/models.html
 # https://pytorch.org/vision/stable/_modules/torchvision/models/detection/ssdlite.html
 # https://pytorch.org/vision/stable/_modules/torchvision/models/detection/faster_rcnn.html
@@ -29,7 +30,8 @@ class NeuralNetPyTorch(AbstractNeuralNet):
             self.model = fasterrcnn_mobilenet_v3_large_fpn(
                 weights=self.weights, box_score_thresh=min_score)
         elif model_name == "FasterRCNN_MobileNet_V3_Large_320_FPN":
-            self.weights = FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
+            self.weights = \
+                FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
             self.model = fasterrcnn_mobilenet_v3_large_320_fpn(
                 weights=self.weights, box_score_thresh=min_score)
         else:
