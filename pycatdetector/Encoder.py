@@ -44,7 +44,6 @@ class Encoder:
 
     def add_image(self, image):
         """
-
         Adds an image to the video file.
 
         Args:
@@ -93,7 +92,7 @@ class Encoder:
 
         Args:
         - folder (str): The path to the folder containing the images.
-        - extension (str): The file extension of the images to be added. 
+        - extension (str): The file extension of the images to be added.
                            Defaults to ".png".
         """
         images = [img for img in os.listdir(folder) if img.endswith(extension)]
