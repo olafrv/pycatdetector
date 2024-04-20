@@ -3,7 +3,6 @@ import logging
 import threading
 import traceback
 from .AbstractNeuralNet import AbstractNeuralNet
-from .Recorder import Recorder
 from .Encoder import Encoder
 from queue import SimpleQueue
 from time import sleep
@@ -54,7 +53,8 @@ class Detector(threading.Thread):
         self.screener_enabled = False
 
         self.images_boxed.empty()
-        self.logger.info("Screener disabled. Queue: %i " % self.images_boxed.qsize())
+        self.logger.info("Screener disabled. Queue: %i."
+                         % self.images_boxed.qsize())
 
     def get_detections(self):
         """
@@ -99,7 +99,8 @@ class Detector(threading.Thread):
         if not os.path.exists(self.encoder_folder):
             self.logger.info('Creating folder: ' + self.encoder_folder)
             os.makedirs(self.encoder_folder)
-        video_name = "output-" + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".avi"
+        video_name = "output-" \
+                     + datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".avi"
 
         self.video_path = os.path.join(self.encoder_folder, video_name)
 
@@ -118,7 +119,8 @@ class Detector(threading.Thread):
         """
         Run the detector thread.
         """
-        self.logger.info("Starting with Thread ID: %s" % threading.get_native_id())
+        self.logger.info("Starting with Thread ID: %s"
+                         % threading.get_native_id())
         self.logger.info('Minimum Score: ' + str(self.notify_min_score))
         if len(self.encoder_folder) > 0:
             self.logger.info('Encoder folder: ' + self.encoder_folder)
