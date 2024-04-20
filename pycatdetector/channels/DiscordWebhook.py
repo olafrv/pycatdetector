@@ -46,7 +46,7 @@ class DiscordWebhook:
 
         headers = {
             "content-type": "application/json",
-        }    
+        }
         data = {
             "wait": "true",
             "content": str(datetime.now()) + ' - ' + content,
