@@ -32,7 +32,7 @@ class Config:
         Flattens a nested dictionary into a flat dictionary.
 
         Args:
-            config (dict): The nested dictionary to be flattened. 
+            config (dict): The nested dictionary to be flattened.
                            Default is an empty dictionary.
             separator (str): The separator to be used for the flattened keys.
                              Default is '_'.
