@@ -1,31 +1,52 @@
 import logging
 from requests import post
 
-###
-# HomeAssitant - API:
-# - https://developers.home-assistant.io/docs/api/rest/
-#
-# Google Translate: Text to MP3 served by Google Translate
-# - https://www.home-assistant.io/integrations/google_translate/
-#
-# Text to Speech (TTS): Play Audio File into Google Castable Device
-# - https://www.home-assistant.io/integrations/tts/#service-speak
-#
-# FAQ:
-# - https://community.home-assistant.io/t/rest-api-service-calls-specify-target/537269  # noqa
-##
-
 
 class HaGoogleSpeak:
+    """
+    A class that provides functionality to speak a text message
+    using Google Translate TTS and Google Cast.
+
+     HomeAssitant - API:
+     - https://developers.home-assistant.io/docs/api/rest/
+    
+     Google Translate: Text to MP3 served by Google Translate
+     - https://www.home-assistant.io/integrations/google_translate/
+    
+     Text to Speech (TTS): Play Audio File into Google Castable Device
+     - https://www.home-assistant.io/integrations/tts/#service-speak
+    
+     FAQ:
+     - https://community.home-assistant.io/t/rest-api-service-calls-specify-target/537269  # noqa
+
+    Args:
+        config (dict): A dictionary containing the configuration parameters.
+
+    Attributes:
+        config (dict): A dictionary containing the configuration parameters.
+        logger (logging.Logger): The logger object for logging messages.
+
+    """
 
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger(__name__)
 
     def get_name(self):
+        """
+        Get the name of the class.
+
+        Returns:
+            str: The name of the class.
+
+        """
         return self.__class__.__name__
 
     def notify(self):
+        """
+        Send a notification by setting the volume and speaking a text message.
+
+        """
         token = self.config["token"]
         entity_id = self.config["entity_id"]
         media_player_entity_id = self.config["media_player_entity_id"]
