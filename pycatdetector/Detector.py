@@ -17,8 +17,9 @@ class Detector(threading.Thread):
     images_boxed = None
     labels = []
     detections = None
+    video_path = None
     screenerOn = False
-    sleep_time_min = 0.05  # seconds, avoid CPU overload
+    SLEEP_TIME_MIN = 0.05  # seconds, avoid CPU overload
     sleep_time = 10  # seconds, start with worst case
     must_stop = False
     logger = None
@@ -55,6 +56,17 @@ class Detector(threading.Thread):
     def set_labels(self, labels):
         self.labels = labels
 
+    def get_video_path(self):
+        return self.video_path
+
+    def set_video_path(self):
+        if not os.path.exists(self.encoder_folder):
+            self.logger.info('Creating folder: ' + self.encoder_folder)
+            os.makedirs(self.encoder_folder)
+        video_name = "output-" + \
+            datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".avi"
+        self.video_path = os.path.join(self.encoder_folder, video_name)
+
     def stop(self):
         if not self.must_stop:
             self.logger.info("Stopping...")
@@ -69,14 +81,10 @@ class Detector(threading.Thread):
         self.logger.info('Minimum Score: '+str(self.notify_min_score))
 
         if len(self.encoder_folder) > 0:
-            if not os.path.exists(self.encoder_folder):
-                self.logger.info('Creating folder: ' + self.encoder_folder)
-                os.makedirs(self.encoder_folder)
-            video_name = "output-" + \
-                datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".avi"
-            video_path = os.path.join(self.encoder_folder, video_name)
-            self.logger.info('Encoding video to: ' + video_path)
-            encoder = Encoder(video_path)
+            self.logger.info('Encoder folder: ' + self.encoder_folder)
+            self.set_video_path()
+            self.logger.info('Encoding video to: ' + self.video_path)
+            encoder = Encoder(self.video_path)
             self.encoder_active = True
 
         while (not self.must_stop):
@@ -96,9 +104,9 @@ class Detector(threading.Thread):
 
                 analyze_duration = analyze_end - analyze_begin
                 analyze_duration = analyze_duration.total_seconds()
-                if analyze_duration < self.sleep_time_min:
+                if analyze_duration < self.SLEEP_TIME_MIN:
                     # Avoid CPU overload on next cycle
-                    self.sleep_time = self.sleep_time_min
+                    self.sleep_time = self.SLEEP_TIME_MIN
                 else:
                     if analyze_duration > self.sleep_time:
                         # Keep worst case for one more cycle
@@ -109,16 +117,18 @@ class Detector(threading.Thread):
                             (analyze_duration + self.sleep_time)/2
 
                 self.logger.debug(
-                    "Analisis: %.3fs, Queue: %i, Shape: %s"
-                    % (analyze_duration, images_queued, str(image_raw.shape))
+                    "Analisis: %.3fs, Shape: %s, Queue: %i"
+                    % (analyze_duration, str(image_raw.shape), images_queued)
                 )
 
                 all_scored_labels = self.net.get_scored_labels(result)
                 min_scored_labels = \
                     self.net.get_scored_labels(result, self.notify_min_score)
 
-                self.logger.debug("ALL: " + repr(all_scored_labels))
-                self.logger.debug("MIN: " + repr(min_scored_labels))
+                self.logger.debug("Scores: %s" % repr(all_scored_labels))
+                self.logger.debug("Scores >%.2f): %s" % 
+                                  (self.notify_min_score, 
+                                   repr(min_scored_labels)))
 
                 if self.screener_enabled or self.encoder_active:
                     image_boxed = self.net.plot(result)
@@ -128,13 +138,14 @@ class Detector(threading.Thread):
 
                 for detection in min_scored_labels:
                     if detection['label'] not in self.labels:
-                        self.logger.info('Ignored: ' + repr(detection))
+                        self.logger.debug('Ignored: ' + repr(detection))
                         continue
-                    detection['timestamp'] = str(datetime.now())
+                    detection['timestamp'] = datetime.now()
                     self.detections.put(detection)
                     self.logger.info('Match: ' + repr(detection))
                     if self.encoder_active:
-                        self.logger.debug('Adding to video...')
+                        self.logger.debug(
+                            'Adding +1 frame to: %s', self.video_path)
                         encoder.add_image(image_boxed)
 
                 self.logger.debug("Sleeping %.3fs due to empty queue..."
@@ -144,7 +155,7 @@ class Detector(threading.Thread):
                 sleep(self.sleep_time)
 
         if self.encoder_active:
-            self.logger.info('Closing video at: ' + video_path)
+            self.logger.info('Closing video at: ' + self.video_path)
             encoder.close()
 
         self.logger.info("Stopped.")
