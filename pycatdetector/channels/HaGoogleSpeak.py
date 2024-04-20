@@ -1,5 +1,5 @@
 import logging
-from requests import post
+from requests import post, get
 
 
 class HaGoogleSpeak:
@@ -31,6 +31,14 @@ class HaGoogleSpeak:
     def __init__(self, config):
         self.config = config
         self.logger = logging.getLogger(__name__)
+        self.headers = {
+            "Authorization": "Bearer " + self.config["token"],
+            "Content-Type": "application/json",
+        }
+        self.entity_id = self.config["entity_id"]
+        self.media_player_entity_id = self.config["media_player_entity_id"]
+        self.volume_level = self.config["volume_level"]
+        self.message = self.config["message"]
 
     def get_name(self):
         """
@@ -42,43 +50,78 @@ class HaGoogleSpeak:
         """
         return self.__class__.__name__
 
-    def notify(self):
-        """
-        Send a notification by setting the volume and speaking a text message.
+    def call_api(self, url, method, headers={}, data={}):
 
-        """
-        token = self.config["token"]
-        entity_id = self.config["entity_id"]
-        media_player_entity_id = self.config["media_player_entity_id"]
-        volume_level = self.config["volume_level"]
-        message = self.config["message"]
+        if method == "post":
+            self.logger.info("POST: %s" % url)
+            self.logger.debug("DATA: %s" % repr(data))
+            response = post(url, headers=headers, json=data)
+        elif method == "get":
+            self.logger.info("GET: %s" % url)
+            response = get(url, headers=headers)
+        else:
+            raise ValueError("Invalid HTTP method '%s'" % method)
 
-        headers = {
-            "Authorization": "Bearer " + token,
-            "Content-Type": "application/json",
-        }
+        self.logger.debug("Response: " + response.text)
 
-        # Set Volume
+        return response
+
+    def get_volume(self) -> float:
+        url = self.config["url"] + "/api/states/" + self.media_player_entity_id
+        response = self.call_api(url, "get", headers=self.headers)
+        if response.status_code != 200:
+            self.logger.error("Failed to get volume level: " + response.text)
+            return None
+        else:
+            return response.json()["attributes"]["volume_level"]
+
+    def set_volume(self, volume_level) -> bool:
         url = self.config["url"] + "/api/services/media_player/volume_set"
         data = {
-            "entity_id": media_player_entity_id,
+            "entity_id": self.media_player_entity_id,
             "volume_level": volume_level,
         }
-        self.logger.info("Request: " + str(data))
-        response = post(url, headers=headers, json=data)
-        self.logger.info("Response: " + response.text)
+        response = self.call_api(url, "post", headers=self.headers, data=data)
+        if response.status_code != 200:
+            self.logger.error("Failed to set volume level: " + response.text)
+            return False
+        else:
+            self.logger.info("Response: " + response.text)
+            return True
 
-        # Speak
+    def speak(self, message) -> bool:
         url = self.config["url"] + "/api/services/tts/speak"
         data = {
             # HomeAssitant => Settings => Devices & Services
             # => Integrations => Google Translate TTS
-            "entity_id": entity_id,
+            "entity_id": self.entity_id,
             # => Integrations => Google Cast
-            "media_player_entity_id": media_player_entity_id,
+            "media_player_entity_id": self.media_player_entity_id,
             # Text message to be spoken
             "message": message
         }
-        self.logger.info("Request: " + str(data))
-        response = post(url, headers=headers, json=data)
-        self.logger.info("Response: " + response.text)
+        response = self.call_api(url, "post", headers=self.headers, data=data)
+        if response.status_code != 200:
+            self.logger.error("Failed to speak: %s" % response.text)
+            return False
+        else:
+            self.logger.info("Spoken '%s' sucessfully." % message)
+            return True
+
+    def notify(self, custom_message=None):
+        """
+        Send a notification by setting the volume and speaking a text message.
+        """
+        current_volume = self.get_volume()  # Save the current volume
+        self.set_volume(self.volume_level)  # Set the volume to desired level
+
+        notified = False
+        if custom_message is not None:
+            notified = self.speak(custom_message)  # Speak the custom message
+        else:
+            notified = self.speak(self.message)  # Speak the default message
+
+        if current_volume is not None:
+            self.set_volume(current_volume)  # Restore the volume
+
+        return notified
