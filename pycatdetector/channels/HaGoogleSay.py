@@ -18,7 +18,6 @@ from requests import post
 
 
 class HaGoogleSay:
-    config = {}
 
     def __init__(self, config):
         self.config = config
