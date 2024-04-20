@@ -1,3 +1,7 @@
+# 1.1.10
+
+* Moved preload to Preloader helper.
+
 # 1.1.9
 
 * Shortener an reduced DEBUG log messages.

@@ -32,8 +32,8 @@ RUN sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' \
 COPY pycatdetector/AbstractNeuralNet.py /opt/pycatdetector/pycatdetector/
 COPY pycatdetector/NeuralNetMXNet.py /opt/pycatdetector/pycatdetector/
 COPY pycatdetector/NeuralNetPyTorch.py /opt/pycatdetector/pycatdetector/
-COPY preload.py /opt/pycatdetector/
-RUN python3 preload.py
+COPY pycatdetector/Preloader.py /opt/pycatdetector/pycatdetector/
+RUN python3 -c "from pycatdetector.Preloader import preload; preload()"
 
 # This allows faster builds
 COPY pycatdetector /opt/pycatdetector/pycatdetector

@@ -11,5 +11,5 @@ from .Screener import Screener
 __all__ = [
     "Config", "Detector", "Encoder",
     "AbstractNeuralNet", "NeuralNetMXNet", "NeuralNetPyTorch",
-    "Notifier", "Recorder", "Screener",
+    "Notifier", "Recorder", "Screener", "Preloader"
 ]

@@ -38,8 +38,8 @@ install.venv: install.base
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip \
 		&& sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' venv/lib/python3.10/site-packages/gluoncv/__init__.py \
-		&& python3 preload.py \
-		&& sudo apt install python3-tk  # matplotlib uses tkinter
+		&& python3 -c "from pycatdetector.Preloader import preload; preload()"
+
 
 install.base:
 	@ sudo apt update \
@@ -47,7 +47,7 @@ install.base:
 		&& sudo apt install -y python3.10-venv python3-dev python3-setuptools \
 		&& sudo apt install -y --no-install-recommends build-essential gcc \
 		&& sudo apt install -y python3-pip \
-		&& sudo apt clean
+		&& sudo apt install python3-tk  # matplotlib uses tkinter
 
 uninstall: uninstall.venv clean
 
