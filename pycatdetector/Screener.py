@@ -1,21 +1,42 @@
-from time import sleep
-from matplotlib import pyplot as plt
-import matplotlib
 import logging
+import matplotlib
+import matplotlib.pyplot as plt
+from time import sleep
 
 
 class Screener:
+    """
+    A class that represents a image screener for PyCatDetector.
 
-    detector = None
-    must_stop = False
-    logger = None
+    Attributes:
+        detector (object): detector object used for image detection.
+        must_stop (bool): flag indicating whether the thread must stop.
+        logger (object): logger object for logging messages.
+        SLEEP_TIME (float): sleep time in seconds between image updates.
+    """
+
+    SLEEP_TIME = 0.5  # seconds
 
     def __init__(self, detector):
-        self.detector = detector
-        self.logger = logging.getLogger(__name__)
-        self.sleep_time = 0.5  # seconds
+        """
+        Initializes a new instance of the Screener class.
 
-    def close(self, event=None):  # noqa -- mpl_connect event required
+        Args:
+            detector (object): The detector object used for image detection.
+        """
+        self.detector = detector
+        self.must_stop = False
+        self.logger = logging.getLogger(__name__)
+
+    def close(self, event=None):
+        """
+        Closes the screener.
+
+        Args:
+            event (object, optional): The event object.
+                                      Defaults to None, required by
+                                      Matplotlib window close_event.
+        """
         if not self.must_stop:
             self.logger.info("Closing...")
             self.must_stop = True
@@ -23,6 +44,9 @@ class Screener:
             self.logger.info("Already closed.")
 
     def show(self):
+        """
+        Shows the screener (Matplotlib window with images from the detector)
+        """
         self.logger.info("Showing...")
         matplotlib.use('TkAgg')
         plt.ion()
@@ -30,7 +54,7 @@ class Screener:
         fig.canvas.mpl_connect('close_event', self.close)
         ax = fig.add_subplot()
         imgs = self.detector.get_images()
-        while (not self.must_stop):
+        while not self.must_stop:
             ax.clear()
             if not imgs.empty():
                 img = imgs.get(block=False)
@@ -38,10 +62,9 @@ class Screener:
                 fig.canvas.draw()
                 fig.canvas.flush_events()
             else:
-                # better sleep than not react to termination signals
                 self.logger.debug("Sleeping %.2f, due to empty queue..."
-                                  % self.sleep_time)
-                sleep(self.sleep_time)
+                                  % self.SLEEP_TIME)
+                sleep(self.SLEEP_TIME)
         plt.close('all')
         self.detector.disable_screener()
         self.logger.info("Closed.")
