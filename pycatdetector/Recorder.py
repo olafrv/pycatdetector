@@ -85,7 +85,8 @@ class Recorder (threading.Thread):
                         else:
                             self.logger.warn(
                                 "Reads: %i, Writes: %i, Queued: %i" %
-                                (total_reads, total_writes, self.images.qsize())
+                                (total_reads, total_writes,
+                                 self.images.qsize())
                             )
                             continue  # skip frame
                     else:
@@ -110,7 +111,8 @@ class Recorder (threading.Thread):
                             self.images.put(frame)
                             self.logger.debug(
                                 "Reads: %i, Writes: %i, Queued: %i" %
-                                (total_reads, total_writes, self.images.qsize())
+                                (total_reads, total_writes,
+                                 self.images.qsize())
                             )
 
             cap.release()
