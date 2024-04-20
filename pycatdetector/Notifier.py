@@ -25,7 +25,7 @@ class Notifier(threading.Thread):
     def add_channel(self, channel, labels):
         for label in labels:
             self.logger.info(
-                "Adding '%s' for label '%s'" % (channel, label)
+                "Adding '%s' for label '%s'" % (channel.get_name(), label)
             )
             if label not in self.channels.keys():
                 self.channels[label] = [channel]
