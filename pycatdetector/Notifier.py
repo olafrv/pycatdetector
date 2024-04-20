@@ -40,7 +40,6 @@ class Notifier(threading.Thread):
         self.must_stop = False
         self.queue_sleep = 1  # seconds, less queue polling, honor exit signals
         self.channels = {}
-        self.logger = None
         self.notifications = {}
         self.detections = detections
         self.notify_window_start = None  # string with HH:MM 24h format
