@@ -48,7 +48,7 @@ def main():
 
     videos_folder = config.get("videos_folder")
 
-    detector = Detector(recorder, screener_enabled, net,
+    detector = Detector(recorder.get_images(), screener_enabled, net,
                         notify_min_score, videos_folder)
 
     notifier = Notifier(detector.get_detections())
