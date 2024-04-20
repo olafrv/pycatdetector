@@ -16,9 +16,9 @@ net_version: 'v2'  # 'v1' MXNet or 'v2' PyTorch
 # For 'v2' PyTorch - RTSP at 1080p <-> 720p
 # https://pytorch.org/vision/stable/models.html (Object Detection Models) 
 # net_model_name: 'FasterRCNN_MobileNet_V3_Large_FPN' # PC (Big), min_score = 0.9
-net_model_name: 'FasterRCNN_MobileNet_V3_Large_320_FPN' # IoT (Small), min_score = 0.7
+net_model_name: 'FasterRCNN_MobileNet_V3_Large_320_FPN' # IoT (Small), min_score = 0.9
 
-notify_min_score: 0.7
+notify_min_score: 0.9
 notify_window_start: "06:00"
 notify_window_end: "22:00"
 videos_folder: "./videos"
