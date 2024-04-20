@@ -140,7 +140,8 @@ class Detector(threading.Thread):
                     if detection['label'] not in self.labels:
                         self.logger.debug('Ignored: ' + repr(detection))
                         continue
-                    detection['timestamp'] = datetime.now()
+                    detection['timestamp'] = \
+                        str(datetime.now().astimezone().isoformat())
                     self.detections.put(detection)
                     self.logger.info('Match: ' + repr(detection))
                     if self.encoder_active:

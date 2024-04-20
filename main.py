@@ -52,8 +52,7 @@ def main():
                         notify_min_score, videos_folder)
 
     notifier = Notifier(detector.get_detections())
-    notifier.set_notify_window(config.get("notify_window_start"),
-                               config.get("notify_window_end"))
+    notifier.set_notify_window(config.get_assoc("notify_window"))
     load_channels(config, notifier)
 
     detector.set_labels(notifier.get_labels())

@@ -42,8 +42,7 @@ class Notifier(threading.Thread):
         self.channels = {}
         self.notifications = {}
         self.detections = detections
-        self.notify_window_start = None  # string with HH:MM 24h format
-        self.notify_window_end = None  # string with HH:MM 24h format
+        self.notify_window = None
 
     def add_channel(self, channel, labels):
         """
@@ -68,16 +67,15 @@ class Notifier(threading.Thread):
         """
         return self.channels.keys()
 
-    def set_notify_window(self, start_hhmm, end_hhmm):
+    def set_notify_window(self, notify_window):
         """
         Sets the notification window (time frame).
 
         Args:
-            start_hhmm: The start time of the window in HH:MM 24h format.
-            end_hhmm: The end time of the window in HH:MM 24h format.
+            notify_window: A dictionary containing a set of combinations
+                           with defined days and the start and end times.
         """
-        self.notify_window_start = start_hhmm
-        self.notify_window_end = end_hhmm
+        self.notify_window = notify_window
 
     def is_notify_window_open(self):
         """
@@ -86,23 +84,31 @@ class Notifier(threading.Thread):
         Returns:
             A boolean indicating whether the notification window is open.
         """
-        if self.notify_window_start is None or self.notify_window_end is None:
+        if self.notify_window is None:
             return True
         else:
-            now = datetime.now()
-            start = datetime.strptime(self.notify_window_start, "%H:%M")
-            start = start.replace(day=now.day, month=now.month, year=now.year)
-            end = datetime.strptime(self.notify_window_end, "%H:%M")
-            end = end.replace(day=now.day, month=now.month, year=now.year)
-            opened = start <= now <= end
-            self.logger.debug(
-                "Notify window: %s <= %s <= %s <=> %s" % (
-                    str(start),
-                    str(now),
-                    str(end),
-                    str(opened)
-                )
-            )
+            opened = False
+            for window in self.notify_window:
+                active_days = self.notify_window[window]["days"].split(",")
+                active_days = [day.strip().lower() for day in active_days]
+                now_day_name = datetime.now().strftime('%a').lower()
+                if now_day_name in active_days:
+                    notify_window_start = self.notify_window[window]["start"]
+                    notify_window_end = self.notify_window[window]["end"]
+                    now = datetime.now()
+                    start = datetime.strptime(notify_window_start, "%H:%M")
+                    start = start.replace(
+                        day=now.day, month=now.month, year=now.year)
+                    end = datetime.strptime(notify_window_end, "%H:%M")
+                    end = end.replace(
+                        day=now.day, month=now.month, year=now.year)
+                    opened = start <= now <= end
+                    if opened:
+                        self.logger.info(
+                            "Notify window '%s' is open: %s <= %s <= %s"
+                            % (window, start, now, end)
+                        )
+                        break
             return opened
 
     def run(self):
@@ -124,7 +130,6 @@ class Notifier(threading.Thread):
                 sleep(self.queue_sleep)
                 continue
 
-            self.logger.debug("Notify window is open")
             detection = self.detections.get(block=False)
             detected_label = detection['label']
             if detected_label in self.channels.keys():
