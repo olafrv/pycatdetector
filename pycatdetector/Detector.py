@@ -126,8 +126,8 @@ class Detector(threading.Thread):
                     self.net.get_scored_labels(result, self.notify_min_score)
 
                 self.logger.debug("Scores: %s" % repr(all_scored_labels))
-                self.logger.debug("Scores >%.2f): %s" % 
-                                  (self.notify_min_score, 
+                self.logger.debug("Scores >%.2f): %s" %
+                                  (self.notify_min_score,
                                    repr(min_scored_labels)))
 
                 if self.screener_enabled or self.encoder_active:
