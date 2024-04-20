@@ -69,7 +69,7 @@ class HaGoogleSpeak:
     def get_volume(self) -> float:
         url = self.config["url"] + "/api/states/" + self.media_player_entity_id
         response = self.call_api(url, "get", headers=self.headers)
-        if response.status_code != 200:
+        if not response.ok:
             self.logger.error("Failed to get volume level: " + response.text)
             return None
         else:
@@ -82,7 +82,7 @@ class HaGoogleSpeak:
             "volume_level": volume_level,
         }
         response = self.call_api(url, "post", headers=self.headers, data=data)
-        if response.status_code != 200:
+        if not response.ok:
             self.logger.error("Failed to set volume level: " + response.text)
             return False
         else:
@@ -101,7 +101,7 @@ class HaGoogleSpeak:
             "message": message
         }
         response = self.call_api(url, "post", headers=self.headers, data=data)
-        if response.status_code != 200:
+        if not response.ok:
             self.logger.error("Failed to speak: %s" % response.text)
             return False
         else:

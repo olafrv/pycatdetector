@@ -33,15 +33,20 @@ class DiscordWebhook:
         """
         return self.__class__.__name__
 
-    def notify(self):
+    def notify(self, custom_content=None):
         """
         Sends a notification to the Discord webhook.
         """
         url = self.config["url"]
-        content = self.config["content"]
+
+        if custom_content:
+            content = custom_content
+        else:
+            content = self.config["content"]
+
         headers = {
             "content-type": "application/json",
-        }
+        }    
         data = {
             "wait": "true",
             "content": str(datetime.now()) + ' - ' + content,
@@ -49,3 +54,4 @@ class DiscordWebhook:
         self.logger.info("Request: " + str(data))
         response = post(url, headers=headers, json=data)
         self.logger.info("Response: " + response.text)
+        return response.ok

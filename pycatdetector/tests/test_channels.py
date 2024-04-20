@@ -1,5 +1,6 @@
 
 from pycatdetector.channels.HaGoogleSpeak import HaGoogleSpeak
+from pycatdetector.channels.DiscordWebhook import DiscordWebhook
 from pycatdetector.Config import Config
 
 
@@ -14,3 +15,10 @@ def test_main():
     else:
         print("Channel not enabled, test skipped.")
         assert True
+
+    print()
+    channel_name = "discord_webhook"
+    if config.get("notifiers_" + channel_name + "_enabled"):
+        filtered_config = config.get_prefix("notifiers_" + channel_name)
+        channel = DiscordWebhook(filtered_config)
+        assert channel.notify("Disculpa, esto es una prueba, te quiero.")
