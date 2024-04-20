@@ -6,21 +6,19 @@ class HaGoogleSay:
     """
     A class that represents the Home Assistant Google Say channel (deprecated).
 
-    HomeAssitant
-    Text To Speech (TTS):
+    HomeAssitant - Text To Speech (TTS):
     - https://www.home-assistant.io/integrations/tts
-    API:
+    HomeAssitant - API:
      - https://developers.home-assistant.io/docs/api/rest/
-    
-    TTS Integration Configuration (configuration.yaml)
-    <<<
-    tts:
-    - platform: google_translate
-      cache: true
-      cache_dir: /tmp/tts
-      time_memory: 300
-      service_name: google_translate_say
-    >>>
+    HomeAssitant - TTS Integration Configuration (configuration.yaml):
+        (...)
+        tts:
+        - platform: google_translate
+        cache: true
+        cache_dir: /tmp/tts
+        time_memory: 300
+        service_name: google_translate_say
+        (...)
 
     Attributes:
         config (dict): A dictionary containing the configuration parameters.
