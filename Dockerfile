@@ -39,5 +39,4 @@ RUN python3 -c "from pycatdetector.Preloader import preload; preload()"
 COPY pycatdetector /opt/pycatdetector/pycatdetector
 COPY main.py /opt/pycatdetector/
 
-ENTRYPOINT [ "python3" , "main.py" ]
-CMD [ "-c" ]
+CMD [ "python3", "main.py" ]
