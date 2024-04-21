@@ -1,4 +1,5 @@
 import logging
+from time import sleep
 from requests import post, get
 
 
@@ -27,6 +28,8 @@ class HaGoogleSpeak:
         logger (logging.Logger): The logger object for logging messages.
 
     """
+
+    DEFAULT_VOLUME_LEVEL = 0.5
 
     def __init__(self, config):
         self.config = config
@@ -73,7 +76,10 @@ class HaGoogleSpeak:
             self.logger.error("Failed to get volume level: " + response.text)
             return None
         else:
-            return response.json()["attributes"]["volume_level"]
+            if response.json()["state"] == "on":
+                return response.json()["attributes"]["volume_level"]
+            else:
+                return self.DEFAULT_VOLUME_LEVEL
 
     def set_volume(self, volume_level) -> bool:
         url = self.config["url"] + "/api/services/media_player/volume_set"
@@ -88,6 +94,14 @@ class HaGoogleSpeak:
         else:
             self.logger.info("Response: " + response.text)
             return True
+
+    def calculate_speech_time(self, text):
+        words = text.split()
+        num_words = len(words)
+        words_per_minute = 150
+        words_per_second = words_per_minute/60
+        speech_time = num_words / words_per_second
+        return speech_time
 
     def speak(self, message) -> bool:
         url = self.config["url"] + "/api/services/tts/speak"
@@ -122,6 +136,7 @@ class HaGoogleSpeak:
             notified = self.speak(self.message)  # Speak the default message
 
         if current_volume is not None:
+            sleep(self.calculate_speech_time(self.message) * 1.1)  # +10% slack
             self.set_volume(current_volume)  # Restore the volume
 
         return notified
