@@ -10,7 +10,7 @@ class Recorder (threading.Thread):
 
     RECONNECT_DELAY = 10  # seconds
     CORRUPTED_DELAY = 1
-    CORRUPTED_MAX_FRAMES = 100  # max corrupted frames
+    CORRUPTED_MAX_FRAMES = 60  # max corrupted frames (1 frame <=> 1 sec)
     images = None
     rtspUrl = None
     must_stop = False
