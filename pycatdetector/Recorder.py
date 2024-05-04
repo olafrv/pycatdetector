@@ -84,8 +84,9 @@ class Recorder (threading.Thread):
                             break    # retry conn
                         else:
                             self.logger.warn(
-                                "Reads: %i, Writes: %i, Queued: %i" %
-                                (total_reads, total_writes,
+                                "Bad: %i/%i, R: %i, W: %i, Q: %i" %
+                                (corrupted_count, self.CORRUPTED_MAX_FRAMES,
+                                 total_reads, total_writes,
                                  self.images.qsize())
                             )
                             continue  # skip frame
@@ -110,8 +111,9 @@ class Recorder (threading.Thread):
                             total_writes += 1
                             self.images.put(frame)
                             self.logger.debug(
-                                "Reads: %i, Writes: %i, Queued: %i" %
-                                (total_reads, total_writes,
+                                "Bad: %i/%i, R: %i, W: %i, Q: %i" %
+                                (corrupted_count, self.CORRUPTED_MAX_FRAMES,
+                                 total_reads, total_writes,
                                  self.images.qsize())
                             )
 
