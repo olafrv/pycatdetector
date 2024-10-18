@@ -111,7 +111,8 @@ make run             # with python3 interpreter
 ## Run (Docker)
 
 ```shell
-./install-docker.sh  # install docker with compose capabilities
+# If you don't have it (latest docker official version)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/olafrv/my_collections/refs/heads/main/scripts/bash/install-docker.sh)"
 make docker.build    # build docker image with python requirements
 make docker.run      # A) without compose, and removed after stopped
 make docker.start    # B.1) with compose running in background as service
