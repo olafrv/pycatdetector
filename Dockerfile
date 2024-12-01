@@ -16,7 +16,7 @@ LABEL org.opencontainers.image.licenses=MIT
 WORKDIR /opt/pycatdetector
 COPY requirements.txt /opt/pycatdetector
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install --upgrade pip
