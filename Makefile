@@ -153,6 +153,7 @@ docker.sh:
 docker.stop:
 	@ docker compose down
 
+docker.restart: docker.stop docker.start
 
 github.push: docker.build
 	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
