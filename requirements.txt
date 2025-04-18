@@ -16,5 +16,5 @@ gluoncv==0.10.5
 # Neural Net PyTorch (Remove +cpu for full NVIDIA CUDA support)
 # https://github.com/pytorch/pytorch/issues/29745#issuecomment-553588171
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==2.2.2+cpu
+torch==2.6.0
 torchvision==0.17.2+cpu
