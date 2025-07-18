@@ -48,18 +48,6 @@ notifiers:
 #      - "pottedplant"
 #      - "potted plant"
 
-  ha_google_say:  # LEGACY: ./channels/HaGoogleSay.py
-    enabled: true
-    url: "http://homeassistant.local:8123/api"
-    token: "token123ABC"
-    entity: "media_player.nesti_speaker"
-    message: "El gato está en la caja de arena."
-    language: "es"
-    objects:
-      - "cat"
-#      - "pottedplant"
-#      - "potted plant"
-
   discord_webhook:
     enabled: true
     url: "https://discordapp.com/api/webhooks/X/Y"
