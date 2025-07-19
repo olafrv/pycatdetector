@@ -87,22 +87,18 @@ def handler(signum, frame):
 
 def load_channels(config, notifier):
     global logger
-    channels = config.get_regex("^notifiers_.*_enabled$")
-    for name, enabled in channels.items():
-        class_name = Config.camel_to_snake(
-            name.lstrip("notifiers_").rstrip("_enabled"))
+    settings = config.get_regex("^notifiers_.*_enabled$")
+    for setting, enabled in settings.items():
+        setting_name = setting.lstrip("notifiers_").rstrip("_enabled")
+        class_name = Config.snake_to_camel(setting_name)
         logger.debug("Channel: " + class_name + ", enabled: " + str(enabled))
         if not enabled:
             continue
         else:
-            if config.get("notifiers_" + class_name + "_enabled"):
-                filtered_config = config.get_prefix(
-                    "notifiers_" + class_name)
-                logger.debug("Loading channel: " + class_name)
-                channel = \
-                    eval('pycatdetector.channels.' + class_name)(filtered_config)
-                labels = config.get("notifiers_" + class_name + "_objects")
-                notifier.add_channel(channel, labels)
+            channel_settings = config.get_prefix("notifiers_" + setting_name, ltrim=True)
+            channel_labels = config.get("notifiers_" + setting_name + "_objects")
+            channel = eval('pycatdetector.channels.' + class_name)(channel_settings)
+            notifier.add_channel(channel, channel_labels)
 
 
 def enable_logging(config):

@@ -160,6 +160,19 @@ class Config:
                         c.lower() if c.isupper() else c for c in s
                       ]).lstrip('_')
 
+    @classmethod
+    def snake_to_camel(cls, s: str) -> str:
+        """
+        Converts a snake_case string to CamelCase.
+
+        Args:
+            s (str): The snake_case string to convert.
+
+        Returns:
+            str: The CamelCase string.
+        """
+        return ''.join(word.capitalize() for word in s.split('_'))
+
     def __str__(self) -> str:
         """
         Returns a string representation of the Config instance.
