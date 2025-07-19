@@ -5,7 +5,7 @@ RUN apt update -y \
     && apt install -y python3.12-venv\
     && apt install -y python3-tk \
     && apt install -y --no-install-recommends build-essential gcc \
-    && apt install -y ffmpeg \
+    && apt install -y ffmpeg fonts-dejavu jq \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 

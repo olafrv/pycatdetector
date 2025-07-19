@@ -48,7 +48,7 @@ install.base:
 		&& sudo apt install -y --no-install-recommends build-essential gcc \
 		&& sudo apt install -y python3-pip \
 		&& sudo apt install -y python3-tk \
-		&& sudo apt install -y ffmpeg jq
+		&& sudo apt install -y ffmpeg fonts-dejavu jq
 
 uninstall: uninstall.venv clean
 

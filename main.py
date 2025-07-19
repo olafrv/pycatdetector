@@ -1,3 +1,4 @@
+from asyncio.log import logger
 import os
 import sys
 import signal
@@ -14,16 +15,16 @@ from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
 
 images = recorder = detector = notifier = screener = config = None
-
+logger = None
 
 def main():
-    global images, recorder, detector, notifier, screener, config
+    global images, recorder, detector, notifier, screener, config, logger
 
     config = Config()
 
     if len(sys.argv) > 1:
         if "--check-config" in sys.argv:
-            print(json.dumps(config.CONFIG_FLAT, indent=2))
+            print(json.dumps(config.get_all(), indent=2))
             exit(0)
 
     enable_logging(config)
@@ -85,16 +86,23 @@ def handler(signum, frame):
 
 
 def load_channels(config, notifier):
-    for class_name in pycatdetector.channels.__all__:
-        if class_name == "Channels":
+    global logger
+    channels = config.get_regex("^notifiers_.*_enabled$")
+    for name, enabled in channels.items():
+        class_name = Config.camel_to_snake(
+            name.lstrip("notifiers_").rstrip("_enabled"))
+        logger.debug("Channel: " + class_name + ", enabled: " + str(enabled))
+        if not enabled:
             continue
-        channel_s = Config.camel_to_snake(class_name)
-        if config.get("notifiers_" + channel_s + "_enabled"):
-            filtered_config = config.get_prefix("notifiers_" + channel_s)
-            channel = \
-                eval('pycatdetector.channels.' + class_name)(filtered_config)
-            labels = config.get("notifiers_" + channel_s + "_objects")
-            notifier.add_channel(channel, labels)
+        else:
+            if config.get("notifiers_" + class_name + "_enabled"):
+                filtered_config = config.get_prefix(
+                    "notifiers_" + class_name)
+                logger.debug("Loading channel: " + class_name)
+                channel = \
+                    eval('pycatdetector.channels.' + class_name)(filtered_config)
+                labels = config.get("notifiers_" + class_name + "_objects")
+                notifier.add_channel(channel, labels)
 
 
 def enable_logging(config):

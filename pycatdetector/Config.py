@@ -1,5 +1,6 @@
 import re
 import yaml
+from typing import Optional
 
 
 class Config:
@@ -8,12 +9,12 @@ class Config:
     and provides access to configuration settings.
 
     Attributes:
-        CONFIG (dict): Loaded configuration settings (i.e. key1.key2).
-        CONFIG_FLAT (dict): Flattened configuration settings (i.e. key1_key2).
+        _CONFIG (dict): Loaded configuration settings (i.e. key1.key2).
+        _CONFIG_FLAT (dict): Flattened configuration settings (i.e. key1_key2).
 
     """
-    CONFIG = {}
-    CONFIG_FLAT = {}
+    _CONFIG = {}
+    _CONFIG_FLAT = {}
 
     def __init__(self, config_file='config.yaml'):
         """
@@ -25,11 +26,11 @@ class Config:
 
         """
         with open(config_file, 'r') as stream:
-            self.CONFIG = yaml.safe_load(stream)
+            self._CONFIG = yaml.safe_load(stream)
 
-        self.CONFIG_FLAT = self.flatten(self.CONFIG)
+        self._CONFIG_FLAT = self._flatten(self._CONFIG)
 
-    def flatten(self, config={}, separator="_"):
+    def _flatten(self, config={}, separator="_"):
         """
         Flattens a nested dictionary into a flat dictionary.
 
@@ -47,7 +48,7 @@ class Config:
         for key in config:
             value = config[key]
             if isinstance(value, dict):
-                recursive_config = self.flatten(value)
+                recursive_config = self._flatten(value)
                 for rkey in recursive_config:
                     rvalue = recursive_config[rkey]
                     flattened_config[key + separator + str(rkey)] = rvalue
@@ -55,7 +56,30 @@ class Config:
                 flattened_config[key] = value
         return flattened_config
 
-    def get_regex(self, regex):
+    def get(self, name: str) -> str:
+        """
+        Retrieves a specific configuration setting by its key.
+
+        Args:
+            name (str): The key of the configuration setting to retrieve.
+
+        Returns:
+            str: The configuration setting value.
+
+        """
+        return self._CONFIG_FLAT[name]
+
+    def get_all(self) -> dict:
+        """
+        Retrieves all configuration settings.
+
+        Returns:
+            dict: A dictionary containing all configuration settings.
+
+        """
+        return self._CONFIG_FLAT
+
+    def get_regex(self, regex: str) -> dict:
         """
         Retrieves configuration settings that match a given regular expression.
 
@@ -67,9 +91,9 @@ class Config:
 
         """
         config = {}
-        for key in self.CONFIG_FLAT:
+        for key in self._CONFIG_FLAT:
             if re.match(regex, key):
-                config[key] = self.CONFIG_FLAT[key]
+                config[key] = self._CONFIG_FLAT[key]
         return config
 
     def get_prefix(self, prefix="", ltrim=True):
@@ -87,31 +111,18 @@ class Config:
 
         """
         filtered_config = {}
-        for key in self.CONFIG_FLAT:
+        for key in self._CONFIG_FLAT:
             if re.match("^"+prefix+"_", key):
                 if ltrim:
                     ltrim_key = str(key).replace(prefix+"_", '', 1)
-                    filtered_config[ltrim_key] = self.CONFIG_FLAT[key]
+                    filtered_config[ltrim_key] = self._CONFIG_FLAT[key]
                 else:
-                    filtered_config[key] = self.CONFIG[key]
+                    filtered_config[key] = self._CONFIG_FLAT[key]
         return filtered_config
 
-    def get(self, name) -> str:
+    def get_assoc(self, key: str) -> dict:
         """
-        Retrieves a specific configuration setting by its key.
-
-        Args:
-            name (str): The key of the configuration setting to retrieve.
-
-        Returns:
-            str: The configuration setting.
-
-        """
-        return self.CONFIG_FLAT[name]
-
-    def get_assoc(self, key) -> dict:
-        """
-        Retrieves a nested configuration setting by its key.
+        Retrieves a nested configuration setting for an specific key.
 
         Args:
             key (str): The key of the nested configuration setting to retrieve.
@@ -120,7 +131,17 @@ class Config:
             dict: The nested configuration setting.
 
         """
-        return self.CONFIG[key]
+        return self._CONFIG[key]
+
+    def get_assoc_all(self) -> dict:
+        """
+        Retrieves all nested configuration settings.
+
+        Returns:
+            dict: A dictionary containing all nested configuration settings.
+
+        """
+        return self._CONFIG
 
     @classmethod
     def camel_to_snake(cls, s: str) -> str:
@@ -147,4 +168,4 @@ class Config:
             str: The string representation of the Config instance.
 
         """
-        return yaml.dump(self.CONFIG)
+        return yaml.dump(self._CONFIG)
