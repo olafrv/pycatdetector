@@ -48,30 +48,76 @@ class Recorder (threading.Thread):
         return replaced.geturl()
 
     def record(self, greyscale=False, showVisor=False, saveImage=False):
+
+        # Used for debugging OpenCV issues with versions upgrade
+        # Uncomment the following lines to enable detailed OpenCV logging
+        # https://github.com/opencv/opencv/issues/27091 (Bug)
+        #
+        # See entrypoint.sh for activating global OpenCV logging:
+        # export OPENCV_LOG_LEVEL=DEBUG
+        # export OPENCV_VIDEOIO_DEBUG=1
+        #
+        # Here we set the OpenCV log level to debug:
+        # cv2.setLogLevel(5) # Set OpenCV log level to debug
+
         while (not self.must_stop):
             conn_error = False
 
-            cap = cv2.VideoCapture(self.rtspUrl)
+            cap = cv2.VideoCapture(self.rtspUrl, cv2.CAP_FFMPEG)
+            
+            # Set buffer size and timeout properties to prevent stream timeout
+            cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Reduce buffer to avoid lag
+            cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 15000)  # 15 second open timeout
+            cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 5000)    # 5 second read timeout
+            
+            # Additional RTSP optimizations
+            cap.set(cv2.CAP_PROP_FPS, 30)  # Try to set target FPS
+            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('H', '2', '6', '4'))  # Prefer H264
+            
             if not cap.isOpened():
                 self.logger.error(
                     "Connection error to: " + self.mask_url(self.rtspUrl)
                 )
                 conn_error = True
             else:
+                # Log connection success and actual stream properties
+                fps = cap.get(cv2.CAP_PROP_FPS)
+                width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+                height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+                self.logger.info(
+                    "Connected successfully. Resolution: %dx%d, Reported FPS: %.1f" 
+                    % (width, height, fps)
+                )
                 reads = 0
                 total_reads = 0
                 total_writes = 0
                 corrupted_count = 0
-                fps = cap.get(cv2.CAP_PROP_FPS)
                 frames_to_skip = fps-1
+                
                 self.logger.info("Connected. FPS: %i, SKIP: %i"
                                  % (fps, frames_to_skip))
 
+                
+
                 while (not self.must_stop):
-                    ret, frame = cap.read()  # return numpy.array
-                    reads += 1
-                    total_reads += 1
-                    corrupted = frame is None or len(frame.shape) != 3
+                    try:
+                        ret, frame = cap.read()  # return numpy.array
+                        reads += 1
+                        total_reads += 1
+                        
+                        # Check if read was successful
+                        if not ret:
+                            self.logger.warning("Failed to read frame from stream")
+                            corrupted_count += 1
+                            if corrupted_count > self.CORRUPTED_MAX_FRAMES:
+                                self.logger.error("Too many failed reads, reconnecting...")
+                                break
+                            continue
+                            
+                        corrupted = frame is None or len(frame.shape) != 3
+                    except Exception as e:
+                        self.logger.error(f"Error reading frame: {e}")
+                        break  # Exit inner loop to reconnect
 
                     if corrupted:
                         corrupted_count += 1

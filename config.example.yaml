@@ -7,26 +7,21 @@ log_level: "info" # debug, info
 rtsp_url: "rtsp://username:password@192.168.1.2:554/stream1"
 headless: false  # Only terminal (no GUI) or with Screener Window (GUI)
 
-net_version: 'v2'  # 'v1' MXNet or 'v2' PyTorch
-# For 'v1' MXNet  - RTSP at 1080p <-> 720p
-# https://cv.gluon.ai/model_zoo/detection.html
-# net_model_name: 'ssd_512_resnet50_v1_voc'  # PC (Big), min_score = 0.9
-# net_model_name: 'ssd_512_mobilenet1.0_voc'  # IoT (Small), min_score = 0.7
-
-# For 'v2' PyTorch - RTSP at 1080p <-> 720p
+# PyTorch & RTSP at 1080p <-> 720p
 # https://pytorch.org/vision/stable/models.html (Object Detection Models) 
 # net_model_name: 'FasterRCNN_MobileNet_V3_Large_FPN' # PC (Big), min_score = 0.9
 net_model_name: 'FasterRCNN_MobileNet_V3_Large_320_FPN' # IoT (Small), min_score = 0.9
+net_version: 'v2'  # 'v2' PyTorch
 
 notify_min_score: 0.9
 notify_window:
   weekdays:
     days: "Mon,Tue,Wed,Thu,Fri"
-    start: "06:00"
+    start: "09:00"
     end: "21:00"
   weekends:
     days: "Sat,Sun"
-    start: "08:00"
+    start: "09:00"
     end: "21:00"
 videos_folder: "./videos"
 
@@ -41,18 +36,22 @@ notifiers:
     token: "token123ABC"
     entity_id: "tts.google_en_com"
     media_player_entity_id: "media_player.nesti_speaker"
-    volume_level: 1  # 0.0 to 1.0
+    volume_level: 0.8  # 0.0 to 1.0
     message: "El gato está en la caja de arena."
     objects:
       - "cat"
-#      - "pottedplant"
-#      - "potted plant"
+      - "chair"
+      - "person"
+      - "pottedplant"
+      - "potted plant"
 
   discord_webhook:
     enabled: true
     url: "https://discordapp.com/api/webhooks/X/Y"
-    content: "El gato está en la caja de arena."
+    message: "El gato está en la caja de arena."
     objects:
       - "cat"
-#      - "pottedplant"
-#      - "potted plant"
+      - "chair"
+      - "person"
+      - "pottedplant"
+      - "potted plant"

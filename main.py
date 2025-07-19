@@ -7,7 +7,6 @@ import colorlog
 import pycatdetector.channels
 from pycatdetector.Config import Config
 from pycatdetector.Recorder import Recorder
-from pycatdetector.NeuralNetMXNet import NeuralNetMXNet
 from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
@@ -39,9 +38,7 @@ def main():
     net_model_name = config.get("net_model_name")
     notify_min_score = config.get("notify_min_score")
 
-    if config.get("net_version") == 'v1':
-        net = NeuralNetMXNet(net_model_name)
-    elif config.get("net_version") == 'v2':
+    if config.get("net_version") == 'v2':
         net = NeuralNetPyTorch(net_model_name)
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
@@ -82,6 +79,8 @@ def handler(signum, frame):
 
 def load_channels(config, notifier):
     for class_name in pycatdetector.channels.__all__:
+        if class_name == "Channels":
+            continue
         channel_s = Config.camel_to_snake(class_name)
         if config.get("notifiers_" + channel_s + "_enabled"):
             filtered_config = config.get_prefix("notifiers_" + channel_s)

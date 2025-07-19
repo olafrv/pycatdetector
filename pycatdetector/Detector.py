@@ -176,14 +176,30 @@ class Detector(threading.Thread):
                 if self.screener_enabled:
                     self.images_boxed.put(image_boxed)
 
+                # detection: dict
+                # 'image': The original image data (e.g., numpy array).
+                # 'label': The detected object's class label (e.g., "cat").
+                # 'score': The confidence score for the detection (e.g., 0.92).
+                # 'box': The bounding box coordinates (e.g., [x1, y1, x2, y2]).
+                # 'timestamp': The time (e.g., "2023-10-01T12:00:00Z").
+                
                 for detection in min_scored_labels:
+                    
                     if detection['label'] not in self.labels:
                         self.logger.debug('Ignored: ' + repr(detection))
                         continue
+                    
+                    detection['image'] = image_raw
                     detection['timestamp'] = \
                         str(datetime.now().astimezone().isoformat())
+                    
                     self.detections.put(detection)
-                    self.logger.info('Match: ' + repr(detection))
+                    
+                    self.logger.info('Match: ' + repr({
+                        'label': detection['label'],
+                        'score': detection['score']
+                    }))
+                    
                     if self.encoder_active:
                         self.logger.debug(
                             'Adding +1 frame to: %s', self.video_path)

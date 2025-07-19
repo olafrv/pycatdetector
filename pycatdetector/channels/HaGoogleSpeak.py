@@ -1,9 +1,10 @@
 import logging
 from time import sleep
 from requests import post, get
+from .Channel import Channel  # Import the abstract base class
 
 
-class HaGoogleSpeak:
+class HaGoogleSpeak(Channel):  # Inherit from Channel
     """
     A class that provides functionality to speak a text message
     using Google Translate TTS and Google Cast.
@@ -53,8 +54,7 @@ class HaGoogleSpeak:
         """
         return self.__class__.__name__
 
-    def call_api(self, url, method, headers={}, data={}):
-
+    def _call_api(self, url, method, headers={}, data={}):
         if method == "post":
             self.logger.info("POST: %s" % url)
             self.logger.debug("DATA: %s" % repr(data))
@@ -66,12 +66,11 @@ class HaGoogleSpeak:
             raise ValueError("Invalid HTTP method '%s'" % method)
 
         self.logger.debug("Response: " + response.text)
-
         return response
 
-    def get_volume(self) -> float:
+    def _get_volume(self) -> float:
         url = self.config["url"] + "/api/states/" + self.media_player_entity_id
-        response = self.call_api(url, "get", headers=self.headers)
+        response = self._call_api(url, "get", headers=self.headers)
         if not response.ok:
             self.logger.error("Failed to get volume level: " + response.text)
             return None
@@ -81,13 +80,13 @@ class HaGoogleSpeak:
             else:
                 return self.DEFAULT_VOLUME_LEVEL
 
-    def set_volume(self, volume_level) -> bool:
+    def _set_volume(self, volume_level) -> bool:
         url = self.config["url"] + "/api/services/media_player/volume_set"
         data = {
             "entity_id": self.media_player_entity_id,
             "volume_level": volume_level,
         }
-        response = self.call_api(url, "post", headers=self.headers, data=data)
+        response = self._call_api(url, "post", headers=self.headers, data=data)
         if not response.ok:
             self.logger.error("Failed to set volume level: " + response.text)
             return False
@@ -95,7 +94,7 @@ class HaGoogleSpeak:
             self.logger.info("Response: " + response.text)
             return True
 
-    def calculate_speech_time(self, text):
+    def _calculate_speech_time(self, text):
         words = text.split()
         num_words = len(words)
         words_per_minute = 150
@@ -103,7 +102,7 @@ class HaGoogleSpeak:
         speech_time = num_words / words_per_second
         return speech_time
 
-    def speak(self, message) -> bool:
+    def _speak(self, message) -> bool:
         url = self.config["url"] + "/api/services/tts/speak"
         data = {
             # HomeAssitant => Settings => Devices & Services
@@ -114,7 +113,7 @@ class HaGoogleSpeak:
             # Text message to be spoken
             "message": message
         }
-        response = self.call_api(url, "post", headers=self.headers, data=data)
+        response = self._call_api(url, "post", headers=self.headers, data=data)
         if not response.ok:
             self.logger.error("Failed to speak: %s" % response.text)
             return False
@@ -122,21 +121,23 @@ class HaGoogleSpeak:
             self.logger.info("Spoken '%s' sucessfully." % message)
             return True
 
-    def notify(self, custom_message=None):
+    def notify(self, custom_content: dict = None) -> bool:
         """
         Send a notification by setting the volume and speaking a text message.
         """
-        current_volume = self.get_volume()  # Save the current volume
-        self.set_volume(self.volume_level)  # Set the volume to desired level
+        current_volume = self._get_volume()  # Save the current volume
+        self._set_volume(self.volume_level)  # Set the volume to desired level
 
         notified = False
-        if custom_message is not None:
-            notified = self.speak(custom_message)  # Speak the custom message
+        if isinstance(custom_content, dict) and "message" in custom_content:
+            message = custom_content["message"]
         else:
-            notified = self.speak(self.message)  # Speak the default message
+            message = self.message  # the default message
+
+        notified = self._speak(message)
 
         if current_volume is not None:
-            sleep(self.calculate_speech_time(self.message) * 1.1)  # +10% slack
-            self.set_volume(current_volume)  # Restore the volume
+            sleep(self._calculate_speech_time(message) * 1.1)  # +10% delay
+            self._set_volume(current_volume)  # Restore the volume
 
         return notified

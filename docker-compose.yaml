@@ -9,6 +9,7 @@ services:
     - ./config.yaml:/opt/pycatdetector/config.yaml:ro
     - ./logs:/opt/pycatdetector/logs:rw
     - ./videos:/opt/pycatdetector/videos:rw
+    - ./models:/root/.cache/torch:rw
     restart: always
     deploy:
         resources:

@@ -79,18 +79,6 @@ Run the following to check if AVX is enabled: [test_aaa_torch.py](./pycatdetecto
 See more information on: \
 https://pytorch.org/get-started/locally/#windows-verification
 
-### Apache MXNet (Legacy)
-
-During runtime check if AVX, define the following environment variable:
-
-```bash
-# Apache MXNet
-export MKLDNN_VERBOSE=1
-# unset MKLDNN_VERBOSE
-```
-See more information on: \
-https://mxnet.apache.org/versions/1.9.1/api/python/docs/tutorials/performance/backend/mkldnn/index.html
-
 # Usage
 
 ## Configuration
@@ -112,7 +100,8 @@ make run             # with python3 interpreter
 
 ```shell
 # If you don't have it (latest docker official version)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/olafrv/my_collections/refs/heads/main/scripts/bash/install-docker.sh)"
+# https://github.com/docker/docker-install
+curl -fsSL https://get.docker.com -o get-docker.sh; sh get-docker.sh
 make docker.build    # build docker image with python requirements
 make docker.run      # A) without compose, and removed after stopped
 make docker.start    # B.1) with compose running in background as service
@@ -153,14 +142,14 @@ make github.release       # create a new github relase
 
 # References
 
-## OpenCV (cv2)
+## OpenCV - a.k.a. cv2
 * https://pypi.org/project/opencv-python/
 * https://docs.opencv.org/4.6.0/d6/d00/tutorial_py_root.html
 * https://docs.opencv.org/3.0-beta/doc/py_tutorials/py_gui/py_video_display/py_video_display.html
 * https://answers.opencv.org/question/24714/skipping-frames-in-videocapture/
 * https://docs.opencv.org/4.x/dd/d9e/classcv_1_1VideoWriter.html
 
-## PyTorch - Torchvision
+## PyTorch & Torchvision
 * https://pytorch.org/vision/stable/index.html
 * https://pytorch.org/vision/stable/models.html#classification
 * https://pytorch.org/vision/main/models/faster_rcnn.html
@@ -184,7 +173,7 @@ make github.release       # create a new github relase
 ## PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 
-## Deep Learning (MXNet)
+## Deep Learning
 * https://d2l.ai/chapter_computer-vision/bounding-box.html
 
 ## PEP 8 – Style Guide for Python Code

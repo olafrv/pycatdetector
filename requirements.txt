@@ -1,20 +1,21 @@
-# make run
+# make (docker.)run
 
 # General
-colorlog==6.8.2
+PyYAML==6.0.2
+colorlog==6.9.0
+matplotlib==3.10.3
 
-# Neural Net MXNet (Legacy)
-#
-# To fix conflict with PyTorch and MXNet requirements:
-# sed -i 's/\(_require_.*_version\)/# FIX: \1/g' \
-#   ./venv/lib/python3.10/site-packages/gluoncv/__init__.py
-#
-numpy==1.23  # https://github.com/apache/mxnet/issues/21165
-mxnet==1.9.1
-gluoncv==0.10.5
+# OpenCV 4.12.0.88 requires numpy<2.3.0
+numpy==2.2.6
+# OpenCV latest available version at 19.Jul.2025
+opencv-python==4.12.0.88
 
 # Neural Net PyTorch (Remove +cpu for full NVIDIA CUDA support)
 # https://github.com/pytorch/pytorch/issues/29745#issuecomment-553588171
 --find-links https://download.pytorch.org/whl/torch_stable.html
-torch==2.2.2+cpu
-torchvision==0.17.2+cpu
+torch==2.7.1
+torchvision==0.22.1
+
+# Discord Webhook
+# https://github.com/lovvskillz/python-discord-webhook
+discord-webhook==1.4.1

@@ -48,7 +48,13 @@ class Screener:
         Shows the screener (Matplotlib window with images from the detector)
         """
         self.logger.info("Showing...")
-        matplotlib.use('TkAgg')
+        
+        try:
+            matplotlib.use('TkAgg')
+        except ImportError:
+            self.logger.warn("TkAgg backend is not available, headless=true?")
+            return
+        
         plt.ion()
         fig = plt.figure("PyCatDetector")
         fig.canvas.mpl_connect('close_event', self.close)

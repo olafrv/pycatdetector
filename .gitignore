@@ -7,6 +7,8 @@ venv
 *.swp
 # videos
 videos
+# torch models
+models
 # logs
 logs
 *.log
