@@ -40,6 +40,7 @@
   * Updated changelog with comprehensive version history (this one)
   * Improved Makefile with better Docker handling and volume mounting
 * Bug Fixes & Stability
+  * A lot of Pylance type checks and prototype fixes
   * Fixed NumPy 2.x compatibility issues with OpenCV
   * Resolved dependency conflicts between packages in requirements.txt
   * Improved detection data structure with proper image and timestamp handling
