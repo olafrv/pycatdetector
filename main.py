@@ -24,7 +24,7 @@ def main():
 
     if len(sys.argv) > 1:
         if "--check-config" in sys.argv:
-            print(json.dumps(config.get_all(), indent=2))
+            print(config.to_json())
             exit(0)
 
     enable_logging(config)

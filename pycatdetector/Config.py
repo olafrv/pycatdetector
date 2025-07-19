@@ -1,5 +1,6 @@
 import re
 import yaml
+import json
 from typing import Optional
 
 
@@ -172,6 +173,16 @@ class Config:
             str: The CamelCase string.
         """
         return ''.join(word.capitalize() for word in s.split('_'))
+
+    def to_json(self) -> str:
+        """
+        Converts the configuration settings to a JSON string.
+
+        Returns:
+            str: The JSON string representation of the configuration settings.
+
+        """
+        return json.dumps(self._CONFIG, indent=2)
 
     def __str__(self) -> str:
         """

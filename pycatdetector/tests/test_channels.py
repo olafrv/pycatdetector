@@ -5,6 +5,7 @@ from pycatdetector.Config import Config
 
 
 def test_main(caplog):
+    
     caplog.set_level(logging.DEBUG)
     print()
     config = Config()
@@ -28,7 +29,9 @@ def test_main(caplog):
         channel = DiscordWebhook(filtered_config)
         assert channel.notify(
             custom_content={
-                "message": "Esto es una prueba a través de chat."
+                "message": "Esto es una prueba a través de chat.",
+                "image_name": "test_image.jpg",
+                "image_data": open("cookie.jpg", "rb").read()
             }
         )
     else:
