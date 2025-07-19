@@ -12,6 +12,8 @@ class Config:
         CONFIG_FLAT (dict): Flattened configuration settings (i.e. key1_key2).
 
     """
+    CONFIG = {}
+    CONFIG_FLAT = {}
 
     def __init__(self, config_file='config.yaml'):
         """
@@ -94,7 +96,7 @@ class Config:
                     filtered_config[key] = self.CONFIG[key]
         return filtered_config
 
-    def get(self, name) -> dict:
+    def get(self, name) -> str:
         """
         Retrieves a specific configuration setting by its key.
 
@@ -102,7 +104,7 @@ class Config:
             name (str): The key of the configuration setting to retrieve.
 
         Returns:
-            dict: The configuration setting.
+            str: The configuration setting.
 
         """
         return self.CONFIG_FLAT[name]
@@ -120,7 +122,8 @@ class Config:
         """
         return self.CONFIG[key]
 
-    def camel_to_snake(s):
+    @classmethod
+    def camel_to_snake(cls, s: str) -> str:
         """
         Converts a camel case string to snake case.
 
