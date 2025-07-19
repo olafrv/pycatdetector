@@ -73,7 +73,7 @@ class HaGoogleSpeak(Channel):  # Inherit from Channel
         response = self._call_api(url, "get", headers=self.headers)
         if not response.ok:
             self.logger.error("Failed to get volume level: " + response.text)
-            return self.volume_level  # Return default volume level
+            return self.DEFAULT_VOLUME_LEVEL  # Return default volume level
         else:
             if response.json()["state"] == "on":
                 return response.json()["attributes"]["volume_level"]
