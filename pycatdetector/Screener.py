@@ -2,6 +2,7 @@ import logging
 import matplotlib
 import matplotlib.pyplot as plt
 from time import sleep
+from pycatdetector.Detector import Detector as Detector
 
 
 class Screener:
@@ -17,7 +18,7 @@ class Screener:
 
     SLEEP_TIME = 0.5  # seconds
 
-    def __init__(self, detector):
+    def __init__(self, detector: Detector):
         """
         Initializes a new instance of the Screener class.
 
