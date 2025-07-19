@@ -35,7 +35,7 @@ class DiscordWebhook(Channel):
         """
         return self.__class__.__name__
 
-    def notify(self, custom_content: dict = None) -> bool:
+    def notify(self, custom_content: dict = {}) -> bool:
         """
         Sends a notification to the Discord webhook with optional image.
         """
@@ -46,21 +46,24 @@ class DiscordWebhook(Channel):
         
         content = str(datetime.now()) + ' - ' + content
 
-        image_data = None
-        image_name = None
+        webhook = discord_webhook(url=self.url, content=content)
+
         if custom_content \
             and "image_data" in custom_content \
             and "image_name" in custom_content:
             
             image_data = custom_content["image_data"]
             image_name = custom_content["image_name"]
-
-        self.logger.info("Request: URL:"  + self.url + ", Message: " + content
-                         + (", Image: " + image_name if image_name else "No"))
-
-        webhook = discord_webhook(url=self.url, content=content)
-        if image_data is not None:
+            
             webhook.add_file(file=image_data, filename=image_name)
+            
+            self.logger.info(
+                "Request: URL:"  + self.url + ", Message: " + content
+                    + ", Image: " + image_name)
+        else:
+            self.logger.info(
+                "Request: URL:"  + self.url + ", Message: " + content
+                    + ", Image: None")   
         
         response = webhook.execute()
         self.logger.info("Response: " + repr(response))     

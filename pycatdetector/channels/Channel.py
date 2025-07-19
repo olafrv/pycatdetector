@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 class Channel(ABC):
     """
@@ -6,7 +7,7 @@ class Channel(ABC):
     """
 
     @abstractmethod
-    def notify(self, custom_content: dict = None) -> bool:
+    def notify(self, custom_content: Optional[dict] = None) -> bool:
         """
         Sends a notification through the channel.
 

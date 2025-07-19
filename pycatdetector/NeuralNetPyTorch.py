@@ -1,7 +1,8 @@
 # pyright: reportMissingImports=false
 
 import os
-import PIL
+from PIL import Image
+from typing import Optional
 from torchvision.io import read_image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
@@ -36,7 +37,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
     """
 
-    def __init__(self, model_name, min_score=0.7):
+    def __init__(self, model_name, min_score: Optional[float] = 0.7):
         """
         Initializes a NeuralNetPyTorch object.
 
@@ -90,8 +91,8 @@ class NeuralNetPyTorch(AbstractNeuralNet):
             else:
                 raise FileNotFoundError
         else:
-            if not isinstance(image, PIL.Image.Image):
-                img = PIL.Image.fromarray(image)  # PIL Image
+            if not isinstance(image, Image.Image):
+                img = Image.fromarray(image)  # PIL Image
 
         batch = [self.preprocess(img)]
         prediction = self.model(batch)[0]
@@ -117,7 +118,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
         return self.weights.meta["categories"]
 
-    def get_scored_labels(self, result, min_score=-1) -> list:
+    def get_scored_labels(self, result: dict, min_score: Optional[float] = -1) -> list:
         """
         Filters the labels based on the minimum score threshold.
 
@@ -144,7 +145,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
                 })
         return scored_labels
 
-    def plot(self, result) -> PIL.Image.Image:
+    def plot(self, result: dict) -> Image.Image:
         """
         Plots the bounding boxes on the image.
 

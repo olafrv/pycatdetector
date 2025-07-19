@@ -11,10 +11,7 @@ class Recorder (threading.Thread):
     RECONNECT_DELAY = 10  # seconds
     CORRUPTED_DELAY = 1
     CORRUPTED_MAX_FRAMES = 60  # max corrupted frames (1 frame <=> 1 sec)
-    images = None
-    rtspUrl = None
     must_stop = False
-    logger = None
 
     def __init__(self, rtspUrl):
         threading.Thread.__init__(self)
@@ -72,7 +69,6 @@ class Recorder (threading.Thread):
             
             # Additional RTSP optimizations
             cap.set(cv2.CAP_PROP_FPS, 30)  # Try to set target FPS
-            cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('H', '2', '6', '4'))  # Prefer H264
             
             if not cap.isOpened():
                 self.logger.error(

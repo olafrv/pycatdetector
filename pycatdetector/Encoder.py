@@ -1,3 +1,4 @@
+import PIL.Image
 import cv2
 import os
 import PIL
@@ -12,7 +13,6 @@ class Encoder:
 
     - video_file (str): The path to the output video file.
     - video_writer: The video writer object from OpenCV.
-    - opened (bool): Flag indicating if the video writer is opened.
     """
 
     def __init__(self, video_file):
@@ -24,7 +24,6 @@ class Encoder:
         """
         self.video_file = video_file
         self.video_writer = None
-        self.opened = False
 
     def open(self, frame: np.ndarray):
         """
@@ -40,7 +39,6 @@ class Encoder:
         height, width, layers = frame.shape
         self.video_writer = cv2.VideoWriter(
             self.video_file, 0, 1, (width, height))
-        self.opened = True
 
     def add_image(self, image):
         """
@@ -59,10 +57,11 @@ class Encoder:
         else:
             raise ValueError("Invalid image type: " + str(type(image)))
 
-        if not self.opened:
+        if self.video_writer:
             self.open(frame)
-
-        self.video_writer.write(frame)
+            self.video_writer.write(frame)
+        else:
+            raise ValueError("Video writer is not initialized or was closed")
 
     def load_image(self, file) -> np.ndarray:
         """
@@ -103,7 +102,7 @@ class Encoder:
         """
         Closes the video writer and releases resources.
         """
-        if self.opened:
+        if self.video_writer:
             self.video_writer.release()
-            self.opened = False
+
         cv2.destroyAllWindows()  # safe to call even if no windows are created

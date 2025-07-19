@@ -5,7 +5,7 @@ import numpy
 import cv2
 from time import sleep
 from datetime import datetime
-
+from typing import Optional
 
 class Notifier(threading.Thread):
     """
@@ -67,7 +67,7 @@ class Notifier(threading.Thread):
         """
         Returns the list of labels.
         """
-        return self.channels.keys()
+        return list(self.channels.keys())
 
     def set_notify_window(self, notify_window):
         """
@@ -160,7 +160,7 @@ class Notifier(threading.Thread):
         else:
             self.logger.info("Already stopped")
 
-    def notify(self, channel, image: numpy.ndarray = None) -> bool:
+    def notify(self, channel, image: Optional[numpy.ndarray] = None) -> bool:
         """
         Sends a notification to the specified channel with attached image.
 
@@ -181,13 +181,17 @@ class Notifier(threading.Thread):
                 send = False
         if send:
             
-            image_format = ".jpeg"
-            _, buffer = cv2.imencode(image_format, image)
-            image_data = buffer.tobytes()
+            if image is not None:
+                image_format = ".jpeg"
+                _, buffer = cv2.imencode(image_format, image)
+                image_data = buffer.tobytes()
 
-            image_name = channel.get_name() \
-                + '-' + now.strftime("%Y-%m-%d_%H-%M-%S") + image_format
-            channel.notify({'image_data': image_data, 'image_name': image_name})
+                image_name = channel.get_name() \
+                    + '-' + now.strftime("%Y-%m-%d_%H-%M-%S") + image_format
+                channel.notify({'image_data': image_data, 'image_name': image_name})
+            else:
+                channel.notify()
+                
             self.notifications[channel_id] = now
         
         return send

@@ -22,7 +22,7 @@ def main():
 
     if len(sys.argv) > 1:
         if "--check-config" in sys.argv:
-            print(config.config_flat)
+            print(config.CONFIG_FLAT)
             exit(0)
 
     enable_logging(config)
@@ -36,7 +36,7 @@ def main():
 
     screener_enabled = not config.get("headless")
     net_model_name = config.get("net_model_name")
-    notify_min_score = config.get("notify_min_score")
+    notify_min_score = float(config.get("notify_min_score"))
 
     if config.get("net_version") == 'v2':
         net = NeuralNetPyTorch(net_model_name)
@@ -45,8 +45,11 @@ def main():
 
     videos_folder = config.get("videos_folder")
 
-    detector = Detector(recorder.get_images(), screener_enabled, net,
-                        notify_min_score, videos_folder)
+    detector = Detector(images=recorder.get_images(), 
+                        screener_enabled=screener_enabled, 
+                        net=net,
+                        notify_min_score=notify_min_score, 
+                        encoder_folder=videos_folder)
 
     notifier = Notifier(detector.get_detections())
     notifier.set_notify_window(config.get_assoc("notify_window"))
@@ -72,9 +75,12 @@ def handler(signum, frame):
     if signum == signal.SIGINT:  # CTRL + C
         if screener is not None:
             screener.close()
-        notifier.stop()
-        recorder.stop()
-        detector.stop()
+        if notifier is not None:
+            notifier.stop()
+        if recorder is not None:
+            recorder.stop()
+        if detector is not None:
+            detector.stop()
 
 
 def load_channels(config, notifier):
