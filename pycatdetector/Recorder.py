@@ -112,7 +112,7 @@ class Recorder (threading.Thread):
                             
                         corrupted = frame is None or len(frame.shape) != 3
                     except Exception as e:
-                        self.logger.error(f"Error reading frame: {e}")
+                        self.logger.error("Error reading frame: %s" % (e))
                         break  # Exit inner loop to reconnect
 
                     if corrupted:
