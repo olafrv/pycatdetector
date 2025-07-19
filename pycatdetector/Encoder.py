@@ -24,6 +24,7 @@ class Encoder:
         """
         self.video_file = video_file
         self.video_writer = None
+        self.video_opened = False
 
     def open(self, frame: np.ndarray):
         """
@@ -39,6 +40,7 @@ class Encoder:
         height, width, layers = frame.shape
         self.video_writer = cv2.VideoWriter(
             self.video_file, 0, 1, (width, height))
+        self.video_opened = True
 
     def add_image(self, image):
         """
@@ -57,12 +59,13 @@ class Encoder:
         else:
             raise ValueError("Invalid image type: " + str(type(image)))
 
-        if self.video_writer:
+        if not self.video_opened:
             self.open(frame)
+        
+        if self.video_writer is not None:
             self.video_writer.write(frame)
-        else:
-            raise ValueError("Video writer is not initialized or was closed")
 
+        
     def load_image(self, file) -> np.ndarray:
         """
         Loads an image from a file.
