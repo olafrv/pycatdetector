@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional
 from discord_webhook import DiscordWebhook as discord_webhook
 from .Channel import Channel  # Import the abstract base class
 
@@ -35,7 +36,7 @@ class DiscordWebhook(Channel):
         """
         return self.__class__.__name__
 
-    def notify(self, custom_content: dict = {}) -> bool:
+    def notify(self, custom_content: Optional[dict] = None) -> bool:
         """
         Sends a notification to the Discord webhook with optional image.
         """
