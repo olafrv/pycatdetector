@@ -4,6 +4,7 @@ import signal
 import logging
 import time
 import colorlog
+import json
 import pycatdetector.channels
 from pycatdetector.Config import Config
 from pycatdetector.Recorder import Recorder
@@ -22,7 +23,7 @@ def main():
 
     if len(sys.argv) > 1:
         if "--check-config" in sys.argv:
-            print(config.CONFIG_FLAT)
+            print(json.dumps(config.CONFIG_FLAT, indent=2))
             exit(0)
 
     enable_logging(config)

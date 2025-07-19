@@ -48,7 +48,7 @@ install.base:
 		&& sudo apt install -y --no-install-recommends build-essential gcc \
 		&& sudo apt install -y python3-pip \
 		&& sudo apt install -y python3-tk \
-		&& sudo apt install -y ffmpeg
+		&& sudo apt install -y ffmpeg jq
 
 uninstall: uninstall.venv clean
 
@@ -67,7 +67,7 @@ clean:
 # customize!
 check-config:
 	@ . venv/bin/activate \
-		&& python3 main.py --check-config
+		&& python3 main.py --check-config | jq
 
 build: install.dev
 	# https://nuitka.net/doc/user-manual.html
@@ -89,7 +89,8 @@ package.outdated:
 run:
 	@ mkdir -p logs \
 		&& . venv/bin/activate \
-		&& python3 main.py
+		&& chmod +x entrypoint.sh \
+		&& ./entrypoint.sh
 
 run.bin:
 	@ ./build/main.bin
