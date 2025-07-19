@@ -84,6 +84,7 @@ package.outdated:
 		&& pip3 list --outdated > requirements.new && deactivate
 	@ grep -f requirements.txt requirements.new > requirements.outdated || true
 	@ grep -f requirements-dev.txt requirements.new > requirements-dev.outdated || true
+	@ rm -f requirements.new && ls -ls *.outdated || true
 
 # customize!
 run:
