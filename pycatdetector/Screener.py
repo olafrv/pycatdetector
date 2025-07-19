@@ -53,7 +53,7 @@ class Screener:
         try:
             matplotlib.use('TkAgg')
         except ImportError:
-            self.logger.warn("TkAgg backend is not available, headless=true?")
+            self.logger.warning("TkAgg backend is not available, headless=true?")
             return
         
         plt.ion()
