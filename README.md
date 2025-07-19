@@ -50,13 +50,11 @@ This Python package has been tested and designed for:
   * (Optional) A compatible IoT device like [Google Nest](https://store.google.com/product/google_nest_mini?hl=de) with HomeAssistant (see below).
 
 * Software:
-  * [Ubuntu Linux 22.04 LTS](https://releases.ubuntu.com/)
-  * [Python 3.10.6](https://docs.python.org/3/) and several [python libraries](https://github.com/olafrv/pycatdetector/blob/master/requirements.txt).
-  * PyCatDetector uses [Apache MXNet](https://attic.apache.org/projects/mxnet.html) but it is being [refactored](https://github.com/olafrv/pycatdetector/issues/4) to only rely on [PyTorch](https://pytorch.org/).
+  * [Ubuntu Linux 24.04 LTS](https://releases.ubuntu.com/)
+  * [Python 3.12](https://docs.python.org/3/) and several [python libraries](https://github.com/olafrv/pycatdetector/blob/master/requirements.txt).
+  * PyCatDetector uses [PyTorch](https://pytorch.org/).
   * (Recommended) [Docker and/or Docker Compose](https://docs.docker.com/) for headless run (no graphical features).
   * (Optional) [HomeAssistant](https://www.home-assistant.io/) endpoint for Text-To-Speach (TTS) service.
-
-
 
 
 ## AVX Instruction Set
