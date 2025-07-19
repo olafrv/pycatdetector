@@ -1,10 +1,8 @@
 # make profile
-snakeviz==2.1.1
+snakeviz==2.2.0
 # make bin
-Nuitka==2.1.5
+Nuitka==2.7.12
 ordered-set==4.1.0
 # make test
-pytest==7.4.4
-coverage==7.4.4
-# linter
-flake8==7.0.0
+pytest==8.4.1
+coverage==7.9.2

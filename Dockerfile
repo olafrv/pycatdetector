@@ -1,10 +1,11 @@
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 RUN apt update -y \
     && apt install -y tzdata \
     && apt install -y python3 \
-    && apt install -y python3.10-venv\
+    && apt install -y python3.12-venv\
+    && apt install -y python3-tk \
     && apt install -y --no-install-recommends build-essential gcc \
-    && apt install -y ffmpeg \
+    && apt install -y ffmpeg fonts-dejavu jq \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -21,22 +22,14 @@ RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install --upgrade pip
 RUN --mount=type=cache,target=/root/.cache/pip pip3 install -Ur requirements.txt
-# RUN pip3 cache purge
+# RUN pip3 cache purge  # not needed as we use a cache mount, kept for reference
 
-# To fix conflict with PyTorch and MXNet requirements:
-RUN sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' \
-    /opt/venv/lib/python3.10/site-packages/gluoncv/__init__.py
-
-# Workaround to avoid downloading the models every time
-# image is built or container is created from the image
-COPY pycatdetector/AbstractNeuralNet.py /opt/pycatdetector/pycatdetector/
-COPY pycatdetector/NeuralNetMXNet.py /opt/pycatdetector/pycatdetector/
-COPY pycatdetector/NeuralNetPyTorch.py /opt/pycatdetector/pycatdetector/
-COPY pycatdetector/Preloader.py /opt/pycatdetector/pycatdetector/
-RUN python3 -c "from pycatdetector.Preloader import preload; preload()"
-
-# This allows faster builds
+# Copy the package files
 COPY pycatdetector /opt/pycatdetector/pycatdetector
-COPY main.py /opt/pycatdetector/
 
-CMD [ "python3", "main.py" ]
+# Copy the main script and entrypoint files
+COPY main.py /opt/pycatdetector/
+COPY entrypoint.sh /opt/pycatdetector/
+RUN chmod +x /opt/pycatdetector/entrypoint.sh
+
+ENTRYPOINT [ "/opt/pycatdetector/entrypoint.sh" ]

@@ -20,7 +20,6 @@ metadata:
 	@ echo "METADATA: NAME=${NAME}, VERSION=${VERSION}"
 
 install: install.venv
-# https://github.com/pytorch/pytorch/issues/17023  - PyTorch Download Speed Issue
 	@ . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt
 
@@ -43,11 +42,13 @@ install.venv: install.base
 
 install.base:
 	@ sudo apt update \
+		&& sudo apt install -y tzdata \
 		&& sudo apt install -y python3 \
-		&& sudo apt install -y python3.10-venv python3-dev python3-setuptools \
+		&& sudo apt install -y python3.12-venv python3-dev python3-setuptools \
 		&& sudo apt install -y --no-install-recommends build-essential gcc \
 		&& sudo apt install -y python3-pip \
-		&& sudo apt install python3-tk  # matplotlib uses tkinter
+		&& sudo apt install -y python3-tk \
+		&& sudo apt install -y ffmpeg fonts-dejavu jq
 
 uninstall: uninstall.venv clean
 
@@ -66,7 +67,7 @@ clean:
 # customize!
 check-config:
 	@ . venv/bin/activate \
-		&& python3 main.py --check-config
+		&& python3 main.py --check-config | jq
 
 build: install.dev
 	# https://nuitka.net/doc/user-manual.html
@@ -88,7 +89,8 @@ package.outdated:
 run:
 	@ mkdir -p logs \
 		&& . venv/bin/activate \
-		&& python3 main.py
+		&& chmod +x entrypoint.sh \
+		&& ./entrypoint.sh
 
 run.bin:
 	@ ./build/main.bin
@@ -121,8 +123,7 @@ profile.view: install.dev
 	@ . venv/bin/activate && snakeviz profile/main.prof
 
 docker.build:
-# ARM64 MXNet Issue Impides Multi-Arch Build: 
-# https://github.com/apache/mxnet/issues/19234
+# Multiple architectures build (too slow for non native architectures)
 #	@ if ! docker buildx ls | grep multi-arch-builder; \
 #	then \
 #		docker buildx create --name multi-arch-builder; \
@@ -130,6 +131,7 @@ docker.build:
 #	@ docker buildx build \
 #		--push --platform linux/amd64,linux/arm64 \
 #		-t ${IMAGE_NAME}:${VERSION} .
+# Single architecture build (faster also the most used by end users)
 	@ DOCKER_BUILDKIT=1 docker build -t ${IMAGE_NAME}:${VERSION} .
 	@ docker tag ${IMAGE_NAME}:${VERSION} ${IMAGE_NAME}:latest 
 
@@ -138,10 +140,11 @@ docker.clean:
 
 # customize!
 docker.run:
-	@ docker run --rm -it --cpus ${CPUS} \
+	@ docker run --rm -it --cpus ${CPUS} --name ${NAME} \
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		-v "${PWD}/videos:${IMAGE_APP_DIR}/videos" \
+		-v "${PWD}/models:/root/.cache/torch" \
 		${IMAGE_NAME}:${VERSION}
 
 docker.start:

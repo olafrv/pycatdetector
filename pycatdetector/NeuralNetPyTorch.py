@@ -1,7 +1,8 @@
 # pyright: reportMissingImports=false
 
 import os
-import PIL
+from PIL import Image
+from typing import Optional
 from torchvision.io import read_image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
@@ -11,6 +12,7 @@ from torchvision.models.detection import \
     FasterRCNN_MobileNet_V3_Large_320_FPN_Weights, \
     FasterRCNN_MobileNet_V3_Large_FPN_Weights
 from .AbstractNeuralNet import AbstractNeuralNet
+import torch
 
 
 class NeuralNetPyTorch(AbstractNeuralNet):
@@ -36,7 +38,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
     """
 
-    def __init__(self, model_name, min_score=0.7):
+    def __init__(self, model_name, min_score: Optional[float] = 0.7):
         """
         Initializes a NeuralNetPyTorch object.
 
@@ -90,8 +92,8 @@ class NeuralNetPyTorch(AbstractNeuralNet):
             else:
                 raise FileNotFoundError
         else:
-            if not isinstance(image, PIL.Image.Image):
-                img = PIL.Image.fromarray(image)  # PIL Image
+            if not isinstance(image, Image.Image):
+                img = Image.fromarray(image)  # PIL Image
 
         batch = [self.preprocess(img)]
         prediction = self.model(batch)[0]
@@ -117,7 +119,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
         return self.weights.meta["categories"]
 
-    def get_scored_labels(self, result, min_score=-1) -> list:
+    def get_scored_labels(self, result: dict, min_score: Optional[float] = -1) -> list:
         """
         Filters the labels based on the minimum score threshold.
 
@@ -144,7 +146,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
                 })
         return scored_labels
 
-    def plot(self, result) -> PIL.Image.Image:
+    def plot(self, result: dict) -> Image.Image:
         """
         Plots the bounding boxes on the image.
 
@@ -159,9 +161,50 @@ class NeuralNetPyTorch(AbstractNeuralNet):
         img = result["image"]
         labels = result["labels"]
         boxes = result["boxes"]
-        img_tensor = ToTensor()(img)  # Convert PIL Image to tensor
-        img_tensor = img_tensor.mul(255).byte()  # Convert to tensor (uint8)
-        img_tensor = draw_bounding_boxes(img_tensor, boxes,
-                                         labels=labels, width=1)
+        scores = result["scores"]
+
+        # Format labels to include scores
+        label_strings = [
+            f"{label}: {score:.2f}" for label, score in zip(labels, scores)
+        ]
+
+        # Convert PIL Image to tensor
+        img_tensor = ToTensor()(img)
+        img_tensor = img_tensor.mul(255).byte()
+
+        # Define a palette of vivid dark colors
+        palette = torch.tensor([
+            [255, 0, 0],      # Red
+            [0, 255, 0],      # Green
+            [0, 0, 255],      # Blue
+            [255, 255, 0],    # Yellow
+            [255, 0, 255],    # Magenta
+            [0, 255, 255],    # Cyan
+            [255, 128, 0],    # Orange
+            [128, 0, 255],    # Purple
+            [0, 128, 255],    # Sky Blue
+            [128, 255, 0],    # Lime
+            [0, 255, 128],    # Aqua
+            [255, 0, 128],    # Pink
+        ], dtype=torch.uint8)
+
+        # Assign a color to each box (cycling through palette)
+        num_boxes = boxes.shape[0]
+        colors = [tuple(palette[i % len(palette)].tolist()) for i in range(num_boxes)]
+
+        # Draw bounding boxes with labels
+        img_tensor = draw_bounding_boxes(
+            img_tensor,
+            boxes,
+            labels=label_strings,
+            colors=colors,  # type: ignore
+            font_size=60,
+            width=10,
+            font="DejaVuSans",
+            fill=False
+        )
+
+        # Convert tensor back to PIL Image
         img = ToPILImage()(img_tensor)
+
         return img

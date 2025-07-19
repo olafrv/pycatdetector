@@ -1,3 +1,63 @@
+# 1.2.1 (Todo)
+
+* https://github.com/olafrv/pycatdetector/issues/2
+
+# 1.2.0 (Latest)
+
+* Infrastructure & Dependencies
+  * Updated Docker base image from Ubuntu 22.04 → 24.04
+  * Updated Python version from 3.10 → 3.12
+  * Updated NumPy from 1.23 → 2.2.6 (compatible with OpenCV)
+  * Updated OpenCV from 4.10.0.82 → 4.12.0.88 (latest with NumPy 2.x support)
+  * Updated PyTorch from 2.2.2+cpu → 2.7.1 and torchvision 0.17.2+cpu → 0.22.1
+  * Updated colorlog from 6.9.0 → 6.8.2
+  * Added discord-webhook 1.4.1 dependency
+* Neural Network Migration
+  * Deprecated Apache MXNet support 
+    https://github.com/olafrv/pycatdetector/issues/6
+  * Switched to PyTorch-only neural network implementation
+  * Updated model preloading to only use PyTorch models
+  * Added error handling for unsupported MXNet usage
+* RTSP Stream Improvements
+  * Enhanced connection handling with explicit FFmpeg backend usage
+  * Added timeout configurations (15s open, 5s read timeouts)
+  * Improved stream optimization with H.264 codec preference and buffer management
+  * Better error handling for failed frame reads and connection timeouts
+  * Enhanced logging of stream properties (resolution, FPS)
+* Notification System Enhancements
+  * Implemented abstract Channel class for better code organization
+  * Enhanced Channel with image attachment using discord-webhook library
+  * Updated Home Assistant Google Speak channel with improved API calls
+  * Added image data support in notification system with automatic encoding
+  * Renamed configuration parameter from "content" → "message" for consistency
+* Application Architecture
+  * Enhanced Docker configuration with torch models volume mounting
+  * Added entrypoint.sh for container initialization with model preloading
+  * Enhanced screener with TkAgg backend fallback for headless environments
+* Configuration & Documentation
+  * Enhanced Docker installation documentation
+  * Updated example configuration with new parameter names
+  * Updated changelog with comprehensive version history (this one)
+  * Improved Makefile with better Docker handling and volume mounting
+* Bug Fixes & Stability
+  * A lot of Pylance type checks and prototype fixes
+  * Fixed NumPy 2.x compatibility issues with OpenCV
+  * Resolved dependency conflicts between packages in requirements.txt
+  * Improved detection data structure with proper image and timestamp handling
+  * Enhanced error handling for missing TkAgg backend in headless mode
+  * Fixed channel loading to skip abstract base classes
+
+# 1.1.12
+
+* Fixed Dockerfile ENV definitions.
+* Eliminated credential printing for docker login.
+* Switched to custom centralized docker installer.
+
+# 1.1.11
+
+* Reduced maximum corrupted frames counts.
+* Added statistics about corrupted frames.
+
 # 1.1.10
 
 * Moved preload to Preloader helper.

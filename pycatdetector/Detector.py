@@ -28,7 +28,7 @@ class Detector(threading.Thread):
                  images: SimpleQueue,
                  screener_enabled: bool,
                  net: AbstractNeuralNet,
-                 notify_min_score: int,
+                 notify_min_score: float,
                  encoder_folder: str):
         threading.Thread.__init__(self)
         self.logger = logging.getLogger(__name__)
@@ -36,13 +36,11 @@ class Detector(threading.Thread):
         self.net = net
         self.notify_min_score = notify_min_score
         self.screener_enabled = screener_enabled
-        self.images_boxed = SimpleQueue() if self.screener_enabled else None
+        self.images_boxed = SimpleQueue()
         self.labels = []
         self.detections = SimpleQueue()
         self.encoder_folder = encoder_folder
-
-        self.encoder_active = False
-        self.video_path = None
+        self.video_path = ""
         self.sleep_time = 10  # seconds, start with worst case
         self.must_stop = False
 
@@ -52,9 +50,10 @@ class Detector(threading.Thread):
         """
         self.screener_enabled = False
 
-        self.images_boxed.empty()
-        self.logger.info("Screener disabled. Queue: %i."
-                         % self.images_boxed.qsize())
+        if self.images_boxed is not None:
+            self.images_boxed.empty()
+            self.logger.info("Screener disabled. Queue: %i."
+                                % self.images_boxed.qsize())
 
     def get_detections(self):
         """
@@ -65,7 +64,7 @@ class Detector(threading.Thread):
         """
         return self.detections
 
-    def get_images(self):
+    def get_images(self) -> SimpleQueue:
         """
         Get the images queue coming from the recorder.
 
@@ -83,7 +82,7 @@ class Detector(threading.Thread):
         """
         self.labels = labels
 
-    def get_video_path(self):
+    def get_video_path(self) -> str:
         """
         Get the video path.
 
@@ -122,17 +121,19 @@ class Detector(threading.Thread):
         self.logger.info("Starting with Thread ID: %s"
                          % threading.get_native_id())
         self.logger.info('Minimum Score: ' + str(self.notify_min_score))
+        
+        encoder = None
         if len(self.encoder_folder) > 0:
             self.logger.info('Encoder folder: ' + self.encoder_folder)
             self.set_video_path()
             self.logger.info('Encoding video to: ' + self.video_path)
             encoder = Encoder(self.video_path)
-            self.encoder_active = True
 
         while (not self.must_stop):
             if not self.images.empty():
                 image_raw = self.images.get(False)
                 images_queued = self.images.qsize()
+                image_boxed = None  # Will be used if screener enabled
 
                 try:
                     analyze_begin = datetime.now()
@@ -161,30 +162,48 @@ class Detector(threading.Thread):
                     % (analyze_duration, str(image_raw.shape), images_queued)
                 )
 
-                all_scored_labels = self.net.get_scored_labels(result)
+                all_scored_labels = \
+                    self.net.get_scored_labels(result=result)
+                
                 min_scored_labels = \
-                    self.net.get_scored_labels(result, self.notify_min_score)
+                    self.net.get_scored_labels(
+                        result=result, min_score=self.notify_min_score)
 
                 self.logger.debug("Scores: %s" % repr(all_scored_labels))
                 self.logger.debug("Scores >%.2f): %s" %
                                   (self.notify_min_score,
                                    repr(min_scored_labels)))
 
-                if self.screener_enabled or self.encoder_active:
+                if self.screener_enabled or encoder:
                     image_boxed = self.net.plot(result)
+                    if self.screener_enabled:
+                        self.images_boxed.put(image_boxed)
 
-                if self.screener_enabled:
-                    self.images_boxed.put(image_boxed)
-
+                # detection: dict
+                # 'image': The original image data (e.g., numpy array).
+                # 'label': The detected object's class label (e.g., "cat").
+                # 'score': The confidence score for the detection (e.g., 0.92).
+                # 'box': The bounding box coordinates (e.g., [x1, y1, x2, y2]).
+                # 'timestamp': The time (e.g., "2023-10-01T12:00:00Z").
+                
                 for detection in min_scored_labels:
+                    
                     if detection['label'] not in self.labels:
                         self.logger.debug('Ignored: ' + repr(detection))
                         continue
+                    
+                    detection['image'] = image_raw
                     detection['timestamp'] = \
                         str(datetime.now().astimezone().isoformat())
+                    
                     self.detections.put(detection)
-                    self.logger.info('Match: ' + repr(detection))
-                    if self.encoder_active:
+                    
+                    self.logger.info('Match: ' + repr({
+                        'label': detection['label'],
+                        'score': detection['score']
+                    }))
+                    
+                    if encoder:
                         self.logger.debug(
                             'Adding +1 frame to: %s', self.video_path)
                         encoder.add_image(image_boxed)
@@ -195,7 +214,7 @@ class Detector(threading.Thread):
                 # Better sleep than not answering termination signals
                 sleep(self.sleep_time)
 
-        if self.encoder_active:
+        if encoder:
             self.logger.info('Closing video at: ' + self.video_path)
             encoder.close()
 

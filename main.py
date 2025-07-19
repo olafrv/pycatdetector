@@ -1,29 +1,30 @@
+from asyncio.log import logger
 import os
 import sys
 import signal
 import logging
 import time
 import colorlog
+import json
 import pycatdetector.channels
 from pycatdetector.Config import Config
 from pycatdetector.Recorder import Recorder
-from pycatdetector.NeuralNetMXNet import NeuralNetMXNet
 from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
 
 images = recorder = detector = notifier = screener = config = None
-
+logger = None
 
 def main():
-    global images, recorder, detector, notifier, screener, config
+    global images, recorder, detector, notifier, screener, config, logger
 
     config = Config()
 
     if len(sys.argv) > 1:
         if "--check-config" in sys.argv:
-            print(config.config_flat)
+            print(json.dumps(config.get_all(), indent=2))
             exit(0)
 
     enable_logging(config)
@@ -37,19 +38,20 @@ def main():
 
     screener_enabled = not config.get("headless")
     net_model_name = config.get("net_model_name")
-    notify_min_score = config.get("notify_min_score")
+    notify_min_score = float(config.get("notify_min_score"))
 
-    if config.get("net_version") == 'v1':
-        net = NeuralNetMXNet(net_model_name)
-    elif config.get("net_version") == 'v2':
+    if config.get("net_version") == 'v2':
         net = NeuralNetPyTorch(net_model_name)
     else:
         raise ValueError("Invalid net_version: " + config.get("net_version"))
 
     videos_folder = config.get("videos_folder")
 
-    detector = Detector(recorder.get_images(), screener_enabled, net,
-                        notify_min_score, videos_folder)
+    detector = Detector(images=recorder.get_images(), 
+                        screener_enabled=screener_enabled, 
+                        net=net,
+                        notify_min_score=notify_min_score, 
+                        encoder_folder=videos_folder)
 
     notifier = Notifier(detector.get_detections())
     notifier.set_notify_window(config.get_assoc("notify_window"))
@@ -75,20 +77,32 @@ def handler(signum, frame):
     if signum == signal.SIGINT:  # CTRL + C
         if screener is not None:
             screener.close()
-        notifier.stop()
-        recorder.stop()
-        detector.stop()
+        if notifier is not None:
+            notifier.stop()
+        if recorder is not None:
+            recorder.stop()
+        if detector is not None:
+            detector.stop()
 
 
 def load_channels(config, notifier):
-    for class_name in pycatdetector.channels.__all__:
-        channel_s = Config.camel_to_snake(class_name)
-        if config.get("notifiers_" + channel_s + "_enabled"):
-            filtered_config = config.get_prefix("notifiers_" + channel_s)
-            channel = \
-                eval('pycatdetector.channels.' + class_name)(filtered_config)
-            labels = config.get("notifiers_" + channel_s + "_objects")
-            notifier.add_channel(channel, labels)
+    global logger
+    channels = config.get_regex("^notifiers_.*_enabled$")
+    for name, enabled in channels.items():
+        class_name = Config.camel_to_snake(
+            name.lstrip("notifiers_").rstrip("_enabled"))
+        logger.debug("Channel: " + class_name + ", enabled: " + str(enabled))
+        if not enabled:
+            continue
+        else:
+            if config.get("notifiers_" + class_name + "_enabled"):
+                filtered_config = config.get_prefix(
+                    "notifiers_" + class_name)
+                logger.debug("Loading channel: " + class_name)
+                channel = \
+                    eval('pycatdetector.channels.' + class_name)(filtered_config)
+                labels = config.get("notifiers_" + class_name + "_objects")
+                notifier.add_channel(channel, labels)
 
 
 def enable_logging(config):
