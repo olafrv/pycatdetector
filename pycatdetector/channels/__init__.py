@@ -3,4 +3,4 @@
 from .Channel import Channel
 from .HaGoogleSpeak import HaGoogleSpeak
 from .DiscordWebhook import DiscordWebhook
-__all__ = ["Channels", "HaGoogleSpeak", "DiscordWebhook"]
+__all__ = ["Channel", "HaGoogleSpeak", "DiscordWebhook"]
