@@ -1,8 +1,8 @@
 import logging
 from time import sleep
 from requests import post, get
+from typing import Optional
 from .Channel import Channel  # Import the abstract base class
-
 
 class HaGoogleSpeak(Channel):  # Inherit from Channel
     """
@@ -73,7 +73,7 @@ class HaGoogleSpeak(Channel):  # Inherit from Channel
         response = self._call_api(url, "get", headers=self.headers)
         if not response.ok:
             self.logger.error("Failed to get volume level: " + response.text)
-            return None
+            return self.volume_level  # Return default volume level
         else:
             if response.json()["state"] == "on":
                 return response.json()["attributes"]["volume_level"]
@@ -121,14 +121,13 @@ class HaGoogleSpeak(Channel):  # Inherit from Channel
             self.logger.info("Spoken '%s' sucessfully." % message)
             return True
 
-    def notify(self, custom_content: dict = None) -> bool:
+    def notify(self, custom_content: Optional[dict] = None) -> bool:
         """
         Send a notification by setting the volume and speaking a text message.
         """
         current_volume = self._get_volume()  # Save the current volume
         self._set_volume(self.volume_level)  # Set the volume to desired level
 
-        notified = False
         if isinstance(custom_content, dict) and "message" in custom_content:
             message = custom_content["message"]
         else:
