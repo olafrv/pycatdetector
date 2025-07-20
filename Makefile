@@ -101,14 +101,14 @@ test:
 		&& pytest -s --disable-warnings ${NAME}/tests/
 
 # customize!
-test.coverage:
+coverage:
 	# https://coverage.readthedocs.io
 	@ . venv/bin/activate \
 		&& coverage run main.py \
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
 
 # customize!
-test.coverage.report:
+coverage.test:
 	@ . venv/bin/activate \
 		&& coverage run -m pytest -s --disable-warnings ${NAME}/tests/ \
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
