@@ -1,11 +1,11 @@
 FROM ubuntu:24.04
+
 RUN apt update -y \
-    && apt install -y tzdata \
-    && apt install -y python3 \
-    && apt install -y python3.12-venv\
-    && apt install -y python3-tk \
-    && apt install -y --no-install-recommends build-essential gcc \
-    && apt install -y ffmpeg fonts-dejavu jq \
+    && apt install -y --no-install-recommends \
+        tzdata \
+        python3 python3.12-venv \
+        python3-tk \
+        ffmpeg fonts-dejavu jq \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -26,8 +26,6 @@ RUN --mount=type=cache,target=/root/.cache/pip pip3 install -Ur requirements.txt
 
 # Copy the package files
 COPY pycatdetector /opt/pycatdetector/pycatdetector
-
-# Copy the main script and entrypoint files
 COPY main.py /opt/pycatdetector/
 
 CMD [ "python3" , "main.py" ]
