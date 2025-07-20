@@ -1,8 +1,25 @@
 # About PyCatDetector
 
-<a href="cookie.jpg"><img src="cookie.jpg" width=250></a> 
+<table align="center">
+  <tr>
+    <td bgcolor="black">
+      <font color="white"><b>Screener (Live View)</b></font>
+    </td>
+    <td bgcolor="black">
+      <font color="white"><b>Discord Notification (WebHook)</b></font>
+  <tr>
+    <td bgcolor="#f0f0f0">
+      <a href="cookie.jpg"><img src="cookie.jpg" width="300"></a>
+    </td>
+    <td bgcolor="#f0f0f0">
+      <a href="cookie_discord.jpg"><img src="cookie_discord.jpg" width="350"></a>
+    </td>
+  </tr>
+</table>
 
-Python Cat Detector is a tool to detect the presence of my cat ["Cookie"](pycatdetector/tests/images/cat1.jpg) near her litterbox and alerts me to clean it.
+
+**Python Cat Detector** ([![GitHub license](https://img.shields.io/github/license/olafrv/pycatdetector)](https://github.com/olafrv/pycatdetector/blob/master/LICENSE))
+ is a tool to detect the presence of my cat ["Cookie"](pycatdetector/tests/images/cat1.jpg) near her litterbox and alerts me to clean it.
 
 Basically, the application grabs video frames from an IP camera RTSP stream, uses a [neural network](pycatdetector/NeuralNetPyTorch.py) to identify a cat object, and play a message in a speaker.
 
