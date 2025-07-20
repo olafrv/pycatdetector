@@ -121,29 +121,6 @@ class Config:
                     filtered_config[key] = self._CONFIG_FLAT[key]
         return filtered_config
 
-    def get_assoc(self, key: str) -> dict:
-        """
-        Retrieves a nested configuration setting for an specific key.
-
-        Args:
-            key (str): The key of the nested configuration setting to retrieve.
-
-        Returns:
-            dict: The nested configuration setting.
-
-        """
-        return self._CONFIG[key]
-
-    def get_assoc_all(self) -> dict:
-        """
-        Retrieves all nested configuration settings.
-
-        Returns:
-            dict: A dictionary containing all nested configuration settings.
-
-        """
-        return self._CONFIG
-
     @classmethod
     def camel_to_snake(cls, s: str) -> str:
         """
