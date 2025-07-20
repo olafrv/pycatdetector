@@ -6,6 +6,7 @@ import cv2
 from time import sleep
 from datetime import datetime
 from typing import Optional
+from pycatdetector.channels.AbstractChannel import AbstractChannel
 
 class Notifier(threading.Thread):
     """
@@ -41,22 +42,23 @@ class Notifier(threading.Thread):
         self.detector = None
         self.must_stop = False
         self.queue_sleep = 1  # seconds, less queue polling, honor exit signals
-        self.channels = {}
+        self.channels = {}  # indexed per object label (from the detected object)
         self.notifications = {}
         self.detections = detections
-        self.notify_window = None
+        self.notify_window = {}  # indexed per channel (class name snake cased)
 
-    def add_channel(self, channel, labels):
+
+    def add_channel(self, channel: AbstractChannel, labels: list[str]):
         """
-        Adds a channel for the specified labels.
+        Adds channel used for notifications when labels are detected.
 
         Args:
-            channel: The channel object.
-            labels: A list of labels.
+            channel: The channel instance.
+            labels: A list of object labels (detection).
         """
         for label in labels:
             self.logger.info(
-                "Adding '%s' for label '%s'" % (channel.get_name(), label)
+                "Channel '%s' will notify for the label '%s'" % (channel.get_name(), label)
             )
             if label not in self.channels.keys():
                 self.channels[label] = [channel]
@@ -69,34 +71,46 @@ class Notifier(threading.Thread):
         """
         return list(self.channels.keys())
 
-    def set_notify_window(self, notify_window):
+    def add_notify_window(self, 
+                          channel: AbstractChannel, 
+                          window_name: str, 
+                          window_schedule: dict):
         """
-        Sets the notification window (time frame).
+        Sets the channel's notification window (schedule).
 
         Args:
-            notify_window: A dictionary containing a set of combinations
-                           with defined days and the start and end times.
+            channel_name (str): The name of the channel.
+            window_name (str): The name of the notification window.
+            window_schedule (dict): The schedule for the notification window.
         """
-        self.notify_window = notify_window
+        channel_name = channel.get_name()
+        if channel_name not in self.notify_window:
+            self.notify_window[channel_name] = {}
 
-    def is_notify_window_open(self):
+        self.notify_window[channel_name][window_name] = window_schedule
+
+    def is_notify_window_open(self, channel: AbstractChannel) -> bool:
         """
         Checks if the notification window is open.
 
         Returns:
             A boolean indicating whether the notification window is open.
         """
-        if self.notify_window is None:
-            return True
+        channel_name = channel.get_name()
+        if channel_name not in self.notify_window:
+            self.logger.info(
+                "Channel '%s' has no notify windows configured, skipping." % channel_name
+            )
+            return False
         else:
             opened = False
-            for window in self.notify_window:
-                active_days = self.notify_window[window]["days"].split(",")
+            for window_name, schedule in self.notify_window[channel_name].items():
+                active_days = schedule["days"].split(",")
                 active_days = [day.strip().lower() for day in active_days]
                 now_day_name = datetime.now().strftime('%a').lower()
                 if now_day_name in active_days:
-                    notify_window_start = self.notify_window[window]["start"]
-                    notify_window_end = self.notify_window[window]["end"]
+                    notify_window_start = schedule["start"]
+                    notify_window_end = schedule["end"]
                     now = datetime.now()
                     start = datetime.strptime(notify_window_start, "%H:%M")
                     start = start.replace(
@@ -107,8 +121,8 @@ class Notifier(threading.Thread):
                     opened = start <= now <= end
                     if opened:
                         self.logger.info(
-                            "Notify window '%s' is open: %s <= %s <= %s"
-                            % (window, start, now, end)
+                            "Notify window '%s' for channel '%s' is open: %s <= %s <= %s"
+                            % (window_name, channel_name, start, now, end)
                         )
                         break
             return opened
@@ -126,26 +140,27 @@ class Notifier(threading.Thread):
                 sleep(self.queue_sleep)
                 continue
 
-            if not self.is_notify_window_open():
-                self.logger.debug(
-                    "Window closed, sleeping " + str(self.queue_sleep) + "s")
-                sleep(self.queue_sleep)
-                continue
-
             detection = self.detections.get(block=False)
             detected_label = detection['label']
 
             if detected_label in self.channels.keys():
+
                 for channel in self.channels[detected_label]:
+
                     try:
                         detected_image = detection['image']  # numpy array
                         if self.notify(channel, detected_image):
-                            self.logger.info('Match: ' + repr({
-                                'label': detection['label'],
-                                'score': detection['score']
-                            }))
+                            self.logger.info(
+                                "Notification sent on channel '%s' for %s" % 
+                                (channel.get_name(), 
+                                    'detection: ' + repr({
+                                        'label': detection['label'],
+                                        'score': detection['score']
+                                    })
+                                )
+                            )
 
-                    except:  # noqa -- flake8 skip
+                    except:
                         self.logger.error(traceback.format_exc())
 
         self.logger.info("Stopped.")
@@ -160,12 +175,14 @@ class Notifier(threading.Thread):
         else:
             self.logger.info("Already stopped")
 
-    def notify(self, channel, image: Optional[numpy.ndarray] = None) -> bool:
+    def notify(self, 
+               channel: AbstractChannel, 
+               image: Optional[numpy.ndarray] = None) -> bool:
         """
         Sends a notification to the specified channel with attached image.
 
         Args:
-            channel: The channel object.
+            channel: The channel instance.
             image (numpy.ndarray): The image to be sent with the notification.
 
         Returns:

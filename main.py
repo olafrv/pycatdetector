@@ -14,8 +14,12 @@ from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
 
-images = recorder = detector = notifier = screener = config = None
-logger = None
+recorder : Recorder
+detector : Detector
+notifier : Notifier
+screener : Screener 
+config : Config
+logger : logging.Logger
 
 def main():
     global images, recorder, detector, notifier, screener, config, logger
@@ -54,7 +58,6 @@ def main():
                         encoder_folder=videos_folder)
 
     notifier = Notifier(detector.get_detections())
-    notifier.set_notify_window(config.get_assoc("notify_window"))
     load_channels(config, notifier)
 
     detector.set_labels(notifier.get_labels())
@@ -87,19 +90,44 @@ def handler(signum, frame):
 
 def load_channels(config, notifier):
     global logger
+
+    # Find all notification channels enabled
     settings = config.get_regex("^notifiers_.*_enabled$")
     for setting, enabled in settings.items():
-        setting_name = setting.lstrip("notifiers_").rstrip("_enabled")
-        class_name = Config.snake_to_camel(setting_name)
-        logger.debug("Channel: " + class_name + ", enabled: " + str(enabled))
+        # Set channel name variants
+        c_name_snaked = setting.lstrip("notifiers_").rstrip("_enabled")
+        c_name_camel = Config.snake_to_camel(c_name_snaked)
+        logger.debug("Channel: " + c_name_camel + ", enabled: " + str(enabled))
         if not enabled:
+            logger.info("Channel " + c_name_camel + " is disabled, skipping.")
             continue
-        else:
-            channel_settings = config.get_prefix("notifiers_" + setting_name, ltrim=True)
-            channel_labels = config.get("notifiers_" + setting_name + "_objects")
-            channel = eval('pycatdetector.channels.' + class_name)(channel_settings)
-            notifier.add_channel(channel, channel_labels)
 
+        # Load channel class and its configuration (snake cased)
+        c_config = \
+            config.get_prefix("notifiers_" + c_name_snaked, ltrim=True)
+        channel = eval('pycatdetector.channels.' + c_name_camel)(c_config)
+        
+        # Get channel notify object labels and it to the notifier
+        # c_labels = ["cat", "dog", "person"]
+        c_labels = config.get("notifiers_" + c_name_snaked + "_objects")
+        notifier.add_channel(channel, c_labels)
+
+        # Get channel notification window names
+        for c_notify_window_name in ["weekdays", "weekends"]:
+            
+            # Get channel notify windows config
+            c_notify_window_schedule = config.get_prefix(
+                "notifiers_" + c_name_snaked + "_notify_window_" + c_notify_window_name)
+
+            # Add channel's notify window and its schedule to the notifier
+            c_name = channel.get_name()
+            notifier.add_notify_window(
+                channel, c_notify_window_name, c_notify_window_schedule)
+            logger.info(
+                "Added notify window '" + c_notify_window_name 
+                + "' for channel '" + c_name + "' for schedule: " 
+                + json.dumps(c_notify_window_schedule)
+            )
 
 def enable_logging(config):
     tz = time.strftime('%z')
