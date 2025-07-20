@@ -50,11 +50,11 @@ class Recorder (threading.Thread):
         # Uncomment the following lines to enable detailed OpenCV logging
         # https://github.com/opencv/opencv/issues/27091 (Bug)
         #
-        # See entrypoint.sh for activating global OpenCV logging:
+        # See Dockerfile for activating global OpenCV logging:
         # export OPENCV_LOG_LEVEL=DEBUG
         # export OPENCV_VIDEOIO_DEBUG=1
         #
-        # Here we set the OpenCV log level to debug:
+        # Alternative, here set the OpenCV log level to debug:
         # cv2.setLogLevel(5) # Set OpenCV log level to debug
 
         while (not self.must_stop):
