@@ -1,12 +1,12 @@
 FROM ubuntu:24.04
 
-RUN apt update -y \
-    && apt install -y --no-install-recommends \
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
         tzdata \
         python3 python3.12-venv \
         python3-tk \
         ffmpeg fonts-dejavu jq \
-    && apt clean \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # This is required to autolink the package to the repository in github

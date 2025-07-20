@@ -10,12 +10,13 @@ numpy==2.2.6
 # OpenCV latest available version at 19.Jul.2025
 opencv-python==4.12.0.88
 
-# Neural Net PyTorch (Remove +cpu for full NVIDIA CUDA support)
-# https://pytorch.org/get-started/locally/ use find-links for CUDA support
+# Remove +cpu for NVIDIA CUDA support
+# https://pytorch.org/get-started/locally/
 # https://github.com/pytorch/pytorch/issues/29745#issuecomment-553588171
-#--find-links https://download.pytorch.org/whl/torch_stable.html
-torch==2.7.1
-torchvision==0.22.1
+# --find-links https://download.pytorch.org/whl/torch_stable.html
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.7.1+cpu
+torchvision==0.22.1+cpu
 
 # Discord Webhook
 # https://github.com/lovvskillz/python-discord-webhook
