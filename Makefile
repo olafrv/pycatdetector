@@ -36,7 +36,6 @@ install.venv: install.base
 		&& . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip \
-		&& sed -i 's/\(_require_.*_version(\)/# FIX: \1/g' venv/lib/python3.10/site-packages/gluoncv/__init__.py \
 		&& python3 -c "from pycatdetector.Preloader import preload; preload()"
 
 
