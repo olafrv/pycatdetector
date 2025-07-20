@@ -2,10 +2,10 @@ import logging
 from datetime import datetime
 from typing import Optional
 from discord_webhook import DiscordWebhook as discord_webhook
-from .Channel import Channel  # Import the abstract base class
+from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
 
-class DiscordWebhook(Channel):
+class DiscordWebhook(AbstractChannel):
     """
     A class representing a Discord webhook:
     - https://support.discord.com/hc/en-us/articles/228383668

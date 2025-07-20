@@ -2,9 +2,9 @@ import logging
 from time import sleep
 from requests import post, get
 from typing import Optional
-from .Channel import Channel  # Import the abstract base class
+from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
-class HaGoogleSpeak(Channel):  # Inherit from Channel
+class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
     """
     A class that provides functionality to speak a text message
     using Google Translate TTS and Google Cast.

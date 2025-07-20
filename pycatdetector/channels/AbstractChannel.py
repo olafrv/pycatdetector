@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional
 
-class Channel(ABC):
+class AbstractChannel(ABC):
     """
     An abstract base class for different channel implementations.
     """
