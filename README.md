@@ -170,7 +170,7 @@ make github.release       # create a new github relase
 * https://pytorch.org/vision/main/models/faster_rcnn.html
 * https://pytorch.org/vision/stable/auto_examples/others/plot_visualization_utils.html
 
-## GluonCV (Legacy)
+## GluonCV (Deprecated since v1.2.0)
 * https://cv.gluon.ai/
 * https://cv.gluon.ai/install.html
 * https://cv.gluon.ai/tutorials/index.html
@@ -180,7 +180,7 @@ make github.release       # create a new github relase
 * https://cv.gluon.ai/_modules/gluoncv/data/transforms/presets/ssd.html
 * https://cv.gluon.ai/api/model_zoo.html
 
-## Apache MXNet (Legacy)
+## Apache MXNet (Deprecated since v1.2.0)
 * https://mxnet.apache.org/versions/0.11.0/
 * https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
 * https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
