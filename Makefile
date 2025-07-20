@@ -87,8 +87,7 @@ package.outdated:
 run:
 	@ mkdir -p logs \
 		&& . venv/bin/activate \
-		&& chmod +x entrypoint.sh \
-		&& ./entrypoint.sh
+		&& python3 main.py
 
 run.bin:
 	@ ./build/main.bin
