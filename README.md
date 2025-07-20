@@ -52,7 +52,7 @@ This Python package has been tested and designed for:
 * Software:
   * [Ubuntu Linux 24.04 LTS](https://releases.ubuntu.com/)
   * [Python 3.12](https://docs.python.org/3/) and several [python libraries](https://github.com/olafrv/pycatdetector/blob/master/requirements.txt).
-  * PyCatDetector uses [PyTorch](https://pytorch.org/).
+  * PyCatDetector uses [PyTorch](https://pytorch.org/) with optionally [NVIDIA CUDA GPU](https://github.com/olafrv/nvidia-docker-wsl)
   * (Recommended) [Docker and/or Docker Compose](https://docs.docker.com/) for headless run (no graphical features).
   * (Optional) [HomeAssistant](https://www.home-assistant.io/) endpoint for Text-To-Speach (TTS) service.
 
