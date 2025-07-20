@@ -7,10 +7,10 @@ services:
       - TZ=Europe/Berlin
       # Used for debugging OpenCV issues with versions upgrade
       # Uncomment the following lines to enable detailed OpenCV logging
-      # See also Recorder.py for more OpenCV debugging options
+      # Modify also the Recorder.py to pick up OpenCV debugging options
       # https://github.com/opencv/opencv/issues/27091 (Bug)
-      - OPENCV_LOG_LEVEL=DEBUG
-      - OPENCV_VIDEOIO_DEBUG=1
+      # - OPENCV_LOG_LEVEL=DEBUG
+      # - OPENCV_VIDEOIO_DEBUG=1
     volumes:
     - ./config.yaml:/opt/pycatdetector/config.yaml:ro
     - ./logs:/opt/pycatdetector/logs:rw
