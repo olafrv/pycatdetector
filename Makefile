@@ -35,9 +35,7 @@ install.venv: install.base
 		&& test -d venv || python3 -m venv venv \
 		&& . venv/bin/activate \
 		&& pip3 install -Ur requirements.txt \
-		&& pip3 install --upgrade pip \
-		&& python3 -c "from pycatdetector.Preloader import preload; preload()"
-
+		&& pip3 install --upgrade pip
 
 install.base:
 	@ sudo apt update \
@@ -103,7 +101,10 @@ test:
 # customize!
 coverage:
 	# https://coverage.readthedocs.io
+	# The trap 'true' INT command tells the shell to ignore SIGINT (Ctrl+C) 
+	# signals, prevents 'make' to stop after the GUI is closed.
 	@ . venv/bin/activate \
+	 	&& trap 'true' INT \
 		&& coverage run main.py \
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
 

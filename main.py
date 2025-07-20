@@ -22,7 +22,7 @@ config : Config
 logger : logging.Logger
 
 def main():
-    global images, recorder, detector, notifier, screener, config, logger
+    global recorder, detector, notifier, screener, config, logger
 
     config = Config()
 
@@ -86,6 +86,13 @@ def handler(signum, frame):
             recorder.stop()
         if detector is not None:
             detector.stop()
+
+def models_preload():
+    global logger
+    logger.info("Preloading PyTorch models...")
+    NeuralNetPyTorch('FasterRCNN_MobileNet_V3_Large_FPN')
+    NeuralNetPyTorch('FasterRCNN_MobileNet_V3_Large_320_FPN')
+    logger.info("Preloading: Done.")
 
 
 def load_channels(config, notifier):

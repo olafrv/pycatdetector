@@ -29,7 +29,5 @@ COPY pycatdetector /opt/pycatdetector/pycatdetector
 
 # Copy the main script and entrypoint files
 COPY main.py /opt/pycatdetector/
-COPY entrypoint.sh /opt/pycatdetector/
-RUN chmod +x /opt/pycatdetector/entrypoint.sh
 
-ENTRYPOINT [ "/opt/pycatdetector/entrypoint.sh" ]
+CMD [ "python3" , "main.py" ]

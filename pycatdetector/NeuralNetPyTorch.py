@@ -38,7 +38,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
     """
 
-    def __init__(self, model_name, min_score: Optional[float] = 0.7):
+    def __init__(self, model_name: str, min_score: Optional[float] = 0.7):
         """
         Initializes a NeuralNetPyTorch object.
 

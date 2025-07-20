@@ -18,6 +18,7 @@
   * Switched to PyTorch-only neural network implementation
   * Updated model preloading to only use PyTorch models
   * Added error handling for unsupported MXNet usage
+  * Removed Preloader class and MXNet-specific code
 * RTSP Stream Improvements
   * Enhanced connection handling with explicit FFmpeg backend usage
   * Added timeout configurations (15s open, 5s read timeouts)
@@ -32,13 +33,14 @@
   * Renamed configuration parameter from "content" → "message" for consistency
 * Application Architecture
   * Enhanced Docker configuration with torch models volume mounting
-  * Added entrypoint.sh for container initialization with model preloading
+  * Decided for no entrypoint.sh for initialization of model preloading
   * Enhanced screener with TkAgg backend fallback for headless environments
 * Configuration & Documentation
   * Enhanced Docker installation documentation
   * Updated example configuration with new parameter names
   * Updated changelog with comprehensive version history (this one)
   * Improved Makefile with better Docker handling and volume mounting
+  * Added support for multiple notification windows per channel
 * Bug Fixes & Stability
   * A lot of Pylance type checks and prototype fixes
   * Fixed NumPy 2.x compatibility issues with OpenCV
