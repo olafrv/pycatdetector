@@ -147,6 +147,16 @@ class Notifier(threading.Thread):
 
                 for channel in self.channels[detected_label]:
 
+                    if self.is_notify_window_open(channel):
+                        self.logger.info(
+                            "Window open for channel '%s'" % channel.get_name()
+                        )
+                    else:
+                        self.logger.info(
+                            "Window closed for channel '%s'" % channel.get_name()
+                        )
+                        continue
+
                     try:
                         detected_image = detection['image']  # numpy array
                         if self.notify(channel, detected_image):
