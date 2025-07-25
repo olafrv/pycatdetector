@@ -158,7 +158,12 @@ docker.stop:
 
 docker.restart: docker.stop docker.start
 
-github.push: docker.build
+github.check_commit:
+	# Fail if uncommited changes
+	git diff --exit-code
+	git diff --cached --exit-code
+
+github.push:
 	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
 	# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
 	# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
@@ -166,10 +171,7 @@ github.push: docker.build
 	@ docker push ${IMAGE_NAME}:${VERSION}
 	@ docker push ${IMAGE_NAME}:latest
 
-github.release: github.push
-	# Fail if uncommited changes
-	git diff --exit-code
-	git diff --cached --exit-code
+github.release: github.check_commit docker.build test github.push
 	# Create and push tag
 	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
 	git tag ${VERSION} && git push origin ${VERSION}
