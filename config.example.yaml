@@ -42,7 +42,6 @@ notifiers:
       - "cat"
       - "chair"
       - "person"
-      - "pottedplant"
       - "potted plant"
 
   discord_webhook:
@@ -53,5 +52,4 @@ notifiers:
       - "cat"
       - "chair"
       - "person"
-      - "pottedplant"
       - "potted plant"
