@@ -121,7 +121,8 @@ make docker.build    # build docker image with python requirements
 make docker.run      # A) without compose, and removed after stopped
 make docker.start    # B.1) with compose running in background as service
 make docker.stop     # B.2) stop the composed container service
-make docker.sh       # B.3) open bash in the container service
+make docker.restart  # B.3) restart the composed container service
+make docker.sh       # open bash in the container service
 make docker.clean    # delete local docker images to save space
 ```
 
@@ -151,8 +152,7 @@ make test.coverage.report # check test coverage after runtime
 # GitHub Release
 # See Makefile for required GITHUB_* required variables
 # Adjust METADATA file before running the following commands
-make github.push          # push docker image to github registry
-make github.release       # create a new github relase
+make github.release       # build, test, push and create a new release
 ```
 
 # References
