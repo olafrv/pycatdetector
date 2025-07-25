@@ -17,12 +17,11 @@ from pycatdetector.Screener import Screener
 recorder : Recorder
 detector : Detector
 notifier : Notifier
-screener : Screener 
-config : Config
+screener : Screener
 logger : logging.Logger
 
 def main():
-    global recorder, detector, notifier, screener, config, logger
+    global recorder, detector, notifier, screener, logger
 
     config = Config()
 
@@ -38,18 +37,14 @@ def main():
 
     signal.signal(signal.SIGINT, handler)
 
-    recorder = Recorder(config.get("rtsp_url"))
+    recorder = Recorder(config.get_str("rtsp_url"))
 
-    screener_enabled = not config.get("headless")
-    net_model_name = config.get("net_model_name")
-    notify_min_score = float(config.get("notify_min_score"))
+    screener_enabled = not config.get_bool("headless")
+    net_model_name = config.get_str("net_model_name")
+    net = NeuralNetPyTorch(net_model_name)
+    notify_min_score = config.get_float("notify_min_score")
 
-    if config.get("net_version") == 'v2':
-        net = NeuralNetPyTorch(net_model_name)
-    else:
-        raise ValueError("Invalid net_version: " + config.get("net_version"))
-
-    videos_folder = config.get("videos_folder")
+    videos_folder = config.get_str("videos_folder")
 
     detector = Detector(images=recorder.get_images(), 
                         screener_enabled=screener_enabled, 
@@ -87,6 +82,7 @@ def handler(signum, frame):
         if detector is not None:
             detector.stop()
 
+
 def models_preload():
     global logger
     logger.info("Preloading PyTorch models...")
@@ -95,51 +91,38 @@ def models_preload():
     logger.info("Preloading: Done.")
 
 
-def load_channels(config, notifier):
-    global logger
+def load_channels(config: Config, notifier: Notifier):
 
-    # Find all notification channels enabled
-    settings = config.get_regex("^notifiers_.*_enabled$")
-    for setting, enabled in settings.items():
-        # Set channel name variants
-        c_name_snaked = setting.lstrip("notifiers_").rstrip("_enabled")
-        c_name_camel = Config.snake_to_camel(c_name_snaked)
-        logger.debug("Channel: " + c_name_camel + ", enabled: " + str(enabled))
+    for channel_name, settings in config.get_dict("notifiers").items():
+
+        enabled = "enabled" in settings and settings.get("enabled")
+        logger.debug("Channel: " + channel_name + ", enabled: " + str(enabled))
         if not enabled:
-            logger.info("Channel " + c_name_camel + " is disabled, skipping.")
             continue
 
-        # Load channel class and its configuration (snake cased)
-        c_config = \
-            config.get_prefix("notifiers_" + c_name_snaked, ltrim=True)
-        channel = eval('pycatdetector.channels.' + c_name_camel)(c_config)
-        
-        # Get channel notify object labels and it to the notifier
-        # c_labels = ["cat", "dog", "person"]
-        c_labels = config.get("notifiers_" + c_name_snaked + "_objects")
-        notifier.add_channel(channel, c_labels)
+        class_name = Config.snake_to_camel(channel_name)  # e.g. MyChannel
+        channel_config = config.get_dict("notifiers." + channel_name)
+        channel = eval('pycatdetector.channels.' + class_name)(channel_config)
+
+        notifier.add_channel(
+            channel,
+            config.get_list("notifiers." + channel_name + ".objects")
+        )
 
         # Get channel notification window names
-        for c_notify_window_name in ["weekdays", "weekends"]:
-            
-            # Get channel notify windows config
-            c_notify_window_schedule = config.get_prefix(
-                "notifiers_" + c_name_snaked + "_notify_window_" + c_notify_window_name)
-
-            # Add channel's notify window and its schedule to the notifier
-            c_name = channel.get_name()
-            notifier.add_notify_window(
-                channel, c_notify_window_name, c_notify_window_schedule)
+        windows = config.get_dict("notifiers." + channel_name + ".notify_window")
+        for window, schedule in windows.items():
+            notifier.add_notify_window(channel, window, schedule)
             logger.info(
-                "Added notify window '" + c_notify_window_name 
-                + "' for channel '" + c_name + "' for schedule: " 
-                + json.dumps(c_notify_window_schedule)
+                "Added notify window '" + window
+                + "' for channel '" + channel_name + "' for schedule: "
+                + json.dumps(schedule)
             )
 
-def enable_logging(config):
+def enable_logging(config: Config):
     tz = time.strftime('%z')
     # https://docs.python.org/3/howto/logging.html
-    if config.get("log_level").upper() == "DEBUG":
+    if config.get_str("log_level").upper() == "DEBUG":
         logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
         logFormat += ' {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
     else:
@@ -151,18 +134,18 @@ def enable_logging(config):
         format=logFormat,
         encoding='utf-8',
         filename=os.path.join(
-            config.get("log_dir"), 'detector.log'
+            config.get_str("log_dir"), 'detector.log'
         ),
         level=eval(
             'logging.' +
-            config.get("log_level").upper()
+            config.get_str("log_level").upper()
         ),
         force=True
     )
     logging.Formatter.default_msec_format = '%s.%03d'
 
     # https://pypi.org/project/colorlog/
-    if config.get("log_tty"):
+    if config.get_bool("log_tty"):
         colorHandler = colorlog.StreamHandler()
         colorHandler.setFormatter(
             colorlog.ColoredFormatter('%(log_color)s' + logFormat)

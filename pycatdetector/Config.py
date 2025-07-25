@@ -1,8 +1,6 @@
-import re
 import yaml
 import json
-from typing import Optional
-
+from typing import Any, Optional
 
 class Config:
     """
@@ -10,12 +8,10 @@ class Config:
     and provides access to configuration settings.
 
     Attributes:
-        _CONFIG (dict): Loaded configuration settings (i.e. key1.key2).
-        _CONFIG_FLAT (dict): Flattened configuration settings (i.e. key1_key2).
-
+        _CONFIG (dict): Loaded configuration settings from a YAML file.
     """
     _CONFIG = {}
-    _CONFIG_FLAT = {}
+
 
     def __init__(self, config_file='config.yaml'):
         """
@@ -29,97 +25,105 @@ class Config:
         with open(config_file, 'r') as stream:
             self._CONFIG = yaml.safe_load(stream)
 
-        self._CONFIG_FLAT = self._flatten(self._CONFIG)
 
-    def _flatten(self, config={}, separator="_"):
+    def _get_nested_value(self, keys: list[str]) -> dict:
         """
-        Flattens a nested dictionary into a flat dictionary.
+        Helper method to traverse nested dictionary structure.
+        
+        Args:
+            keys: List of keys representing the path to the value
+            
+        Returns:
+            The value at the specified path
+            
+        Raises:
+            KeyError: If any key in the path is not found
+        """
+        current = self._CONFIG
+        for key in keys:
+            if not isinstance(current, dict) or key not in current:
+                raise KeyError(f"Key path '{'.'.join(keys)}' not found in configuration.")
+            current = current[key]
+        return current
+    
+
+    def _get(self, name: str) -> Any:
+        """
+        Retrieves a configuration value by its key.
+        Supports dot-separated strings for nested keys.
 
         Args:
-            config (dict): The nested dictionary to be flattened.
-                           Default is an empty dictionary.
-            separator (str): The separator to be used for the flattened keys.
-                             Default is '_'.
+            name: The key of the configuration setting to retrieve
+            default: Default value to return if key is not found
 
         Returns:
-            dict: The flattened dictionary.
-
+            The configuration value or default if not found
         """
-        flattened_config = {}
-        for key in config:
-            value = config[key]
-            if isinstance(value, dict):
-                recursive_config = self._flatten(value)
-                for rkey in recursive_config:
-                    rvalue = recursive_config[rkey]
-                    flattened_config[key + separator + str(rkey)] = rvalue
-            else:
-                flattened_config[key] = value
-        return flattened_config
+        if "." not in name:
+            return self._CONFIG[name]
+        else:
+            keys = name.split('.')
+            return self._get_nested_value(keys)
 
-    def get(self, name: str) -> str:
-        """
-        Retrieves a specific configuration setting by its key.
 
-        Args:
-            name (str): The key of the configuration setting to retrieve.
+    def get_str(self, name: str) -> str:
+        """Get a string configuration value."""
+        value = self._get(name)
+        if not isinstance(value, str):
+            raise TypeError(f"Configuration value '{name}' is not a string")
+        return value
 
-        Returns:
-            str: The configuration setting value.
 
-        """
-        return self._CONFIG_FLAT[name]
+    def get_int(self, name: str) -> int:
+        """Get an integer configuration value."""
+        value = self._get(name)
+        if not isinstance(value, int):
+            raise TypeError(f"Configuration value '{name}' is not an integer")
+        return value
 
-    def get_all(self) -> dict:
-        """
-        Retrieves all configuration settings.
 
-        Returns:
-            dict: A dictionary containing all configuration settings.
+    def get_float(self, name: str) -> float:
+        """Get a float configuration value."""
+        value = self._get(name)
+        if not isinstance(value, (int, float)):
+            raise TypeError(f"Configuration value '{name}' is not a number")
+        return float(value)
 
-        """
-        return self._CONFIG_FLAT
 
-    def get_regex(self, regex: str) -> dict:
-        """
-        Retrieves configuration settings that match a given regular expression.
+    def get_bool(self, name: str) -> bool:
+        """Get a boolean configuration value."""
+        value = self._get(name)
+        if not isinstance(value, bool):
+            raise TypeError(f"Configuration value '{name}' is not a boolean")
+        return value
 
-        Args:
-            regex (str): Regexp pattern to match against configuration keys.
 
-        Returns:
-            dict: A dictionary containing the matching configuration settings.
+    def get_dict(self, name: Optional[str] = None) -> dict:
+        """Get a dictionary configuration value."""
+        if name is None:
+            return self._CONFIG
+        value = self._get(name)
+        if not isinstance(value, dict):
+            raise TypeError(f"Configuration value '{name}' is not a dictionary")
+        return value
 
-        """
-        config = {}
-        for key in self._CONFIG_FLAT:
-            if re.match(regex, key):
-                config[key] = self._CONFIG_FLAT[key]
-        return config
 
-    def get_prefix(self, prefix="", ltrim=True):
-        """
-        Retrieves configuration settings that have a given prefix.
+    def get_list(self, name: str) -> list:
+        """Get a list configuration value."""
+        value = self._get(name)
+        if not isinstance(value, list):
+            raise TypeError(f"Configuration value '{name}' is not a list")
+        return value
+    
 
-        Args:
-            prefix (str): The prefix to match against the configuration keys.
-                          Default is an empty string, which matches all keys.
-            ltrim (bool): Specifies whether to remove the prefix from the
-                          returned keys. Default is True.
+    def has_key(self, name: str) -> bool:
+        """Check if a configuration key exists."""
+        try:
+            self._get(name)
+            return True
+        except KeyError:
+            return False
 
-        Returns:
-            dict: A dictionary containing the matching configuration settings.
-
-        """
-        filtered_config = {}
-        for key in self._CONFIG_FLAT:
-            if re.match("^"+prefix+"_", key):
-                if ltrim:
-                    ltrim_key = str(key).replace(prefix+"_", '', 1)
-                    filtered_config[ltrim_key] = self._CONFIG_FLAT[key]
-                else:
-                    filtered_config[key] = self._CONFIG_FLAT[key]
-        return filtered_config
 
     @classmethod
     def camel_to_snake(cls, s: str) -> str:
@@ -138,6 +142,7 @@ class Config:
                         c.lower() if c.isupper() else c for c in s
                       ]).lstrip('_')
 
+
     @classmethod
     def snake_to_camel(cls, s: str) -> str:
         """
@@ -151,6 +156,7 @@ class Config:
         """
         return ''.join(word.capitalize() for word in s.split('_'))
 
+
     def to_json(self) -> str:
         """
         Converts the configuration settings to a JSON string.
@@ -160,6 +166,7 @@ class Config:
 
         """
         return json.dumps(self._CONFIG, indent=2)
+
 
     def __str__(self) -> str:
         """
