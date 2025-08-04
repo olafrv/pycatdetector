@@ -1,5 +1,5 @@
-from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 import os
+from pycatdetector.NeuralNetPyTorch import NeuralNetPyTorch
 
 
 def test_main():
