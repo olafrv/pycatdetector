@@ -77,7 +77,10 @@ class Encoder:
         Returns:
         - np.ndarray: The loaded image as a numpy array.
         """
-        return cv2.imread(filename=filename)
+        image = cv2.imread(filename=filename)
+        if image is None:
+            raise FileNotFoundError(f"Could not load image from {filename}")
+        return image
 
     def add_file(self, file):
         """
