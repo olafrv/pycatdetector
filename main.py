@@ -57,14 +57,17 @@ def main():
 
     detector.set_labels(notifier.get_labels())
 
+    logger.info("Threads starting...")
     recorder.start()
     detector.start()
     notifier.start()
 
     if screener_enabled:
-        screener = Screener(detector)
+        screener = Screener(detector.get_images())
         screener.show()
+        detector.disable_screener()
 
+    logger.info("Threads joining...")
     notifier.join()
     recorder.join()
     detector.join()

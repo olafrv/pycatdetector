@@ -1,12 +1,12 @@
 import logging
 import threading
 import traceback
-import numpy
-import cv2
+import io
 from time import sleep
 from datetime import datetime
 from typing import Optional
 from pycatdetector.channels.AbstractChannel import AbstractChannel
+from PIL import Image
 
 class Notifier(threading.Thread):
     """
@@ -187,7 +187,7 @@ class Notifier(threading.Thread):
 
     def notify(self, 
                channel: AbstractChannel, 
-               image: Optional[numpy.ndarray] = None) -> bool:
+               image: Optional[Image.Image] = None) -> bool:
         """
         Sends a notification to the specified channel with attached image.
 
@@ -209,12 +209,14 @@ class Notifier(threading.Thread):
         if send:
             
             if image is not None:
-                image_format = ".jpeg"
-                _, buffer = cv2.imencode(image_format, image)
-                image_data = buffer.tobytes()
+
+                image_format = "JPEG"
+                buffer = io.BytesIO()
+                image.save(fp=buffer, format=image_format)
+                image_data = buffer.getvalue()
 
                 image_name = channel.get_name() \
-                    + '-' + now.strftime("%Y-%m-%d_%H-%M-%S") + image_format
+                    + '-' + now.strftime("%Y-%m-%d_%H-%M-%S") + "." + image_format.lower()
                 channel.notify({'image_data': image_data, 'image_name': image_name})
             else:
                 channel.notify()

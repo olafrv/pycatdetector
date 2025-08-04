@@ -2,12 +2,14 @@ import os
 import logging
 import threading
 import traceback
+from typing import Optional
+from numpy import ndarray
 from .AbstractNeuralNet import AbstractNeuralNet
 from .Encoder import Encoder
 from queue import SimpleQueue
 from time import sleep
 from datetime import datetime
-
+from PIL import Image
 
 class Detector(threading.Thread):
     """
@@ -131,9 +133,7 @@ class Detector(threading.Thread):
 
         while (not self.must_stop):
             if not self.images.empty():
-                image_raw = self.images.get(False)
-                images_queued = self.images.qsize()
-                image_boxed = None  # Will be used if screener enabled
+                image_raw : ndarray = self.images.get(False)
 
                 try:
                     analyze_begin = datetime.now()
@@ -157,6 +157,7 @@ class Detector(threading.Thread):
                         self.sleep_time = \
                             (analyze_duration + self.sleep_time)/2
 
+                images_queued = self.images.qsize()
                 self.logger.debug(
                     "Analisis: %.3fs, Shape: %s, Queue: %i"
                     % (analyze_duration, str(image_raw.shape), images_queued)
@@ -174,6 +175,7 @@ class Detector(threading.Thread):
                                   (self.notify_min_score,
                                    repr(min_scored_labels)))
 
+                image_boxed : Optional[Image.Image] = None
                 if self.screener_enabled or encoder:
                     image_boxed = self.net.plot(result)
                     if self.screener_enabled:
@@ -192,7 +194,7 @@ class Detector(threading.Thread):
                         self.logger.debug('Ignored: ' + repr(detection))
                         continue
                     
-                    detection['image'] = image_raw
+                    detection['image'] = image_boxed
                     detection['timestamp'] = \
                         str(datetime.now().astimezone().isoformat())
                     
@@ -203,7 +205,7 @@ class Detector(threading.Thread):
                         'score': detection['score']
                     }))
                     
-                    if encoder:
+                    if encoder and image_boxed is not None:
                         self.logger.debug(
                             'Adding +1 frame to: %s', self.video_path)
                         encoder.add_image(image_boxed)

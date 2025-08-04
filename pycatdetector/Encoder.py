@@ -42,7 +42,7 @@ class Encoder:
             self.video_file, 0, 1, (width, height))
         self.video_opened = True
 
-    def add_image(self, image):
+    def add_image(self, image: PIL.Image.Image | np.ndarray):
         """
         Adds an image to the video file.
 
@@ -66,7 +66,7 @@ class Encoder:
             self.video_writer.write(frame)
 
         
-    def load_image(self, file) -> np.ndarray:
+    def load_image(self, filename: str) -> np.ndarray:
         """
         Loads an image from a file.
 
@@ -77,7 +77,7 @@ class Encoder:
         Returns:
         - np.ndarray: The loaded image as a numpy array.
         """
-        return cv2.imread(file)
+        return cv2.imread(filename=filename)
 
     def add_file(self, file):
         """

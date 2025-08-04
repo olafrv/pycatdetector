@@ -2,15 +2,14 @@ import logging
 import matplotlib
 import matplotlib.pyplot as plt
 from time import sleep
-from pycatdetector.Detector import Detector as Detector
-
+from queue import SimpleQueue
 
 class Screener:
     """
     A class that represents a image screener for PyCatDetector.
 
     Attributes:
-        detector (object): detector object used for image detection.
+        images (SimpleQueue): A queue containing images from the detector.
         must_stop (bool): flag indicating whether the thread must stop.
         logger (object): logger object for logging messages.
         SLEEP_TIME (float): sleep time in seconds between image updates.
@@ -18,14 +17,15 @@ class Screener:
 
     SLEEP_TIME = 0.5  # seconds
 
-    def __init__(self, detector: Detector):
+    def __init__(self, images: SimpleQueue):
         """
         Initializes a new instance of the Screener class.
 
         Args:
-            detector (object): The detector object used for image detection.
+            images (SimpleQueue): A queue containing images from the detector,
+                                  images are PIL.Image.Image objects.
         """
-        self.detector = detector
+        self.images = images
         self.must_stop = False
         self.logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class Screener:
         fig = plt.figure("PyCatDetector")
         fig.canvas.mpl_connect('close_event', self.close)
         ax = fig.add_subplot()
-        imgs = self.detector.get_images()
+        imgs = self.images
         while not self.must_stop:
             ax.clear()
             if not imgs.empty():
@@ -73,5 +73,4 @@ class Screener:
                                   % self.SLEEP_TIME)
                 sleep(self.SLEEP_TIME)
         plt.close('all')
-        self.detector.disable_screener()
         self.logger.info("Closed.")
