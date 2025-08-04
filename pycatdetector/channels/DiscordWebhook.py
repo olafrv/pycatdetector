@@ -4,7 +4,6 @@ from typing import Optional, Dict, Any
 from discord_webhook import DiscordWebhook as discord_webhook
 from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
-
 class DiscordWebhook(AbstractChannel):
     """
     A class representing a Discord webhook:
