@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
+
 class AbstractChannel(ABC):
     """
     An abstract base class for different channel implementations.
