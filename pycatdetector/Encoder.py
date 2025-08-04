@@ -108,5 +108,3 @@ class Encoder:
         if self.video_writer:
             self.video_writer.release()
             self.video_opened = False
-
-        cv2.destroyAllWindows()  # safe to call even if no windows are created
