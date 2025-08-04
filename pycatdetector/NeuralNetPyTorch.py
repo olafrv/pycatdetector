@@ -1,6 +1,7 @@
 # pyright: reportMissingImports=false
 
 import os
+import torch
 from PIL import Image
 from typing import Optional
 from torchvision.io import read_image
@@ -12,7 +13,6 @@ from torchvision.models.detection import \
     FasterRCNN_MobileNet_V3_Large_320_FPN_Weights, \
     FasterRCNN_MobileNet_V3_Large_FPN_Weights
 from .AbstractNeuralNet import AbstractNeuralNet
-import torch
 
 
 class NeuralNetPyTorch(AbstractNeuralNet):
