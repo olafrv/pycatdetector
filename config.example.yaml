@@ -11,18 +11,7 @@ headless: false  # Only terminal (no GUI) or with Screener Window (GUI)
 # https://pytorch.org/vision/stable/models.html (Object Detection Models) 
 # net_model_name: 'FasterRCNN_MobileNet_V3_Large_FPN' # PC (Big), min_score = 0.9
 net_model_name: 'FasterRCNN_MobileNet_V3_Large_320_FPN' # IoT (Small), min_score = 0.9
-net_version: 'v2'  # 'v2' PyTorch
-
 notify_min_score: 0.9
-notify_window:
-  weekdays:
-    days: "Mon,Tue,Wed,Thu,Fri"
-    start: "09:00"
-    end: "21:00"
-  weekends:
-    days: "Sat,Sun"
-    start: "09:00"
-    end: "21:00"
 videos_folder: "./videos"
 
 ###
@@ -43,6 +32,15 @@ notifiers:
       - "chair"
       - "person"
       - "potted plant"
+    notify_window:
+      weekdays:
+        days: "Mon,Tue,Wed,Thu,Fri"
+        start: "00:00"
+        end: "23:59"
+      weekends:
+        days: "Sat,Sun"
+        start: "00:00"
+        end: "23:59"
 
   discord_webhook:
     enabled: true
@@ -53,3 +51,34 @@ notifiers:
       - "chair"
       - "person"
       - "potted plant"
+    notify_window:
+      weekdays:
+        days: "Mon,Tue,Wed,Thu,Fri"
+        start: "00:00"
+        end: "23:59"
+      weekends:
+        days: "Sat,Sun"
+        start: "00:00"
+        end: "23:59"
+
+  blinkstick_square:
+    enabled: true
+    url: 'https://bs.olafrv.com/blink'
+    querystring: "color=red&delay=500&repeats=15"
+    authorization: "Basic Token123456="
+    timeout: 30
+    objects:
+      - "cat"
+      - "chair"
+      - "person"
+      - "potted plant"
+      - "toilet"
+    notify_window:
+      weekdays:
+        days: "Mon,Tue,Wed,Thu,Fri"
+        start: "00:00"
+        end: "23:59"
+      weekends:
+        days: "Sat,Sun"
+        start: "00:00"
+        end: "23:59"

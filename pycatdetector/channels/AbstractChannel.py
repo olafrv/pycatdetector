@@ -1,10 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import Optional
-
+from typing import Optional, Dict, Any
 class AbstractChannel(ABC):
     """
     An abstract base class for different channel implementations.
     """
+
+    @abstractmethod
+    def __init__(self, config: Dict[str, Any]):
+        """
+        Initialize the channel with configuration.
+
+        Args:
+            config (dict): A dictionary containing the configuration parameters.
+        """
+        pass    
 
     @abstractmethod
     def notify(self, custom_content: Optional[dict] = None) -> bool:

@@ -1,7 +1,7 @@
 import logging
 from time import sleep
 from requests import post, get
-from typing import Optional
+from typing import Optional, Dict, Any
 from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
 class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
@@ -32,7 +32,7 @@ class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
 
     DEFAULT_VOLUME_LEVEL = 0.5
 
-    def __init__(self, config):
+    def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.logger = logging.getLogger(__name__)
         self.headers = {
@@ -44,7 +44,7 @@ class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
         self.volume_level = self.config["volume_level"]
         self.message = self.config["message"]
 
-    def get_name(self):
+    def get_name(self) -> str:
         """
         Get the name of the class.
 

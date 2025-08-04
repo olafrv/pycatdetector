@@ -1,6 +1,7 @@
 import logging
 from pycatdetector.channels.HaGoogleSpeak import HaGoogleSpeak
 from pycatdetector.channels.DiscordWebhook import DiscordWebhook
+from pycatdetector.channels.BlinkstickSquare import BlinkstickSquare
 from pycatdetector.Config import Config
 
 
@@ -35,6 +36,17 @@ def test_main(caplog):
                 "image_data": open("cookie.jpg", "rb").read()
             }
         )
+    else:
+        print(f"Channel '{channel_name}' not enabled, test skipped.")
+        assert True
+
+    print()
+    channel_name = "blinkstick_square"
+    if config.get_bool("notifiers." + channel_name + ".enabled"):
+        print(f"Channel '{channel_name}' enabled, running test...")
+        filtered_config = config.get_dict("notifiers." + channel_name)
+        channel = BlinkstickSquare(filtered_config)
+        assert channel.notify()
     else:
         print(f"Channel '{channel_name}' not enabled, test skipped.")
         assert True

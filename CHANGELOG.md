@@ -1,8 +1,9 @@
-# 1.2.1 (Todo)
+# 1.2.1
 
-* https://github.com/olafrv/pycatdetector/issues/2
+* Bug: Fixed missing notification window configuration in `config.example.yaml`
+* Blinkstick Square Channel: https://github.com/olafrv/pycatdetector/issues/2
 
-# 1.2.0 (Latest)
+# 1.2.0
 
 * Infrastructure & Dependencies
   * Updated Docker base image from Ubuntu 22.04 → 24.04
