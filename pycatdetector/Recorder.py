@@ -26,7 +26,7 @@ class Recorder (threading.Thread):
         self.logger.info(
             "Starting with Thread ID: %s" % (threading.get_native_id())
         )
-        self.record()
+        self._record()
         self.logger.info("Stopped.")
 
     def stop(self):
@@ -44,7 +44,7 @@ class Recorder (threading.Thread):
         )
         return replaced.geturl()
 
-    def record(self, greyscale=False, showVisor=False, saveImage=False):
+    def _record(self, greyscale=False, showVisor=False, saveImage=False):
 
         # Used for debugging OpenCV issues with versions upgrade
         # Uncomment the following lines to enable detailed OpenCV logging
