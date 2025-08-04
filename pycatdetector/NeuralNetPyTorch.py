@@ -174,8 +174,8 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
         # Define a palette of vivid dark colors
         palette = torch.tensor([
+            [0, 255, 0],      # Green (First one as preferred)
             [255, 0, 0],      # Red
-            [0, 255, 0],      # Green
             [0, 0, 255],      # Blue
             [255, 255, 0],    # Yellow
             [255, 0, 255],    # Magenta
