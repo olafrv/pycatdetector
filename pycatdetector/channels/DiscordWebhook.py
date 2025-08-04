@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 from discord_webhook import DiscordWebhook as discord_webhook
 from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
@@ -16,7 +16,7 @@ class DiscordWebhook(AbstractChannel):
         logger (logging.Logger): A logger object for logging messages.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: Dict[str, Any]):
         """
         Initializes a DiscordWebhook object.
 
@@ -27,7 +27,7 @@ class DiscordWebhook(AbstractChannel):
         self.url = config.get("url")
         self.message = config.get("message")
 
-    def get_name(self):
+    def get_name(self) -> str:
         """
         Returns the name of the class.
 
