@@ -24,9 +24,8 @@ class Encoder:
         """
         self.video_file = video_file
         self.video_writer = None
-        self.video_opened = False
 
-    def open(self, frame: np.ndarray):
+    def open(self, height: int, width: int) -> cv2.VideoWriter:
         """
 
         Opens the video writer with the dimensions of the input frame.
@@ -37,10 +36,8 @@ class Encoder:
         Raises:
         - ValueError: If the frame is not a valid numpy array.
         """
-        height, width, layers = frame.shape
-        self.video_writer = cv2.VideoWriter(
+        return cv2.VideoWriter(
             self.video_file, 0, 1, (width, height))
-        self.video_opened = True
 
     def add_image(self, image: PIL.Image.Image | np.ndarray):
         """
@@ -59,11 +56,11 @@ class Encoder:
         else:
             raise ValueError("Invalid image type: " + str(type(image)))
 
-        if not self.video_opened:
-            self.open(frame)
+        if self.video_writer is None:
+            height, width, _ = frame.shape
+            self.video_writer = self.open(height, width)
         
-        if self.video_writer is not None:
-            self.video_writer.write(frame)
+        self.video_writer.write(frame)
 
         
     def load_image(self, filename: str) -> np.ndarray:
@@ -82,14 +79,14 @@ class Encoder:
             raise FileNotFoundError(f"Could not load image from {filename}")
         return image
 
-    def add_file(self, file):
+    def add_file(self, filename:str):
         """
         Adds an image file to the video file.
 
         Args:
-        - file (str): The path to the image file.
+        - filename (str): The path to the image file.
         """
-        self.add_image(self.load_image(file))
+        self.add_image(self.load_image(filename))
 
     def add_folder(self, folder, extension=".png"):
         """
