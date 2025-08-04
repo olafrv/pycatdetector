@@ -36,7 +36,7 @@ class Recorder (threading.Thread):
         else:
             self.logger.info("Already stopped.")
 
-    def mask_url(self, url) -> str:
+    def _mask_url(self, url) -> str:
         parsed = urlparse(url)
         # 'https://user:???@example.com/path?key=value#hash'
         replaced = parsed._replace(
@@ -72,7 +72,7 @@ class Recorder (threading.Thread):
             
             if not cap.isOpened():
                 self.logger.error(
-                    "Connection error to: " + self.mask_url(self.rtspUrl)
+                    "Connection error to: " + self._mask_url(self.rtspUrl)
                 )
                 conn_error = True
             else:
