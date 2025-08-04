@@ -51,7 +51,8 @@
   * Enhanced error handling for missing TkAgg backend in headless mode
   * Fixed channel loading to skip abstract base classes
   * Resurrected commented code on Recorder for debugging OpenCV issues
-
+  * Refactor Encoder class methods for improved video writer handling
+  
 # 1.1.12
 
 * Fixed Dockerfile ENV definitions.
