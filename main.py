@@ -98,15 +98,16 @@ def load_channels(config: Config, notifier: Notifier):
 
     for channel_name, settings in config.get_dict("notifiers").items():
 
+        # Check if channel is enabled
         enabled = "enabled" in settings and settings.get("enabled")
         logger.debug("Channel: " + channel_name + ", enabled: " + str(enabled))
         if not enabled:
             continue
 
+        # Load channel class and add it to notifier
         class_name = Config.snake_to_camel(channel_name)  # e.g. MyChannel
         channel_config = config.get_dict("notifiers." + channel_name)
         channel = eval('pycatdetector.channels.' + class_name)(channel_config)
-
         notifier.add_channel(
             channel,
             config.get_list("notifiers." + channel_name + ".objects")
@@ -122,9 +123,12 @@ def load_channels(config: Config, notifier: Notifier):
                 + json.dumps(schedule)
             )
 
+
 def enable_logging(config: Config):
+
     tz = time.strftime('%z')
-    # https://docs.python.org/3/howto/logging.html
+
+    # https://docs.python.org/3/howto/logging.html#changing-the-format-of-displayed-messages
     if config.get_str("log_level").upper() == "DEBUG":
         logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
         logFormat += ' {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
