@@ -4,12 +4,12 @@ import threading
 import traceback
 from typing import Optional
 from numpy import ndarray
-from .AbstractNeuralNet import AbstractNeuralNet
-from .Encoder import Encoder
 from queue import SimpleQueue
 from time import sleep
 from datetime import datetime
 from PIL import Image
+from .AbstractNeuralNet import AbstractNeuralNet
+from .Encoder import Encoder
 
 class Detector(threading.Thread):
     """
