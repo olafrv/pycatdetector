@@ -23,8 +23,8 @@ class DiscordWebhook(AbstractChannel):
             config (dict): A dictionary containing the webhook configuration.
         """
         self.logger = logging.getLogger(__name__)
-        self.url = config.get("url")
-        self.message = config.get("message")
+        self.url : str = str(config.get("url"))
+        self.message : str = str(config.get("message"))
 
     def get_name(self) -> str:
         """
