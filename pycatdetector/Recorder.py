@@ -1,8 +1,8 @@
 import cv2
 import threading
+import logging
 from time import sleep
 from queue import SimpleQueue
-import logging
 from urllib.parse import urlparse
 
 
