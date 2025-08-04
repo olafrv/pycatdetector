@@ -136,14 +136,14 @@ class Recorder (threading.Thread):
                         corrupted_count = 0  # reset counter
 
                         if reads % frames_to_skip == 0:
-                            # if greyscale:
-                            #    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
-                            # if saveImage:
-                            #    cv2.imwrite(
-                            #        'recording/opencv/imgx-' +
-                            #        str(total_reads) + '.jpg',
-                            #        frame
-                            #    )
+                            if greyscale:
+                                frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                            if saveImage:
+                                cv2.imwrite(
+                                    'recording/opencv/imgx-' +
+                                    str(total_reads) + '.jpg',
+                                    frame
+                                )
                             if showVisor:
                                 cv2.imshow('frame', frame)
                                 if cv2.waitKey(1) & 0xFF == ord('q'):

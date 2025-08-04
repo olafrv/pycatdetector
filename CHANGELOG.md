@@ -31,6 +31,7 @@
   * Updated Home Assistant Google Speak channel with improved API calls
   * Added image data support in notification system with automatic encoding
   * Renamed configuration parameter from "content" → "message" for consistency
+  * Added images with boxes, labels and scores to messages for better visibility
 * Application Architecture
   * Enhanced Docker configuration with torch models volume mounting
   * Decided for no entrypoint.sh for initialization of model preloading
@@ -41,6 +42,7 @@
   * Updated changelog with comprehensive version history (this one)
   * Improved Makefile with better Docker handling and volume mounting
   * Added support for multiple notification windows per channel
+  * Removed configuration flattening for easy config reading
 * Bug Fixes & Stability
   * A lot of Pylance type checks and prototype fixes
   * Fixed NumPy 2.x compatibility issues with OpenCV
@@ -48,6 +50,7 @@
   * Improved detection data structure with proper image and timestamp handling
   * Enhanced error handling for missing TkAgg backend in headless mode
   * Fixed channel loading to skip abstract base classes
+  * Resurrected commented code on Recorder for debugging OpenCV issues
 
 # 1.1.12
 
