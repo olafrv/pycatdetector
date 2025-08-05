@@ -158,7 +158,10 @@ docker.stop:
 
 docker.restart: docker.stop docker.start
 
-github.check_commit:
+github.formatter:
+	black .
+
+github.check_commit: github.formatter
 	# Fail if uncommited changes
 	git diff --exit-code
 	git diff --cached --exit-code
