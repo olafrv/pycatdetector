@@ -14,11 +14,12 @@ from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
 
-recorder : Recorder
-detector : Detector
-notifier : Notifier
-screener : Screener
-logger : logging.Logger
+recorder: Recorder
+detector: Detector
+notifier: Notifier
+screener: Screener
+logger: logging.Logger
+
 
 def main():
     global recorder, detector, notifier, screener, logger
@@ -46,11 +47,13 @@ def main():
 
     videos_folder = config.get_str("videos_folder")
 
-    detector = Detector(images=recorder.get_images(), 
-                        screener_enabled=screener_enabled, 
-                        net=net,
-                        notify_min_score=notify_min_score, 
-                        encoder_folder=videos_folder)
+    detector = Detector(
+        images=recorder.get_images(),
+        screener_enabled=screener_enabled,
+        net=net,
+        notify_min_score=notify_min_score,
+        encoder_folder=videos_folder,
+    )
 
     notifier = Notifier(detector.get_detections())
     load_channels(config, notifier)
@@ -89,8 +92,8 @@ def handler(signum, frame):
 def models_preload():
     global logger
     logger.info("Preloading PyTorch models...")
-    NeuralNetPyTorch('FasterRCNN_MobileNet_V3_Large_FPN')
-    NeuralNetPyTorch('FasterRCNN_MobileNet_V3_Large_320_FPN')
+    NeuralNetPyTorch("FasterRCNN_MobileNet_V3_Large_FPN")
+    NeuralNetPyTorch("FasterRCNN_MobileNet_V3_Large_320_FPN")
     logger.info("Preloading: Done.")
 
 
@@ -107,10 +110,9 @@ def load_channels(config: Config, notifier: Notifier):
         # Load channel class and add it to notifier
         class_name = Config.snake_to_camel(channel_name)  # e.g. MyChannel
         channel_config = config.get_dict("notifiers." + channel_name)
-        channel = eval('pycatdetector.channels.' + class_name)(channel_config)
+        channel = eval("pycatdetector.channels." + class_name)(channel_config)
         notifier.add_channel(
-            channel,
-            config.get_list("notifiers." + channel_name + ".objects")
+            channel, config.get_list("notifiers." + channel_name + ".objects")
         )
 
         # Get channel notification window names
@@ -118,49 +120,46 @@ def load_channels(config: Config, notifier: Notifier):
         for window, schedule in windows.items():
             notifier.add_notify_window(channel, window, schedule)
             logger.info(
-                "Added notify window '" + window
-                + "' for channel '" + channel_name + "' for schedule: "
+                "Added notify window '"
+                + window
+                + "' for channel '"
+                + channel_name
+                + "' for schedule: "
                 + json.dumps(schedule)
             )
 
 
 def enable_logging(config: Config):
 
-    tz = time.strftime('%z')
+    tz = time.strftime("%z")
 
     # https://docs.python.org/3/howto/logging.html#changing-the-format-of-displayed-messages
     if config.get_str("log_level").upper() == "DEBUG":
-        logFormat = '[%(asctime)s ' + tz + '] p%(process)s %(threadName)s'
-        logFormat += ' {%(filename)s:%(lineno)d} %(levelname)s - %(message)s'
+        logFormat = "[%(asctime)s " + tz + "] p%(process)s %(threadName)s"
+        logFormat += " {%(filename)s:%(lineno)d} %(levelname)s - %(message)s"
     else:
-        logFormat = '[%(asctime)s ' \
-            + tz + '] %(levelname)s %(name)s - %(message)s'
+        logFormat = "[%(asctime)s " + tz + "] %(levelname)s %(name)s - %(message)s"
 
     # https://docs.python.org/3/library/logging.html#logging.basicConfig
     logging.basicConfig(
         format=logFormat,
-        encoding='utf-8',
-        filename=os.path.join(
-            config.get_str("log_dir"), 'detector.log'
-        ),
-        level=eval(
-            'logging.' +
-            config.get_str("log_level").upper()
-        ),
-        force=True
+        encoding="utf-8",
+        filename=os.path.join(config.get_str("log_dir"), "detector.log"),
+        level=eval("logging." + config.get_str("log_level").upper()),
+        force=True,
     )
-    logging.Formatter.default_msec_format = '%s.%03d'
+    logging.Formatter.default_msec_format = "%s.%03d"
 
     # https://pypi.org/project/colorlog/
     if config.get_bool("log_tty"):
         colorHandler = colorlog.StreamHandler()
         colorHandler.setFormatter(
-            colorlog.ColoredFormatter('%(log_color)s' + logFormat)
+            colorlog.ColoredFormatter("%(log_color)s" + logFormat)
         )
         logging.getLogger().addHandler(colorHandler)
     else:
         logging.StreamHandler(stream=None)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
