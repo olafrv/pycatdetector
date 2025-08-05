@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Optional, Dict, Any
 
+
 class AbstractChannel(ABC):
     """
     An abstract base class for different channel implementations.
@@ -14,7 +15,7 @@ class AbstractChannel(ABC):
         Args:
             config (dict): A dictionary containing the configuration parameters.
         """
-        pass    
+        pass
 
     @abstractmethod
     def notify(self, custom_content: Optional[dict] = None) -> bool:

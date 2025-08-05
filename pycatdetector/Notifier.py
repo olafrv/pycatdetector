@@ -8,6 +8,7 @@ from typing import Optional
 from pycatdetector.channels.AbstractChannel import AbstractChannel
 from PIL import Image
 
+
 class Notifier(threading.Thread):
     """
     A class representing a notifier thread that sends
@@ -28,7 +29,8 @@ class Notifier(threading.Thread):
         notify_window_end: The end time of the notification
                            window in HH:MM 24h format.
     """
-    NOTIFY_DELAY = 2*60  # seconds, less noise for same object detection
+
+    NOTIFY_DELAY = 2 * 60  # seconds, less noise for same object detection
 
     def __init__(self, detections):
         """
@@ -47,7 +49,6 @@ class Notifier(threading.Thread):
         self.detections = detections
         self.notify_window = {}  # indexed per channel (class name snake cased)
 
-
     def add_channel(self, channel: AbstractChannel, labels: list[str]):
         """
         Adds channel used for notifications when labels are detected.
@@ -58,7 +59,8 @@ class Notifier(threading.Thread):
         """
         for label in labels:
             self.logger.info(
-                "Channel '%s' will notify for the label '%s'" % (channel.get_name(), label)
+                "Channel '%s' will notify for the label '%s'"
+                % (channel.get_name(), label)
             )
             if label not in self.channels.keys():
                 self.channels[label] = [channel]
@@ -71,10 +73,9 @@ class Notifier(threading.Thread):
         """
         return list(self.channels.keys())
 
-    def add_notify_window(self, 
-                          channel: AbstractChannel, 
-                          window_name: str, 
-                          window_schedule: dict):
+    def add_notify_window(
+        self, channel: AbstractChannel, window_name: str, window_schedule: dict
+    ):
         """
         Sets the channel's notification window (schedule).
 
@@ -99,7 +100,8 @@ class Notifier(threading.Thread):
         channel_name = channel.get_name()
         if channel_name not in self.notify_window:
             self.logger.info(
-                "Channel '%s' has no notify windows configured, skipping." % channel_name
+                "Channel '%s' has no notify windows configured, skipping."
+                % channel_name
             )
             return False
         else:
@@ -107,17 +109,15 @@ class Notifier(threading.Thread):
             for window_name, schedule in self.notify_window[channel_name].items():
                 active_days = schedule["days"].split(",")
                 active_days = [day.strip().lower() for day in active_days]
-                now_day_name = datetime.now().strftime('%a').lower()
+                now_day_name = datetime.now().strftime("%a").lower()
                 if now_day_name in active_days:
                     notify_window_start = schedule["start"]
                     notify_window_end = schedule["end"]
                     now = datetime.now()
                     start = datetime.strptime(notify_window_start, "%H:%M")
-                    start = start.replace(
-                        day=now.day, month=now.month, year=now.year)
+                    start = start.replace(day=now.day, month=now.month, year=now.year)
                     end = datetime.strptime(notify_window_end, "%H:%M")
-                    end = end.replace(
-                        day=now.day, month=now.month, year=now.year)
+                    end = end.replace(day=now.day, month=now.month, year=now.year)
                     opened = start <= now <= end
                     if opened:
                         self.logger.info(
@@ -132,16 +132,17 @@ class Notifier(threading.Thread):
         Starts the notifier thread.
         """
         self.logger.info("Started Thread ID: %s" % (threading.get_native_id()))
-        while (not self.must_stop):
+        while not self.must_stop:
 
             if self.detections.empty():
-                self.logger.debug("Sleeping %.2fs due to empty queue..."
-                                  % self.queue_sleep)
+                self.logger.debug(
+                    "Sleeping %.2fs due to empty queue..." % self.queue_sleep
+                )
                 sleep(self.queue_sleep)
                 continue
 
             detection = self.detections.get(block=False)
-            detected_label = detection['label']
+            detected_label = detection["label"]
 
             if detected_label in self.channels.keys():
 
@@ -158,15 +159,19 @@ class Notifier(threading.Thread):
                         continue
 
                     try:
-                        detected_image = detection['image']  # numpy array
+                        detected_image = detection["image"]  # numpy array
                         if self.notify(channel, detected_image):
                             self.logger.info(
-                                "Notification sent on channel '%s' for %s" % 
-                                (channel.get_name(), 
-                                    'detection: ' + repr({
-                                        'label': detection['label'],
-                                        'score': detection['score']
-                                    })
+                                "Notification sent on channel '%s' for %s"
+                                % (
+                                    channel.get_name(),
+                                    "detection: "
+                                    + repr(
+                                        {
+                                            "label": detection["label"],
+                                            "score": detection["score"],
+                                        }
+                                    ),
                                 )
                             )
 
@@ -185,9 +190,9 @@ class Notifier(threading.Thread):
         else:
             self.logger.info("Already stopped")
 
-    def notify(self, 
-               channel: AbstractChannel, 
-               image: Optional[Image.Image] = None) -> bool:
+    def notify(
+        self, channel: AbstractChannel, image: Optional[Image.Image] = None
+    ) -> bool:
         """
         Sends a notification to the specified channel with attached image.
 
@@ -207,7 +212,7 @@ class Notifier(threading.Thread):
             if delta_seconds <= self.NOTIFY_DELAY:
                 send = False
         if send:
-            
+
             if image is not None:
 
                 image_format = "JPEG"
@@ -215,12 +220,17 @@ class Notifier(threading.Thread):
                 image.save(fp=buffer, format=image_format)
                 image_data = buffer.getvalue()
 
-                image_name = channel.get_name() \
-                    + '-' + now.strftime("%Y-%m-%d_%H-%M-%S") + "." + image_format.lower()
-                channel.notify({'image_data': image_data, 'image_name': image_name})
+                image_name = (
+                    channel.get_name()
+                    + "-"
+                    + now.strftime("%Y-%m-%d_%H-%M-%S")
+                    + "."
+                    + image_format.lower()
+                )
+                channel.notify({"image_data": image_data, "image_name": image_name})
             else:
                 channel.notify()
-                
+
             self.notifications[channel_id] = now
-        
+
         return send

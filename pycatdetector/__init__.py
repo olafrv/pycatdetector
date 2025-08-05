@@ -8,8 +8,14 @@ from .NeuralNetPyTorch import NeuralNetPyTorch
 from .Notifier import Notifier
 from .Recorder import Recorder
 from .Screener import Screener
+
 __all__ = [
-    "Config", "Detector", "Encoder",
-    "AbstractNeuralNet", "NeuralNetPyTorch",
-    "Notifier", "Recorder", "Screener"
+    "Config",
+    "Detector",
+    "Encoder",
+    "AbstractNeuralNet",
+    "NeuralNetPyTorch",
+    "Notifier",
+    "Recorder",
+    "Screener",
 ]

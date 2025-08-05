@@ -6,9 +6,9 @@ from pycatdetector.Config import Config
 
 
 def test_main(caplog):
-    
+
     caplog.set_level(logging.DEBUG)
-    
+
     print()
     config = Config()
     channel_name = "ha_google_speak"
@@ -16,9 +16,9 @@ def test_main(caplog):
         print(f"Channel '{channel_name}' enabled, running test...")
         filtered_config = config.get_dict("notifiers." + channel_name)
         channel = HaGoogleSpeak(filtered_config)
-        assert channel.notify(custom_content={
-            "message": "Esto es una prueba de sonido más larga."
-        })
+        assert channel.notify(
+            custom_content={"message": "Esto es una prueba de sonido más larga."}
+        )
     else:
         print(f"Channel '{channel_name}' not enabled, test skipped.")
         assert True
@@ -33,7 +33,7 @@ def test_main(caplog):
             custom_content={
                 "message": "Esto es una prueba a través de chat.",
                 "image_name": "test_image.jpg",
-                "image_data": open("cookie.jpg", "rb").read()
+                "image_data": open("cookie.jpg", "rb").read(),
             }
         )
     else:

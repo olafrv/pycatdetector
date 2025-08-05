@@ -7,11 +7,12 @@ from typing import Optional
 from torchvision.io import read_image
 from torchvision.transforms import ToTensor, ToPILImage
 from torchvision.utils import draw_bounding_boxes
-from torchvision.models.detection import \
-    fasterrcnn_mobilenet_v3_large_fpn, \
-    fasterrcnn_mobilenet_v3_large_320_fpn, \
-    FasterRCNN_MobileNet_V3_Large_320_FPN_Weights, \
-    FasterRCNN_MobileNet_V3_Large_FPN_Weights
+from torchvision.models.detection import (
+    fasterrcnn_mobilenet_v3_large_fpn,
+    fasterrcnn_mobilenet_v3_large_320_fpn,
+    FasterRCNN_MobileNet_V3_Large_320_FPN_Weights,
+    FasterRCNN_MobileNet_V3_Large_FPN_Weights,
+)
 from .AbstractNeuralNet import AbstractNeuralNet
 
 
@@ -25,7 +26,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
     Args:
         model_name (str): The name of the model to use.
-        min_score (float, optional): The minimum score threshold for 
+        min_score (float, optional): The minimum score threshold for
                                      object detection. Defaults to 0.7.
 
     Raises:
@@ -53,15 +54,15 @@ class NeuralNetPyTorch(AbstractNeuralNet):
         """
 
         if model_name == "FasterRCNN_MobileNet_V3_Large_FPN":
-            self.weights = \
-                FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
+            self.weights = FasterRCNN_MobileNet_V3_Large_FPN_Weights.DEFAULT
             self.model = fasterrcnn_mobilenet_v3_large_fpn(
-                weights=self.weights, box_score_thresh=min_score)
+                weights=self.weights, box_score_thresh=min_score
+            )
         elif model_name == "FasterRCNN_MobileNet_V3_Large_320_FPN":
-            self.weights = \
-                FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
+            self.weights = FasterRCNN_MobileNet_V3_Large_320_FPN_Weights.DEFAULT
             self.model = fasterrcnn_mobilenet_v3_large_320_fpn(
-                weights=self.weights, box_score_thresh=min_score)
+                weights=self.weights, box_score_thresh=min_score
+            )
         else:
             raise ValueError("Invalid model_name" + repr(model_name))
 
@@ -97,15 +98,13 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
         batch = [self.preprocess(img)]
         prediction = self.model(batch)[0]
-        labels = [
-            self.weights.meta["categories"][i] for i in prediction["labels"]
-        ]
+        labels = [self.weights.meta["categories"][i] for i in prediction["labels"]]
 
         return {
             "image": img,  # PIL Image
             "labels": labels,
             "scores": prediction["scores"],
-            "boxes": prediction["boxes"]
+            "boxes": prediction["boxes"],
         }
 
     def get_classes(self) -> list:
@@ -140,10 +139,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
 
         for i, box in enumerate(boxes):
             if scores[i] >= min_score:
-                scored_labels.append({
-                    "label": labels[i],
-                    "score": scores[i]
-                })
+                scored_labels.append({"label": labels[i], "score": scores[i]})
         return scored_labels
 
     def plot(self, result: dict) -> Image.Image:
@@ -173,20 +169,23 @@ class NeuralNetPyTorch(AbstractNeuralNet):
         img_tensor = img_tensor.mul(255).byte()
 
         # Define a palette of vivid dark colors
-        palette = torch.tensor([
-            [0, 255, 0],      # Green (First one as preferred)
-            [255, 0, 0],      # Red
-            [0, 0, 255],      # Blue
-            [255, 255, 0],    # Yellow
-            [255, 0, 255],    # Magenta
-            [0, 255, 255],    # Cyan
-            [255, 128, 0],    # Orange
-            [128, 0, 255],    # Purple
-            [0, 128, 255],    # Sky Blue
-            [128, 255, 0],    # Lime
-            [0, 255, 128],    # Aqua
-            [255, 0, 128],    # Pink
-        ], dtype=torch.uint8)
+        palette = torch.tensor(
+            [
+                [0, 255, 0],  # Green (First one as preferred)
+                [255, 0, 0],  # Red
+                [0, 0, 255],  # Blue
+                [255, 255, 0],  # Yellow
+                [255, 0, 255],  # Magenta
+                [0, 255, 255],  # Cyan
+                [255, 128, 0],  # Orange
+                [128, 0, 255],  # Purple
+                [0, 128, 255],  # Sky Blue
+                [128, 255, 0],  # Lime
+                [0, 255, 128],  # Aqua
+                [255, 0, 128],  # Pink
+            ],
+            dtype=torch.uint8,
+        )
 
         # Assign a color to each box (cycling through palette)
         num_boxes = boxes.shape[0]
@@ -201,7 +200,7 @@ class NeuralNetPyTorch(AbstractNeuralNet):
             font_size=60,
             width=10,
             font="DejaVuSans",
-            fill=False
+            fill=False,
         )
 
         # Convert tensor back to PIL Image

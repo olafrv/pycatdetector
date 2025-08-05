@@ -2,6 +2,7 @@ import yaml
 import json
 from typing import Any, Optional
 
+
 class Config:
     """
     The Config class represents a configuration object that loads
@@ -10,10 +11,10 @@ class Config:
     Attributes:
         _CONFIG (dict): Loaded configuration settings from a YAML file.
     """
+
     _CONFIG = {}
 
-
-    def __init__(self, config_file='config.yaml'):
+    def __init__(self, config_file="config.yaml"):
         """
         Initializes a new instance of the Config class.
 
@@ -22,30 +23,30 @@ class Config:
                                Default is 'config.yaml'.
 
         """
-        with open(config_file, 'r') as stream:
+        with open(config_file, "r") as stream:
             self._CONFIG = yaml.safe_load(stream)
-
 
     def _get_nested_value(self, keys: list[str]) -> dict:
         """
         Helper method to traverse nested dictionary structure.
-        
+
         Args:
             keys: List of keys representing the path to the value
-            
+
         Returns:
             The value at the specified path
-            
+
         Raises:
             KeyError: If any key in the path is not found
         """
         current = self._CONFIG
         for key in keys:
             if not isinstance(current, dict) or key not in current:
-                raise KeyError(f"Key path '{'.'.join(keys)}' not found in configuration.")
+                raise KeyError(
+                    f"Key path '{'.'.join(keys)}' not found in configuration."
+                )
             current = current[key]
         return current
-    
 
     def _get(self, name: str) -> Any:
         """
@@ -62,9 +63,8 @@ class Config:
         if "." not in name:
             return self._CONFIG[name]
         else:
-            keys = name.split('.')
+            keys = name.split(".")
             return self._get_nested_value(keys)
-
 
     def get_str(self, name: str) -> str:
         """Get a string configuration value."""
@@ -73,14 +73,12 @@ class Config:
             raise TypeError(f"Configuration value '{name}' is not a string")
         return value
 
-
     def get_int(self, name: str) -> int:
         """Get an integer configuration value."""
         value = self._get(name)
         if not isinstance(value, int):
             raise TypeError(f"Configuration value '{name}' is not an integer")
         return value
-
 
     def get_float(self, name: str) -> float:
         """Get a float configuration value."""
@@ -89,14 +87,12 @@ class Config:
             raise TypeError(f"Configuration value '{name}' is not a number")
         return float(value)
 
-
     def get_bool(self, name: str) -> bool:
         """Get a boolean configuration value."""
         value = self._get(name)
         if not isinstance(value, bool):
             raise TypeError(f"Configuration value '{name}' is not a boolean")
         return value
-
 
     def get_dict(self, name: Optional[str] = None) -> dict:
         """Get a dictionary configuration value."""
@@ -107,14 +103,12 @@ class Config:
             raise TypeError(f"Configuration value '{name}' is not a dictionary")
         return value
 
-
     def get_list(self, name: str) -> list:
         """Get a list configuration value."""
         value = self._get(name)
         if not isinstance(value, list):
             raise TypeError(f"Configuration value '{name}' is not a list")
         return value
-    
 
     def has_key(self, name: str) -> bool:
         """Check if a configuration key exists."""
@@ -123,7 +117,6 @@ class Config:
             return True
         except KeyError:
             return False
-
 
     @classmethod
     def camel_to_snake(cls, s: str) -> str:
@@ -137,11 +130,7 @@ class Config:
             str: The snake case string.
 
         """
-        return ''.join([
-                        '_' +
-                        c.lower() if c.isupper() else c for c in s
-                      ]).lstrip('_')
-
+        return "".join(["_" + c.lower() if c.isupper() else c for c in s]).lstrip("_")
 
     @classmethod
     def snake_to_camel(cls, s: str) -> str:
@@ -154,8 +143,7 @@ class Config:
         Returns:
             str: The CamelCase string.
         """
-        return ''.join(word.capitalize() for word in s.split('_'))
-
+        return "".join(word.capitalize() for word in s.split("_"))
 
     def to_json(self) -> str:
         """
@@ -166,7 +154,6 @@ class Config:
 
         """
         return json.dumps(self._CONFIG, indent=2)
-
 
     def __str__(self) -> str:
         """

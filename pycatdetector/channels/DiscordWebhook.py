@@ -4,6 +4,7 @@ from typing import Optional, Dict, Any
 from discord_webhook import DiscordWebhook as discord_webhook
 from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
+
 class DiscordWebhook(AbstractChannel):
     """
     A class representing a Discord webhook:
@@ -23,8 +24,8 @@ class DiscordWebhook(AbstractChannel):
             config (dict): A dictionary containing the webhook configuration.
         """
         self.logger = logging.getLogger(__name__)
-        self.url : str = str(config.get("url"))
-        self.message : str = str(config.get("message"))
+        self.url: str = str(config.get("url"))
+        self.message: str = str(config.get("message"))
 
     def get_name(self) -> str:
         """
@@ -43,29 +44,36 @@ class DiscordWebhook(AbstractChannel):
             content = custom_content["message"]
         else:
             content = self.message  # Fallback to default message
-        
-        content = str(datetime.now()) + ' - ' + content
+
+        content = str(datetime.now()) + " - " + content
 
         webhook = discord_webhook(url=self.url, content=content)
 
-        if custom_content \
-            and "image_data" in custom_content \
-            and "image_name" in custom_content:
-            
+        if (
+            custom_content
+            and "image_data" in custom_content
+            and "image_name" in custom_content
+        ):
+
             image_data = custom_content["image_data"]
             image_name = custom_content["image_name"]
-            
+
             webhook.add_file(file=image_data, filename=image_name)
-            
+
             self.logger.info(
-                "Request: URL:"  + self.url + ", Message: " + content
-                    + ", Image: " + image_name)
+                "Request: URL:"
+                + self.url
+                + ", Message: "
+                + content
+                + ", Image: "
+                + image_name
+            )
         else:
             self.logger.info(
-                "Request: URL:"  + self.url + ", Message: " + content
-                    + ", Image: None")   
-        
+                "Request: URL:" + self.url + ", Message: " + content + ", Image: None"
+            )
+
         response = webhook.execute()
-        self.logger.info("Response: " + repr(response))     
+        self.logger.info("Response: " + repr(response))
 
         return response.ok

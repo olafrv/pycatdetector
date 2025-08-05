@@ -4,6 +4,7 @@ from requests import post, get
 from typing import Optional, Dict, Any
 from .AbstractChannel import AbstractChannel  # Import the abstract base class
 
+
 class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
     """
     A class that provides functionality to speak a text message
@@ -11,13 +12,13 @@ class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
 
      HomeAssitant - API:
      - https://developers.home-assistant.io/docs/api/rest/
-    
+
      Google Translate: Text to MP3 served by Google Translate
      - https://www.home-assistant.io/integrations/google_translate/
-    
+
      Text to Speech (TTS): Play Audio File into Google Castable Device
      - https://www.home-assistant.io/integrations/tts/#service-speak
-    
+
      FAQ:
      - https://community.home-assistant.io/t/rest-api-service-calls-specify-target/537269  # noqa
 
@@ -98,7 +99,7 @@ class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
         words = text.split()
         num_words = len(words)
         words_per_minute = 150
-        words_per_second = words_per_minute/60
+        words_per_second = words_per_minute / 60
         speech_time = num_words / words_per_second
         return speech_time
 
@@ -111,7 +112,7 @@ class HaGoogleSpeak(AbstractChannel):  # Inherit from AbstractChannel
             # => Integrations => Google Cast
             "media_player_entity_id": self.media_player_entity_id,
             # Text message to be spoken
-            "message": message
+            "message": message,
         }
         response = self._call_api(url, "post", headers=self.headers, data=data)
         if not response.ok:

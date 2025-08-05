@@ -16,5 +16,7 @@ def test_main():
         print(repr(torch.cuda.get_device_name()))
         print(repr(torch.cuda.get_device_properties(0)))
     else:
-        print("CUDA not available"
-              + ", See tips at: https://github.com/olafrv/ai_chat_llama2")
+        print(
+            "CUDA not available"
+            + ", See tips at: https://github.com/olafrv/ai_chat_llama2"
+        )

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 from time import sleep
 from queue import SimpleQueue
 
+
 class Screener:
     """
     A class that represents a image screener for PyCatDetector.
@@ -49,16 +50,16 @@ class Screener:
         Shows the screener (Matplotlib window with images from the detector)
         """
         self.logger.info("Showing...")
-        
+
         try:
-            matplotlib.use('TkAgg')
+            matplotlib.use("TkAgg")
         except ImportError:
             self.logger.warning("TkAgg backend is not available, headless=true?")
             return
-        
+
         plt.ion()
         fig = plt.figure("PyCatDetector")
-        fig.canvas.mpl_connect('close_event', self.close)
+        fig.canvas.mpl_connect("close_event", self.close)
         ax = fig.add_subplot()
         imgs = self.images
         while not self.must_stop:
@@ -69,8 +70,9 @@ class Screener:
                 fig.canvas.draw()
                 fig.canvas.flush_events()
             else:
-                self.logger.debug("Sleeping %.2f, due to empty queue..."
-                                  % self.SLEEP_TIME)
+                self.logger.debug(
+                    "Sleeping %.2f, due to empty queue..." % self.SLEEP_TIME
+                )
                 sleep(self.SLEEP_TIME)
-        plt.close('all')
+        plt.close("all")
         self.logger.info("Closed.")

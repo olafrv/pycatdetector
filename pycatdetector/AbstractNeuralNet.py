@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from PIL import Image
 from typing import Optional
 
+
 class AbstractNeuralNet(ABC):
     @abstractmethod
     def analyze(self, image) -> dict:

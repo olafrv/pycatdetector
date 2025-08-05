@@ -36,8 +36,7 @@ class Encoder:
         Raises:
         - ValueError: If the frame is not a valid numpy array.
         """
-        return cv2.VideoWriter(
-            self.video_file, 0, 1, (width, height))
+        return cv2.VideoWriter(self.video_file, 0, 1, (width, height))
 
     def add_image(self, image: PIL.Image.Image | np.ndarray):
         """
@@ -59,10 +58,9 @@ class Encoder:
         if self.video_writer is None:
             height, width, _ = frame.shape
             self.video_writer = self.open(height, width)
-        
+
         self.video_writer.write(frame)
 
-        
     def load_image(self, filename: str) -> np.ndarray:
         """
         Loads an image from a file.
@@ -79,7 +77,7 @@ class Encoder:
             raise FileNotFoundError(f"Could not load image from {filename}")
         return image
 
-    def add_file(self, filename:str):
+    def add_file(self, filename: str):
         """
         Adds an image file to the video file.
 

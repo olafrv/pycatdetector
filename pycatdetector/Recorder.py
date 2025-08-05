@@ -6,7 +6,7 @@ from queue import SimpleQueue
 from urllib.parse import urlparse
 
 
-class Recorder (threading.Thread):
+class Recorder(threading.Thread):
 
     RECONNECT_DELAY = 10  # seconds
     CORRUPTED_DELAY = 1
@@ -23,9 +23,7 @@ class Recorder (threading.Thread):
         return self.images
 
     def run(self):
-        self.logger.info(
-            "Starting with Thread ID: %s" % (threading.get_native_id())
-        )
+        self.logger.info("Starting with Thread ID: %s" % (threading.get_native_id()))
         self._record()
         self.logger.info("Stopped.")
 
@@ -57,19 +55,19 @@ class Recorder (threading.Thread):
         # Alternative, here set the OpenCV log level to debug:
         # cv2.setLogLevel(5) # Set OpenCV log level to debug
 
-        while (not self.must_stop):
+        while not self.must_stop:
             conn_error = False
 
             cap = cv2.VideoCapture(self.rtspUrl, cv2.CAP_FFMPEG)
-            
+
             # Set buffer size and timeout properties to prevent stream timeout
             cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Reduce buffer to avoid lag
             cap.set(cv2.CAP_PROP_OPEN_TIMEOUT_MSEC, 15000)  # 15 second open timeout
-            cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 5000)    # 5 second read timeout
-            
+            cap.set(cv2.CAP_PROP_READ_TIMEOUT_MSEC, 5000)  # 5 second read timeout
+
             # Additional RTSP optimizations
             cap.set(cv2.CAP_PROP_FPS, 30)  # Try to set target FPS
-            
+
             if not cap.isOpened():
                 self.logger.error(
                     "Connection error to: " + self._mask_url(self.rtspUrl)
@@ -81,35 +79,34 @@ class Recorder (threading.Thread):
                 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 self.logger.info(
-                    "Connected successfully. Resolution: %dx%d, Reported FPS: %.1f" 
+                    "Connected successfully. Resolution: %dx%d, Reported FPS: %.1f"
                     % (width, height, fps)
                 )
                 reads = 0
                 total_reads = 0
                 total_writes = 0
                 corrupted_count = 0
-                frames_to_skip = fps-1
-                
-                self.logger.info("Connected. FPS: %i, SKIP: %i"
-                                 % (fps, frames_to_skip))
+                frames_to_skip = fps - 1
 
-                
+                self.logger.info("Connected. FPS: %i, SKIP: %i" % (fps, frames_to_skip))
 
-                while (not self.must_stop):
+                while not self.must_stop:
                     try:
                         ret, frame = cap.read()  # return numpy.array
                         reads += 1
                         total_reads += 1
-                        
+
                         # Check if read was successful
                         if not ret:
                             self.logger.warning("Failed to read frame from stream")
                             corrupted_count += 1
                             if corrupted_count > self.CORRUPTED_MAX_FRAMES:
-                                self.logger.error("Too many failed reads, reconnecting...")
+                                self.logger.error(
+                                    "Too many failed reads, reconnecting..."
+                                )
                                 break
                             continue
-                            
+
                         corrupted = frame is None or len(frame.shape) != 3
                     except Exception as e:
                         self.logger.error("Error reading frame: %s" % (e))
@@ -119,17 +116,21 @@ class Recorder (threading.Thread):
                         corrupted_count += 1
                         if corrupted_count > self.CORRUPTED_MAX_FRAMES:
                             self.logger.error(
-                                "Reached max amount of corrupted frames." +
-                                " Shape: " +
-                                str(frame.shape if frame is not None else "-")
+                                "Reached max amount of corrupted frames."
+                                + " Shape: "
+                                + str(frame.shape if frame is not None else "-")
                             )
-                            break    # retry conn
+                            break  # retry conn
                         else:
                             self.logger.warn(
-                                "Bad: %i/%i, R: %i, W: %i, Q: %i" %
-                                (corrupted_count, self.CORRUPTED_MAX_FRAMES,
-                                 total_reads, total_writes,
-                                 self.images.qsize())
+                                "Bad: %i/%i, R: %i, W: %i, Q: %i"
+                                % (
+                                    corrupted_count,
+                                    self.CORRUPTED_MAX_FRAMES,
+                                    total_reads,
+                                    total_writes,
+                                    self.images.qsize(),
+                                )
                             )
                             continue  # skip frame
                     else:
@@ -137,26 +138,31 @@ class Recorder (threading.Thread):
 
                         if reads % frames_to_skip == 0:
                             if greyscale:
-                                frame = cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+                                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
                             if saveImage:
                                 cv2.imwrite(
-                                    'recording/opencv/imgx-' +
-                                    str(total_reads) + '.jpg',
-                                    frame
+                                    "recording/opencv/imgx-"
+                                    + str(total_reads)
+                                    + ".jpg",
+                                    frame,
                                 )
                             if showVisor:
-                                cv2.imshow('frame', frame)
-                                if cv2.waitKey(1) & 0xFF == ord('q'):
+                                cv2.imshow("frame", frame)
+                                if cv2.waitKey(1) & 0xFF == ord("q"):
                                     break
 
                             reads = 0
                             total_writes += 1
                             self.images.put(frame)
                             self.logger.debug(
-                                "Bad: %i/%i, R: %i, W: %i, Q: %i" %
-                                (corrupted_count, self.CORRUPTED_MAX_FRAMES,
-                                 total_reads, total_writes,
-                                 self.images.qsize())
+                                "Bad: %i/%i, R: %i, W: %i, Q: %i"
+                                % (
+                                    corrupted_count,
+                                    self.CORRUPTED_MAX_FRAMES,
+                                    total_reads,
+                                    total_writes,
+                                    self.images.qsize(),
+                                )
                             )
 
             cap.release()
