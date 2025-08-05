@@ -152,7 +152,8 @@ make test.coverage.report # check test coverage after runtime
 # GitHub Release
 # See Makefile for required GITHUB_* required variables
 # Adjust METADATA file before running the following commands
-make github.release       # build, test, push and create a new release
+# make github.* perform code formatting, build, test, push and release
+make github.release       # create a new github package release
 ```
 
 # References

@@ -2,6 +2,7 @@
 
 * Bug: Fixed missing notification window configuration in `config.example.yaml`
 * Blinkstick Square Channel: https://github.com/olafrv/pycatdetector/issues/2
+* Added black for code formatting
 
 # 1.2.0
 
