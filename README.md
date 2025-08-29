@@ -89,8 +89,6 @@ cat /proc/cpuinfo | grep -i avx
 
 ### PyTorch
 
-Run the following to check if AVX is enabled: [test_aaa_torch.py](./pycatdetector/tests/test_aaa_torch.py).
-
 See more information on: \
 https://pytorch.org/get-started/locally/#windows-verification
 
@@ -171,25 +169,10 @@ make github.release       # create a new github package release
 * https://pytorch.org/vision/main/models/faster_rcnn.html
 * https://pytorch.org/vision/stable/auto_examples/others/plot_visualization_utils.html
 
-## GluonCV (Deprecated since v1.2.0)
-* https://cv.gluon.ai/
-* https://cv.gluon.ai/install.html
-* https://cv.gluon.ai/tutorials/index.html
-* https://cv.gluon.ai/build/examples_detection/demo_ssd.html
-* https://github.com/dmlc/gluon-cv
-* https://mxnet.apache.org/versions/0.12.1/tutorials/gluon/ndarray.html
-* https://cv.gluon.ai/_modules/gluoncv/data/transforms/presets/ssd.html
-* https://cv.gluon.ai/api/model_zoo.html
-
-## Apache MXNet (Deprecated since v1.2.0)
-* https://mxnet.apache.org/versions/0.11.0/
-* https://mxnet.apache.org/versions/1.6/api/python/docs/tutorials/packages/ndarray/gotchas_numpy_in_mxnet.html
-* https://mxnet.apache.org/versions/1.9.1/api/python/docs/api/mxnet/image/index.html#mxnet.image.imdecode
-
-## PIL
+## Pillow - a.k.a. PIL
 * https://pillow.readthedocs.io/en/stable/reference/Image.html#PIL.Image.frombytes
 
-## Deep Learning
+## Deep Learning - Computer Vision
 * https://d2l.ai/chapter_computer-vision/bounding-box.html
 
 ## PEP 8 – Style Guide for Python Code
