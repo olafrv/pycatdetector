@@ -4,7 +4,7 @@ snakeviz==2.2.0
 Nuitka==2.7.12
 ordered-set==4.1.0
 # make test
-pytest==8.4.1
+pytest==9.0.3
 coverage==7.9.2
 # make fmt
 black==26.3.1
