@@ -1,12 +1,14 @@
 #!/usr/bin/make
 
-# Environment Variables:
-# - GITHUB_USER
-# - GITHUB_TOKEN
+# GitHub auth is read from the git credential helper (see `git config
+# credential.helper`), populated by a normal `git push` to this repo's
+# origin. The token needs `repo` + `write:packages` scopes (classic PAT)
+# to cover git push, ghcr.io push, and the releases API alike.
 
 NAME=$(shell cat METADATA | grep NAME | cut -d"=" -f2)
 VERSION:=$(shell cat METADATA | grep VERSION | cut -d"=" -f2)
 REPOSITORY="${NAME}"
+GITHUB_USER:=$(shell git remote get-url origin | sed -E 's#.*github\.com[:/]+([^/]+)/.*#\1#')
 IMAGE_NAME="ghcr.io/${GITHUB_USER}/${REPOSITORY}"
 IMAGE_APP_DIR="/opt/${REPOSITORY}"
 GITHUB_API="https://api.github.com/repos/${GITHUB_USER}/${REPOSITORY}"
@@ -14,7 +16,8 @@ GITHUB_API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","n
 CPUS=2
 
 env:
-	@ env | grep -E "GITHUB_" || (echo "GITHUB_ variables not set." && exit 1)
+	@ grep -q '@github.com' ~/.git-credentials 2>/dev/null \
+		|| (echo "No GitHub credential cached. Run 'git push' once to cache one." && exit 1)
 
 metadata: 
 	@ echo "METADATA: NAME=${NAME}, VERSION=${VERSION}"
@@ -25,9 +28,10 @@ install: install.venv
 
 # customize!
 install.dev: install.venv
+	@ command -v patchelf >/dev/null || (echo "Missing patchelf. Install manually: sudo apt install patchelf" && exit 1)
+	@ command -v ccache >/dev/null || (echo "Missing ccache. Install manually: sudo apt install ccache" && exit 1)
 	@ . venv/bin/activate \
-		&& pip3 install -Ur requirements-dev.txt \
-		&& sudo apt install -y patchelf ccache
+		&& pip3 install -Ur requirements-dev.txt
 
 # customize!
 install.venv: install.base
@@ -37,15 +41,17 @@ install.venv: install.base
 		&& pip3 install -Ur requirements.txt \
 		&& pip3 install --upgrade pip
 
+# Read-only prerequisite check (no sudo, no apt, no system mutation).
+# Fails fast with an actionable message instead of installing anything,
+# so `make test`/`make run`/etc. stay fast and don't silently require root.
 install.base:
-	@ sudo apt update \
-		&& sudo apt install -y tzdata \
-		&& sudo apt install -y python3 \
-		&& sudo apt install -y python3.12-venv python3-dev python3-setuptools \
-		&& sudo apt install -y --no-install-recommends build-essential gcc \
-		&& sudo apt install -y python3-pip \
-		&& sudo apt install -y python3-tk \
-		&& sudo apt install -y ffmpeg fonts-dejavu jq
+	@ command -v python3 >/dev/null || (echo "Missing python3. Install manually: sudo apt install python3" && exit 1)
+	@ python3 -m venv --help >/dev/null 2>&1 || (echo "Missing python3-venv. Install manually: sudo apt install python3.12-venv" && exit 1)
+	@ python3 -c "import ensurepip" 2>/dev/null || (echo "Missing python3-pip/ensurepip. Install manually: sudo apt install python3-pip" && exit 1)
+	@ python3 -c "import tkinter" 2>/dev/null || (echo "Missing python3-tk. Install manually: sudo apt install python3-tk" && exit 1)
+	@ command -v gcc >/dev/null || (echo "Missing build-essential/gcc. Install manually: sudo apt install build-essential gcc" && exit 1)
+	@ command -v ffmpeg >/dev/null || (echo "Missing ffmpeg. Install manually: sudo apt install ffmpeg" && exit 1)
+	@ command -v jq >/dev/null || (echo "Missing jq. Install manually: sudo apt install jq" && exit 1)
 
 uninstall: uninstall.venv clean
 
@@ -62,7 +68,7 @@ clean:
 	@ rm -rf build logs
 
 # customize!
-check-config:
+check-config: install.venv
 	@ . venv/bin/activate \
 		&& python3 main.py --check-config | jq
 
@@ -76,7 +82,7 @@ build: install.dev
 			main.py
 	@ chmod +x build/main.bin
 
-package.outdated:
+package.outdated: install.dev
 	@ . venv/bin/activate \
 		&& pip3 list --outdated > requirements.new && deactivate
 	@ grep -f requirements.txt requirements.new > requirements.outdated || true
@@ -84,7 +90,7 @@ package.outdated:
 	@ rm -f requirements.new && ls -ls *.outdated || true
 
 # customize!
-run:
+run: install.venv
 	@ mkdir -p logs \
 		&& . venv/bin/activate \
 		&& python3 main.py
@@ -92,13 +98,13 @@ run:
 run.bin:
 	@ ./build/main.bin
 
-test:
+test: install.dev
 	# https://docs.pytest.org/
 	@ . venv/bin/activate \
 		&& pytest -s --disable-warnings ${NAME}/tests/
 
 # customize!
-coverage:
+coverage: install.dev
 	# https://coverage.readthedocs.io
 	# The trap 'true' INT command tells the shell to ignore SIGINT (Ctrl+C) 
 	# signals, prevents 'make' to stop after the GUI is closed.
@@ -108,7 +114,7 @@ coverage:
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
 
 # customize!
-coverage.test:
+coverage.test: install.dev
 	@ . venv/bin/activate \
 		&& coverage run -m pytest -s --disable-warnings ${NAME}/tests/ \
 		&& coverage report --show-missing ${NAME}/*.py ${NAME}/channels/*.py
@@ -173,17 +179,19 @@ github.test: github.build test
 github.push: github.test
 	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
 	# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-	# https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret
-	@ echo ${GITHUB_TOKEN} | docker login ghcr.io --username ${GITHUB_USER} --password-stdin
-	@ docker push ${IMAGE_NAME}:${VERSION}
-	@ docker push ${IMAGE_NAME}:latest
+	# Token is pulled from the git credential store, not an env var.
+	@ TOKEN=$$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p') \
+		&& echo "$${TOKEN}" | docker login ghcr.io --username ${GITHUB_USER} --password-stdin \
+		&& docker push ${IMAGE_NAME}:${VERSION} \
+		&& docker push ${IMAGE_NAME}:latest
 
 github.release: github.push
 	# Create and push tag
 	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
 	git tag ${VERSION} && git push origin ${VERSION}
 	# https://docs.github.com/rest/reference/repos#create-a-release
-	@echo '${GITHUB_API_JSON}' | curl \
-		-H 'Accept: application/vnd.github+json' \
-		-H 'Authorization: token ${GITHUB_TOKEN}' \
-		-d @- ${GITHUB_API}/releases
+	@ TOKEN=$$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p') \
+		&& echo '${GITHUB_API_JSON}' | curl \
+			-H 'Accept: application/vnd.github+json' \
+			-H "Authorization: token $${TOKEN}" \
+			-d @- ${GITHUB_API}/releases
