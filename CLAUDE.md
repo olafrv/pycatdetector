@@ -40,11 +40,14 @@ on first use.
 ## Docker
 
 `docker-compose.yaml` runs the `pycatdetector` service from
-`ghcr.io/olafrv/pycatdetector:latest`. After a release or a local
-`requirements.txt` change, pick it up with:
-```
-docker compose build && docker compose up -d
-```
+`ghcr.io/olafrv/pycatdetector:latest`. Use the Makefile targets rather than
+raw `docker compose` commands:
+
+- After a release (`make github.release` already pushed to ghcr.io):
+  `make docker.restart` — pulls the new image and recreates the container.
+- To test a local change before releasing (e.g. a `requirements.txt` bump):
+  `make docker.build` (builds and tags `:latest` locally) then
+  `docker compose up -d` (uses the local tag, no pull).
 
 ## Credential Hygiene
 
