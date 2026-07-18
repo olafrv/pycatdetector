@@ -164,8 +164,8 @@ docker.stop:
 
 docker.restart: docker.stop docker.start
 
-github.formatter:
-	black .
+github.formatter: install.dev
+	@ . venv/bin/activate && black .
 
 github.check_commit: github.formatter
 	# Fail if uncommited changes
