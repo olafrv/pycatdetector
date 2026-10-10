@@ -14,10 +14,10 @@ from pycatdetector.Detector import Detector
 from pycatdetector.Notifier import Notifier
 from pycatdetector.Screener import Screener
 
-recorder: Recorder
-detector: Detector
-notifier: Notifier
-screener: Screener
+recorder: Recorder | None = None
+detector: Detector | None = None
+notifier: Notifier | None = None
+screener: Screener | None = None
 logger: logging.Logger
 
 
@@ -37,6 +37,7 @@ def main():
     logger.info("Python Sys Prefix: " + sys.prefix)
 
     signal.signal(signal.SIGINT, handler)
+    signal.signal(signal.SIGTERM, handler)  # docker stop
 
     recorder = Recorder(config.get_str("rtsp_url"))
 
@@ -78,7 +79,7 @@ def main():
 
 def handler(signum, frame):
     global recorder, detector, notifier, screener
-    if signum == signal.SIGINT:  # CTRL + C
+    if signum in (signal.SIGINT, signal.SIGTERM):  # CTRL + C, docker stop
         if screener is not None:
             screener.close()
         if notifier is not None:

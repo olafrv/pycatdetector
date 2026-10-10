@@ -17,6 +17,8 @@ services:
     - ./videos:/opt/pycatdetector/videos:rw
     - ./models:/root/.cache/torch:rw
     restart: always
+    # Detector needs a few seconds to close the current video on shutdown.
+    stop_grace_period: 30s
     deploy:
         resources:
             limits:
