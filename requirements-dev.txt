@@ -7,4 +7,4 @@ ordered-set==4.1.0
 pytest==9.0.3
 coverage==7.9.2
 # make fmt
-black==26.3.1
+black==26.10.1
