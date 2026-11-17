@@ -1,3 +1,21 @@
+# 1.3.0
+
+* Docker: the container runs as non-root
+  * Runs as uid/gid 1000 (`ubuntu` user) with all capabilities dropped and
+    `no-new-privileges`; app code and the venv are read-only to it
+  * The torch model cache moved from `/root/.cache/torch` to
+    `/opt/pycatdetector/models` (`TORCH_HOME`)
+* Docker: images are built locally, no longer published to ghcr.io
+  * `make docker.start` / `docker.restart` build the image from the checkout
+    (`pycatdetector:<VERSION>` and `:latest`) instead of pulling it
+* Releases are git tags only: `make github.release` no longer pushes an
+  image or creates a GitHub Release
+* Development dependencies: black 26.3.1 → 26.10.1
+* Upgrade notes
+  * `config.yaml`, `logs/`, `videos/` and `models/` must be owned by uid 1000
+    (`sudo chown -R 1000:1000 config.yaml logs videos models`)
+  * The ghcr.io image is no longer updated: use `make docker.start`
+
 # 1.2.4
 
 * Bug: Fixed graceful shutdown on `docker stop`
