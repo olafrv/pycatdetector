@@ -1,3 +1,36 @@
+# 1.2.4
+
+* Bug: Fixed graceful shutdown on `docker stop`
+  * The signal handler raised `NameError` in headless mode (`screener` was
+    never assigned), so the threads kept running until Docker sent SIGKILL
+    (nightly at 23:59, and on Ctrl+C)
+  * Globals now start as `None` and SIGTERM is handled as well as SIGINT,
+    so `docker stop` closes the current video and exits 0
+  * Added `stop_grace_period: 30s` to `docker-compose.yaml` so the detector
+    has time to close the video
+
+# 1.2.3
+
+* Updated PyTorch from 2.9.1 → 2.13.0 and torchvision 0.24.1 → 0.28.0
+* Added `CLAUDE.md` documenting the release process, credential setup and
+  the Makefile Docker targets
+
+# 1.2.2
+
+* Updated PyTorch from 2.7.1 → 2.9.1 and torchvision 0.22.1 → 0.24.1
+* Development dependencies: black 25.1.0 → 26.3.1, pytest 8.4.1 → 9.0.3
+* Makefile
+  * `install.base` is now a read-only prerequisite check that fails with an
+    install command, instead of running `sudo apt install` on every
+    `make test`/`run`/`check-config`
+  * `github.push`/`github.release` read the GitHub token from the git
+    credential store instead of `GITHUB_USER`/`GITHUB_TOKEN` env vars
+  * `github.formatter` uses the venv's black; black runs before every release
+* Code: applied black formatting, `DiscordWebhook` enforces `str` for `url`
+  and `message`, `Recorder.record()` made private (`_record()`), green is the
+  first bounding-box color
+* Docs: removed the deprecated GluonCV/MXNet references from the README
+
 # 1.2.1
 
 * Bug: Fixed missing notification window configuration in `config.example.yaml`
