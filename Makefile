@@ -2,17 +2,16 @@
 
 # GitHub auth is read from the git credential helper (see `git config
 # credential.helper`), populated by a normal `git push` to this repo's
-# origin. The token needs `repo` + `write:packages` scopes (classic PAT)
-# to cover git push, ghcr.io push, and the releases API alike.
+# origin. The token needs the `repo` scope (git push only).
+#
+# Docker images are built and tagged locally only; nothing is pushed to a
+# registry (avoids GitHub package limits on a free account).
 
 NAME=$(shell cat METADATA | grep NAME | cut -d"=" -f2)
 VERSION:=$(shell cat METADATA | grep VERSION | cut -d"=" -f2)
 REPOSITORY="${NAME}"
-GITHUB_USER:=$(shell git remote get-url origin | sed -E 's#.*github\.com[:/]+([^/]+)/.*#\1#')
-IMAGE_NAME="ghcr.io/${GITHUB_USER}/${REPOSITORY}"
+IMAGE_NAME=${REPOSITORY}
 IMAGE_APP_DIR="/opt/${REPOSITORY}"
-GITHUB_API="https://api.github.com/repos/${GITHUB_USER}/${REPOSITORY}"
-GITHUB_API_JSON:=$(shell printf '{"tag_name": "%s","target_commitish": "main","name": "%s","body": "Version %s","draft": false,"prerelease": false}' ${VERSION} ${VERSION} ${VERSION})
 CPUS=2
 
 env:
@@ -150,11 +149,11 @@ docker.run:
 		-v "${PWD}/config.yaml:${IMAGE_APP_DIR}/config.yaml:ro" \
     	-v "${PWD}/logs:${IMAGE_APP_DIR}/logs" \
 		-v "${PWD}/videos:${IMAGE_APP_DIR}/videos" \
-		-v "${PWD}/models:/root/.cache/torch" \
+		-v "${PWD}/models:${IMAGE_APP_DIR}/models" \
 		${IMAGE_NAME}:${VERSION}
 
-docker.start:
-	@ docker compose pull && docker compose up -d
+docker.start: docker.build
+	@ docker compose up -d
 
 docker.sh:
 	@ docker exec -it ${NAME} /bin/bash
@@ -176,22 +175,10 @@ github.build: github.check_commit docker.build
 
 github.test: github.build test
 
-github.push: github.test
-	# https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry
-	# https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token
-	# Token is pulled from the git credential store, not an env var.
-	@ TOKEN=$$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p') \
-		&& echo "$${TOKEN}" | docker login ghcr.io --username ${GITHUB_USER} --password-stdin \
-		&& docker push ${IMAGE_NAME}:${VERSION} \
-		&& docker push ${IMAGE_NAME}:latest
-
-github.release: github.push
-	# Create and push tag
+# A release is just the git tag ${VERSION}: no image push, no GitHub
+# release. Images are built locally on each host (`make docker.start`);
+# release notes live in CHANGELOG.md.
+github.release: github.test
+	# Create and push the (annotated) tag
 	git tag -d ${VERSION} && git push --delete origin ${VERSION} || /bin/true
-	git tag ${VERSION} && git push origin ${VERSION}
-	# https://docs.github.com/rest/reference/repos#create-a-release
-	@ TOKEN=$$(printf 'protocol=https\nhost=github.com\n\n' | git credential fill | sed -n 's/^password=//p') \
-		&& echo '${GITHUB_API_JSON}' | curl \
-			-H 'Accept: application/vnd.github+json' \
-			-H "Authorization: token $${TOKEN}" \
-			-d @- ${GITHUB_API}/releases
+	git tag -a ${VERSION} -m "Version ${VERSION}" && git push origin ${VERSION}

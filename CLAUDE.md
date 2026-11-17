@@ -2,25 +2,24 @@
 
 ## Release Process
 
-Releases are cut via `make github.release`, which chains: black format check →
-git-clean check → docker build → full test suite → docker push (ghcr.io) →
-git tag → GitHub release creation.
+A release is just a git tag. `make github.release` chains: black format
+check → git-clean check → docker build → full test suite → create and push the
+annotated tag `<VERSION>`. No GitHub Release is created and no Docker image is
+pushed to any registry (ghcr.io was dropped to stay within free-account package
+limits); each host builds locally. Release notes live in `CHANGELOG.md`.
 
 To cut a release:
-1. Bump `VERSION` in `METADATA`.
+1. Bump `VERSION` in `METADATA` and add its section to `CHANGELOG.md`.
 2. Commit and push to `main`.
 3. Run `make github.release`.
 
 ### Authentication
 
-No env vars needed. `GITHUB_USER` is derived from the `origin` remote URL;
-the GitHub token is read from the git credential store (`~/.git-credentials`)
-at the moment it's needed (ghcr.io login, GitHub Releases API) — never
-exported in plaintext, never echoed. The token needs `repo` +
-`write:packages` scopes (classic PAT — fine-grained PATs don't reliably
-support GHCR pushes).
+No env vars or API tokens are used by the Makefile; the only GitHub access
+is `git push` (of `main` and the tag), authenticated by the git credential
+helper. The token needs the `repo` scope.
 
-If push/release auth fails with a 403, the stored credential is likely
+If a push fails with a 403, the stored credential is likely
 stale/rotated:
 ```
 printf 'protocol=https\nhost=github.com\n\n' | git credential reject
@@ -39,15 +38,16 @@ on first use.
 
 ## Docker
 
-`docker-compose.yaml` runs the `pycatdetector` service from
-`ghcr.io/olafrv/pycatdetector:latest`. Use the Makefile targets rather than
-raw `docker compose` commands:
+`docker-compose.yaml` runs the `pycatdetector` service from the local image
+`pycatdetector:latest`. Use the Makefile targets rather than raw
+`docker compose` commands:
 
-- After a release (`make github.release` already pushed to ghcr.io):
-  `make docker.restart` — pulls the new image and recreates the container.
-- To test a local change before releasing (e.g. a `requirements.txt` bump):
-  `make docker.build` (builds and tags `:latest` locally) then
-  `docker compose up -d` (uses the local tag, no pull).
+- `make docker.start` / `make docker.restart` — builds the image from the
+  current checkout (`docker.build` tags `:<VERSION>` and `:latest`), then
+  recreates the container. Nothing is pulled or pushed.
+- The container runs as uid/gid 1000 (`user:` in compose and `USER` in the
+  Dockerfile) with all capabilities dropped; the mounted `config.yaml`,
+  `logs/`, `videos/` and `models/` must be owned by uid 1000.
 
 ## Credential Hygiene
 
