@@ -1,10 +1,14 @@
 services:
   pycatdetector:
     build: .
-    image: ghcr.io/olafrv/pycatdetector:latest
+    # Built and tagged locally by `make docker.build` (never pulled/pushed)
+    image: pycatdetector:latest
     container_name: pycatdetector
     environment:
       - TZ=Europe/Berlin
+      # Also set in the Dockerfile; kept here so images built before the
+      # non-root change find the models at the new mount path too.
+      - TORCH_HOME=/opt/pycatdetector/models
       # Used for debugging OpenCV issues with versions upgrade
       # Uncomment the following lines to enable detailed OpenCV logging
       # Modify also the Recorder.py to pick up OpenCV debugging options
@@ -15,8 +19,16 @@ services:
     - ./config.yaml:/opt/pycatdetector/config.yaml:ro
     - ./logs:/opt/pycatdetector/logs:rw
     - ./videos:/opt/pycatdetector/videos:rw
-    - ./models:/root/.cache/torch:rw
+    - ./models:/opt/pycatdetector/models:rw
     restart: always
+    # Run as uid/gid 1000 (owner of the mounted dirs). Also set by USER in the
+    # Dockerfile; repeated here so older root-based images run non-root too.
+    # Needed with cap_drop ALL: root without CAP_DAC_OVERRIDE can't write them.
+    user: "1000:1000"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     # Detector needs a few seconds to close the current video on shutdown.
     stop_grace_period: 30s
     deploy:

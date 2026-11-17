@@ -117,7 +117,7 @@ make run             # with python3 interpreter
 curl -fsSL https://get.docker.com -o get-docker.sh; sh get-docker.sh
 make docker.build    # build docker image with python requirements
 make docker.run      # A) without compose, and removed after stopped
-make docker.start    # B.1) with compose running in background as service
+make docker.start    # B.1) build image locally, run with compose in background
 make docker.stop     # B.2) stop the composed container service
 make docker.restart  # B.3) restart the composed container service
 make docker.sh       # open bash in the container service
@@ -150,8 +150,8 @@ make test.coverage.report # check test coverage after runtime
 # GitHub Release
 # See Makefile for required GITHUB_* required variables
 # Adjust METADATA file before running the following commands
-# make github.* perform code formatting, build, test, push and release
-make github.release       # create a new github package release
+# make github.* perform code formatting, build, test and tagging
+make github.release       # tag and push a new version (see CHANGELOG.md)
 ```
 
 # References
